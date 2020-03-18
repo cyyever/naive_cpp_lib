@@ -7,11 +7,7 @@ include(cmake/all.cmake)
 # test
 option(BUILD_TEST "Build test" ON)
 
-if(MSVC)
-  option(BUILD_FUZZING "Build fuzzing" OFF)
-else()
-  option(BUILD_FUZZING "Build fuzzing" ON)
-endif()
+option(BUILD_FUZZING "Build fuzzing" OFF)
 
 set(submodule_names log util)
 set(submodule_libs)
