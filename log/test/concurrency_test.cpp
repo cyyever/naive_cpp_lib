@@ -12,7 +12,7 @@
 #include "../src/log.hpp"
 
 TEST_CASE("concurrency") {
-  cyy::cxx::log::setup_file_logger(".", "file_logger",
+  cyy::cxx_lib::log::setup_file_logger(".", "file_logger",
                                  spdlog::level::level_enum::info);
   std::vector<std::thread> thds;
 

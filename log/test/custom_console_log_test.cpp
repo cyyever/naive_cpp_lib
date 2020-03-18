@@ -11,7 +11,7 @@
 #include "../src/log.hpp"
 
 TEST_CASE("custom console logger") {
-  cyy::cxx::log::console_logger_name = "custom name";
+  cyy::cxx_lib::log::console_logger_name = "custom name";
   LOG_ERROR("hello world.....error");
   LOG_INFO("hello world.....info");
   LOG_DEBUG("hello world.....debug");

@@ -5,10 +5,14 @@
  * \date 2016-04-18
  */
 
-/* #include <spdlog/details/registry.h> */
-/* #include <spdlog/sinks/rotating_file_sink.h> */
-/* #include <spdlog/sinks/stdout_color_sinks.h> */
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+
+#if __has_include(<unistd.h>)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include "log.hpp"
 namespace {
@@ -49,7 +53,7 @@ namespace {
   } initer;
 } // namespace
 
-namespace cyy::cxx::log {
+namespace cyy::cxx_lib::log {
 
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
@@ -58,7 +62,8 @@ namespace cyy::cxx::log {
     for (int l = static_cast<int>(level);
          l <= static_cast<int>(level_enum::err); l++) {
       auto logger_name =
-          name + "-" + spdlog::level::to_str(static_cast<level_enum>(l));
+          name + "-" +
+          spdlog::level::to_short_c_str(static_cast<level_enum>(l));
       auto file_logger = ::spdlog::rotating_logger_mt(
           logger_name, get_full_path(log_dir, logger_name), max_file_size,
           max_file_num);
@@ -71,4 +76,4 @@ namespace cyy::cxx::log {
   void setup_console_logger() {
     static auto logger1 = spdlog::stdout_color_mt(console_logger_name);
   }
-} // namespace cyy::cxx::log
+} // namespace cyy::cxx_lib::log

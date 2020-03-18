@@ -20,8 +20,8 @@ TEST_CASE("default console logger") {
 TEST_CASE("single message") { LOG_ERROR("{} {}"); }
 
 TEST_CASE("file logger") {
-  cyy::cxx::log::setup_file_logger(".", "file_logger",
-                                 spdlog::level::level_enum::info);
+  cyy::cxx_lib::log::setup_file_logger(".", "file_logger",
+                                       spdlog::level::level_enum::info);
 
   LOG_ERROR("hello world.....error");
   LOG_INFO("hello world.....info");

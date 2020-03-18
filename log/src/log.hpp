@@ -11,11 +11,13 @@
 #define FMT_HEADER_ONLY
 #include <spdlog/spdlog.h>
 
-namespace cyy::cxx::log {
+#if __has_include(<source_location>)
+#include <source_location>
+#else
+// copy from <experimental/source_location> and modify some code to make clang
+// success.
 
-  // copy from <experimental/source_location> and modify some code to make clang
-  // success.
-
+namespace std {
   struct source_location {
 
     // 14.1.2, source_location creation
@@ -42,6 +44,10 @@ namespace cyy::cxx::log {
     const char *_M_file;
     uint_least32_t _M_line;
   };
+} // namespace std
+#endif
+
+namespace cyy::cxx_lib::log {
 
   inline std::string console_logger_name = "cyy_cxx";
 
@@ -54,7 +60,7 @@ namespace cyy::cxx::log {
 
   template <typename... Args>
   void log_message(spdlog::level::level_enum level,
-                   const source_location &location, std::string fmt,
+                   const std::source_location &location, std::string fmt,
                    Args &&... args) {
     setup_console_logger();
 
@@ -66,24 +72,22 @@ namespace cyy::cxx::log {
     });
   }
 
-} // namespace cyy::cxx::log
+} // namespace cyy::cxx_lib::log
 
 #define LOG_DEBUG(...)                                                         \
-  cyy::cxx::log::log_message(spdlog::level::level_enum::debug,                 \
-                             cyy::cxx::log::source_location::current(),        \
-                             __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::debug,             \
+                                 std::source_location::current(), __VA_ARGS__)
 
 #define LOG_INFO(...)                                                          \
-  cyy::cxx::log::log_message(spdlog::level::level_enum::info,                  \
-                             cyy::cxx::log::source_location::current(),        \
-                             __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::info,              \
+                                 std::source_location::current(), __VA_ARGS__)
 
 #define LOG_WARN(...)                                                          \
-  cyy::cxx::log::log_message(spdlog::level::level_enum::warn,                  \
-                             cyy::cxx::log::source_location::current(),        \
-                             __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(                                              \
+      spdlog::level::level_enum::warn,                                         \
+      std::source_location::current(), __VA_ARGS__)
 
 #define LOG_ERROR(...)                                                         \
-  cyy::cxx::log::log_message(spdlog::level::level_enum::err,                   \
-                             cyy::cxx::log::source_location::current(),        \
-                             __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(                                              \
+      spdlog::level::level_enum::err,                                          \
+      std::source_location::current(), __VA_ARGS__)
