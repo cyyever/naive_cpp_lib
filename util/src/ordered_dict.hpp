@@ -11,7 +11,7 @@
 #include <utility>
 namespace cyy::cxx_lib {
 
-  template <class Key, class T> class unordered_dict {
+  template <class Key, class T> class ordered_dict {
   public:
     using key_type = Key;
     using mapped_type = T;
@@ -23,11 +23,15 @@ namespace cyy::cxx_lib {
 
     bool empty() const noexcept { return data.empty(); }
     auto size() const noexcept { return data.size(); }
+    void clear() noexcept {
+      data.clear();
+      data_index.clear();
+    }
     template <class... Args> bool emplace(Key &&key, Args &&... args) {
       auto [it, inserted] =
           data_index.emplace(std::forward<Key>(key), data.end());
       if (!inserted && !move_to_end_in_update) {
-        *(it->second).second = mapped_type(std::forward<Args>(args)...);
+        (*(it->second)).second = mapped_type(std::forward<Args>(args)...);
         return false;
       }
       data.emplace_back(it->first, mapped_type(std::forward<Args>(args)...));
