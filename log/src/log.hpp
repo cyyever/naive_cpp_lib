@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <string>
-#define FMT_HEADER_ONLY
 #include <spdlog/spdlog.h>
+#include <string>
 
 #if __has_include(<source_location>)
 #include <source_location>
