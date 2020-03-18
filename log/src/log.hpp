@@ -83,11 +83,9 @@ namespace cyy::cxx_lib::log {
                                  std::source_location::current(), __VA_ARGS__)
 
 #define LOG_WARN(...)                                                          \
-  cyy::cxx_lib::log::log_message(                                              \
-      spdlog::level::level_enum::warn,                                         \
-      std::source_location::current(), __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::warn,              \
+                                 std::source_location::current(), __VA_ARGS__)
 
 #define LOG_ERROR(...)                                                         \
-  cyy::cxx_lib::log::log_message(                                              \
-      spdlog::level::level_enum::err,                                          \
-      std::source_location::current(), __VA_ARGS__)
+  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::err,               \
+                                 std::source_location::current(), __VA_ARGS__)

@@ -24,6 +24,6 @@ TEST_CASE("ordered_dict") {
     container.emplace(1, "hello");
     auto it = container.find(1);
     CHECK_NE(it, container.end());
-    CHECK_EQ(it->second, "hello");
+    CHECK_EQ(*it, "hello");
   }
 }

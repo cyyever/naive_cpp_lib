@@ -18,8 +18,23 @@ namespace cyy::cxx_lib {
     using data_list_type = std::list<std::pair<key_type, mapped_type>>;
     using data_index_type =
         std::unordered_map<key_type, typename data_list_type::iterator>;
-    using iterator = typename data_list_type::iterator;
-    using const_iterator = typename data_list_type::const_iterator;
+    struct iterator : public data_list_type::iterator {
+      iterator(typename data_list_type::iterator rhs)
+          : data_list_type::iterator{rhs} {}
+      auto &operator*() const {
+        return data_list_type::iterator::operator*().second;
+      }
+    };
+
+    struct const_iterator : public data_list_type::const_iterator {
+      const_iterator(typename data_list_type::const_iterator rhs)
+          : data_list_type::const_iterator{rhs} {}
+      const auto &operator*() const {
+        return data_list_type::const_iterator::operator*().second;
+      }
+    };
+    /* using iterator = typename data_list_type::iterator; */
+    /* using const_iterator = typename data_list_type::const_iterator; */
 
     bool empty() const noexcept { return data.empty(); }
     auto size() const noexcept { return data.size(); }
@@ -52,18 +67,18 @@ namespace cyy::cxx_lib {
       }
       return true;
     }
-    auto begin() noexcept { return data.begin(); }
-    auto begin() const noexcept { return data.begin(); }
-    auto cbegin() const noexcept { return data.cbegin(); }
-    auto end() noexcept { return data.end(); }
-    auto end() const noexcept { return data.end(); }
-    auto cend() const noexcept { return data.cend(); }
+    auto begin() noexcept { return iterator(data.begin()); }
+    auto begin() const noexcept { return const_iterator(data.begin()); }
+    auto cbegin() const noexcept { return const_iterator(data.cbegin()); }
+    auto end() noexcept { return iterator(data.end()); }
+    auto end() const noexcept { return const_iterator(data.end()); }
+    auto cend() const noexcept { return const_iterator(data.cend()); }
     iterator find(const Key &key) {
       auto it = data_index.find(key);
       if (it == data_index.end()) {
         return data.end();
       }
-      return it->second;
+      return iterator(it->second);
     }
 
     void move_to_end(iterator it) {
