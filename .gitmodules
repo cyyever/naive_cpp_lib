@@ -1,0 +1,4 @@
+[submodule "cmake"]
+	path = cmake
+	url = git@github.com:cyyever/cmake.git
+	branch = master
