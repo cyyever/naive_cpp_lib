@@ -5,6 +5,7 @@
  * \date 2016-04-18
  */
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -13,6 +14,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
+#include <ctime>
 
 #include "log.hpp"
 namespace {
