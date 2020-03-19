@@ -40,9 +40,9 @@ namespace cyy::cxx_lib {
       data.clear();
       data_index.clear();
     }
-    template <class... Args> bool emplace(Key &&key, Args &&... args) {
+    template <class KeyArg,class... Args> bool emplace(KeyArg &&key, Args &&... args) {
       auto [it, inserted] =
-          data_index.emplace(std::forward<Key>(key), data.end());
+          data_index.emplace(std::forward<KeyArg>(key), data.end());
       if (!inserted && !move_to_end_in_update) {
         (*(it->second)).second = mapped_type(std::forward<Args>(args)...);
         return false;
@@ -71,12 +71,12 @@ namespace cyy::cxx_lib {
     auto end() noexcept { return iterator(data.end()); }
     auto end() const noexcept { return const_iterator(data.end()); }
     auto cend() const noexcept { return const_iterator(data.cend()); }
-    iterator find(const Key &key, bool move_item_to_end = true) {
+    iterator find(const Key &key) {
       auto it = data_index.find(key);
       if (it == data_index.end()) {
         return iterator(data.end());
       }
-      if (move_item_to_end) {
+      if (move_to_end_in_finding) {
         return move_to_end(iterator(it->second));
       }
       return iterator(it->second);
@@ -92,9 +92,12 @@ namespace cyy::cxx_lib {
       return iterator(real_it);
     }
 
+  public:
+    bool move_to_end_in_finding{true};
+    bool move_to_end_in_update{true};
+
   private:
     data_list_type data;
     data_index_type data_index;
-    bool move_to_end_in_update{true};
   };
 } // namespace cyy::cxx_lib
