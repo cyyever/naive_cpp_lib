@@ -12,10 +12,20 @@
 #include <mutex>
 #include <thread>
 
-namespace cyy::cxx_lib{
+namespace cyy::cxx_lib {
   //! \brief runnable 封裝線程啓動和關閉的同步控制
   class runnable {
   public:
+    runnable() = default;
+
+    runnable(const runnable &) = delete;
+    runnable &operator=(const runnable &) = delete;
+
+    runnable(runnable &&) noexcept = delete;
+    runnable &operator=(runnable &&) noexcept = delete;
+
+    //! \note 子類Destructor必須明確調用stop
+    virtual ~runnable() = default;
     void start();
 
     template <typename WakeUpType = std::function<void()>>
@@ -30,9 +40,6 @@ namespace cyy::cxx_lib{
       }
       status = sync_status::no_thread;
     }
-
-    //! \note 子類Destructor必須明確調用stop
-    virtual ~runnable() = default;
 
     void set_name(const std::string &name_) {
       std::lock_guard<std::mutex> lock(sync_mutex);
@@ -55,4 +62,4 @@ namespace cyy::cxx_lib{
     std::string name;
     std::mutex sync_mutex;
   };
-} // namespace deepir
+} // namespace cyy::cxx_lib

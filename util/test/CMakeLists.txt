@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.9)
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
 
 find_package(doctest REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(Threads REQUIRED)
 
 file(GLOB test_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp)
@@ -15,6 +13,5 @@ foreach(test_source IN LISTS test_sources)
   target_link_libraries(${test_prog} PRIVATE doctest::doctest)
   target_compile_definitions(${test_prog}
                              PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
-  target_link_libraries(${test_prog} PRIVATE Threads::Threads)
   add_test_with_runtime_analysis(TARGET ${test_prog})
 endforeach()
