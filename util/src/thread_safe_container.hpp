@@ -78,6 +78,7 @@ namespace cyy::cxx_lib {
     using thread_safe_container<ContainerType>::container_mutex;
 
     thread_safe_linear_container(size_t max_size_ = 0) : max_size{max_size_} {}
+    ~thread_safe_linear_container() { wake_up_all_consumers(); }
 
     template <typename Rep, typename Period>
     std::optional<value_type>
@@ -113,7 +114,7 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      if (wakeup_on_new_elements) {
+      if (wake_up_on_new_elements) {
         new_element_cv.notify_all();
       }
     }
@@ -128,7 +129,7 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      if (wakeup_on_new_elements) {
+      if (wake_up_on_new_elements) {
         new_element_cv.notify_all();
       }
     }
@@ -171,9 +172,9 @@ namespace cyy::cxx_lib {
       });
     }
 
-    void wakeup_all_consumers() {
+    void wake_up_all_consumers() {
       std::lock_guard<mutex_type> lock(container_mutex);
-      wakeup_flag = true;
+      wake_up_flag = true;
       new_element_cv.notify_all();
     }
 
@@ -183,9 +184,9 @@ namespace cyy::cxx_lib {
                             const std::chrono::duration<Rep, Period> &rel_time,
                             Predicate pred) const {
       auto res = new_element_cv.wait_for(
-          lock, rel_time, [this, &pred]() { return wakeup_flag || pred(); });
-      if (wakeup_flag) {
-        wakeup_flag = false;
+          lock, rel_time, [this, &pred]() { return wake_up_flag || pred(); });
+      if (wake_up_flag) {
+        wake_up_flag = false;
         return pred();
       }
       return res;
@@ -203,11 +204,11 @@ namespace cyy::cxx_lib {
     }
 
   public:
-    std::atomic<bool> wakeup_on_new_elements{true};
+    std::atomic<bool> wake_up_on_new_elements{true};
 
   private:
     size_t max_size{0};
-    mutable bool wakeup_flag{false};
+    mutable bool wake_up_flag{false};
     mutable std::condition_variable_any new_element_cv;
   };
 
