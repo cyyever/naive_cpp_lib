@@ -19,7 +19,7 @@ namespace cyy::cxx_lib {
     using data_index_type =
         std::unordered_map<key_type, typename data_list_type::iterator>;
     struct iterator : public data_list_type::iterator {
-      iterator(typename data_list_type::iterator rhs)
+      explicit iterator(typename data_list_type::iterator rhs)
           : data_list_type::iterator{rhs} {}
       auto &operator*() const {
         return data_list_type::iterator::operator*().second;
@@ -27,14 +27,12 @@ namespace cyy::cxx_lib {
     };
 
     struct const_iterator : public data_list_type::const_iterator {
-      const_iterator(typename data_list_type::const_iterator rhs)
+      explicit const_iterator(typename data_list_type::const_iterator rhs)
           : data_list_type::const_iterator{rhs} {}
       const auto &operator*() const {
         return data_list_type::const_iterator::operator*().second;
       }
     };
-    /* using iterator = typename data_list_type::iterator; */
-    /* using const_iterator = typename data_list_type::const_iterator; */
 
     bool empty() const noexcept { return data.empty(); }
     auto size() const noexcept { return data.size(); }
@@ -73,20 +71,25 @@ namespace cyy::cxx_lib {
     auto end() noexcept { return iterator(data.end()); }
     auto end() const noexcept { return const_iterator(data.end()); }
     auto cend() const noexcept { return const_iterator(data.cend()); }
-    iterator find(const Key &key) {
+    iterator find(const Key &key, bool move_item_to_end = true) {
       auto it = data_index.find(key);
       if (it == data_index.end()) {
-        return data.end();
+        return iterator(data.end());
+      }
+      if (move_item_to_end) {
+        return move_to_end(iterator(it->second));
       }
       return iterator(it->second);
     }
 
-    void move_to_end(iterator it) {
-      data.emplace_back(std::move(*it));
-      data.erase(it);
-      it = data.end();
-      it--;
-      data_index[it->first] = it;
+    iterator move_to_end(iterator it) {
+      auto real_it = static_cast<typename data_list_type::iterator>(it);
+      data.emplace_back(std::move(*real_it));
+      data.erase(real_it);
+      real_it = data.end();
+      real_it--;
+      data_index[real_it->first] = real_it;
+      return iterator(real_it);
     }
 
   private:
