@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <deque>
@@ -112,7 +113,9 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      new_element_cv.notify_all();
+      if (wakeup_on_new_elements) {
+        new_element_cv.notify_all();
+      }
     }
 
     template <typename... Args> void emplace_back(Args &&... args) {
@@ -125,7 +128,9 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      new_element_cv.notify_all();
+      if (wakeup_on_new_elements) {
+        new_element_cv.notify_all();
+      }
     }
 
     void pop_front() {
@@ -197,10 +202,11 @@ namespace cyy::cxx_lib {
       }
     }
 
-  private:
-    size_t max_size;
+  public:
+    std::atomic<bool> wakeup_on_new_elements{true};
 
-  protected:
+  private:
+    size_t max_size{0};
     mutable bool wakeup_flag{false};
     mutable std::condition_variable_any new_element_cv;
   };
