@@ -41,11 +41,15 @@ namespace cyy::cxx_lib {
       status = sync_status::no_thread;
     }
 
-    void set_name(const std::string &name_) {
+    bool set_name(const std::string &name_) {
       std::lock_guard<std::mutex> lock(sync_mutex);
-      name = name_;
-      // glibc 限制名字長度
-      name.resize(15);
+      if (status == sync_status::no_thread) {
+        name = name_;
+        // glibc 限制名字長度
+        name.resize(15);
+        return true;
+      }
+      return false;
     }
     bool needs_stop() const { return status == sync_status::wait_stop; }
 

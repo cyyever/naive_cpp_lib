@@ -15,32 +15,35 @@ namespace cyy::cxx_lib {
     if (status != sync_status::no_thread) {
       throw std::runtime_error("thread is running");
     }
-    thd = std::thread([this]() {
-      try {
-#if defined(__linux__)
-        if (!name.empty()) {
-          auto err = pthread_setname_np(pthread_self(), name.c_str());
-          if (err != 0) {
-            LOG_ERROR("pthread_setname_np failed:{}",
-                      cyy::cxx::util::errno_to_str(err));
-          }
-        }
-#endif
-        run();
-      } catch (const std::exception &e) {
-        if (exception_callback) {
-          exception_callback(e);
-        }
-        LOG_ERROR("catch thread exception:{}", e.what());
-      } catch (...) {
-        if (exception_callback) {
-          exception_callback({});
-        }
-        LOG_ERROR("catch thread exception");
-      }
-      status = sync_status::wait_join;
-    });
     status = sync_status::running;
+    try {
+      thd = std::thread([this]() {
+        try {
+#if defined(__linux__)
+          if (!name.empty()) {
+            auto err = pthread_setname_np(pthread_self(), name.c_str());
+            if (err != 0) {
+              LOG_ERROR("pthread_setname_np failed:{}",
+                        cyy::cxx::util::errno_to_str(err));
+            }
+          }
+#endif
+          run();
+        } catch (const std::exception &e) {
+          if (exception_callback) {
+            exception_callback(e);
+          }
+          LOG_ERROR("catch thread exception:{}", e.what());
+        }
+        status = sync_status::wait_join;
+      });
+    } catch (const std::exception &e) {
+      status = sync_status::no_thread;
+      if (exception_callback) {
+        exception_callback(e);
+      }
+      LOG_ERROR("create thread failed:{}", e.what());
+    }
   }
 
 } // namespace cyy::cxx_lib
