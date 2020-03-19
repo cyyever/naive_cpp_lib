@@ -26,4 +26,30 @@ TEST_CASE("ordered_dict") {
     CHECK_NE(it, container.end());
     CHECK_EQ(*it, "hello");
   }
+
+  SUBCASE("pop_front") {
+    container.emplace(1, "a");
+    container.emplace(2, "b");
+    CHECK(!container.empty());
+    CHECK_EQ(container.size(), 2);
+    auto [k,v]=container.pop_front();
+    CHECK_EQ(k, 1);
+    CHECK_EQ(v, "a");
+    std::tie(k,v)=container.pop_front();
+    CHECK_EQ(k, 2);
+    CHECK_EQ(v, "b");
+  }
+  SUBCASE("move_to_end") {
+    container.emplace(1, "a");
+    container.emplace(2, "b");
+    CHECK(!container.empty());
+    CHECK_EQ(container.size(), 2);
+      container.move_to_end(container.begin());
+    auto [k,v]=container.pop_front();
+    CHECK_EQ(k, 2);
+    CHECK_EQ(v, "b");
+    std::tie(k,v)=container.pop_front();
+    CHECK_EQ(k, 1);
+    CHECK_EQ(v, "a");
+  }
 }

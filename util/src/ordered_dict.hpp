@@ -7,8 +7,10 @@
 #pragma once
 
 #include <list>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
+
 namespace cyy::cxx_lib {
 
   template <class Key, class T> class ordered_dict {
@@ -40,7 +42,8 @@ namespace cyy::cxx_lib {
       data.clear();
       data_index.clear();
     }
-    template <class KeyArg,class... Args> bool emplace(KeyArg &&key, Args &&... args) {
+    template <class KeyArg, class... Args>
+    bool emplace(KeyArg &&key, Args &&... args) {
       auto [it, inserted] =
           data_index.emplace(std::forward<KeyArg>(key), data.end());
       if (!inserted && !move_to_end_in_update) {
@@ -80,6 +83,18 @@ namespace cyy::cxx_lib {
         return move_to_end(iterator(it->second));
       }
       return iterator(it->second);
+    }
+
+    std::pair<key_type, mapped_type> pop_front() {
+      auto it = data.begin();
+      if (it == data.end()) {
+        throw std::out_of_range("pop_front empty");
+      }
+      auto key = std::move(it->first);
+      auto value = std::move(it->second);
+      data.pop_front();
+      data_index.erase(key);
+      return {key, value};
     }
 
     iterator move_to_end(iterator it) {
