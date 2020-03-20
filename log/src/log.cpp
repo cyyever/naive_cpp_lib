@@ -57,6 +57,8 @@ namespace {
 
 namespace cyy::cxx_lib::log {
 
+  constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
+
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
                          size_t max_file_size, size_t max_file_num) {
@@ -71,11 +73,12 @@ namespace cyy::cxx_lib::log {
           max_file_num);
       file_logger->set_level(static_cast<level_enum>(l));
       file_logger->flush_on(static_cast<level_enum>(l));
-      file_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v");
+      file_logger->set_pattern(log_pattern);
     }
   }
 
   void setup_console_logger() {
-    static auto logger1 = spdlog::stdout_color_mt(console_logger_name);
+    static auto console_logger = spdlog::stdout_color_mt(console_logger_name);
+    console_logger->set_pattern(log_pattern);
   }
 } // namespace cyy::cxx_lib::log
