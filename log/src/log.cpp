@@ -18,6 +18,7 @@
 
 #include "log.hpp"
 namespace {
+  constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
 
   std::string now_str() {
     time_t t;
@@ -51,13 +52,14 @@ namespace {
     init() {
       // call this function on program starup to avoid race condition
       spdlog::details::registry::instance();
+      auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
+      console_logger->set_pattern(log_pattern);
+      spdlog::set_default_logger(console_logger);
     }
   } initer;
 } // namespace
 
 namespace cyy::cxx_lib::log {
-
-  constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
 
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
@@ -77,8 +79,5 @@ namespace cyy::cxx_lib::log {
     }
   }
 
-  void setup_console_logger() {
-    static auto console_logger = spdlog::stdout_color_mt(console_logger_name);
-    console_logger->set_pattern(log_pattern);
-  }
+  void setup_console_logger() {}
 } // namespace cyy::cxx_lib::log

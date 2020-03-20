@@ -52,10 +52,6 @@ namespace std {
 
 namespace cyy::cxx_lib::log {
 
-  inline std::string console_logger_name = "cyy_cxx";
-
-  void setup_console_logger();
-
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
                          size_t max_file_size = 512 * 1024 * 1024,
@@ -65,8 +61,6 @@ namespace cyy::cxx_lib::log {
   void log_message(spdlog::level::level_enum level,
                    const std::source_location &location, std::string fmt,
                    Args &&... args) {
-    setup_console_logger();
-
     auto real_fmt = std::string(" [ ") + location.file_name() + ":" +
                     std::to_string(location.line()) + " ] " + std::move(fmt);
 
