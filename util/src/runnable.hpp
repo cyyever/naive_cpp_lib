@@ -7,6 +7,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -50,7 +51,14 @@ namespace cyy::cxx_lib {
       }
       return false;
     }
+
+  protected:
     bool needs_stop() const { return status == sync_status::wait_stop; }
+    template <typename Rep, typename Period>
+    bool wait_stop(const std::chrono::duration<Rep, Period> &rel_time) {
+      std::unique_lock lock(sync_mutex);
+      return stop_cv.wait_for(lock, rel_time) == std::cv_status::no_timeout;
+    }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;
