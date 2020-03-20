@@ -24,7 +24,7 @@ public:
   void test_restart() {
     for (size_t i = 0; i < 2; i++) {
       start();
-      stop([] { LOG_INFO("stop thread"); });
+      stop();
     }
   }
 

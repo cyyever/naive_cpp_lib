@@ -28,12 +28,11 @@ namespace cyy::cxx_lib {
     virtual ~runnable() = default;
     void start();
 
-    template <typename WakeUpType = std::function<void()>>
-    void stop(WakeUpType wakeup = []() {}) {
+    void stop() {
       std::lock_guard<std::mutex> lock(sync_mutex);
       if (status == sync_status::running) {
         status = sync_status::wait_stop;
-        wakeup();
+        stop_cv.notify_all();
       }
       if (thd.joinable()) {
         thd.join();
@@ -64,6 +63,9 @@ namespace cyy::cxx_lib {
     std::atomic<sync_status> status{sync_status::no_thread};
     std::thread thd;
     std::string name;
+
+  protected:
     std::mutex sync_mutex;
+    std::condition_variable stop_cv;
   };
 } // namespace cyy::cxx_lib
