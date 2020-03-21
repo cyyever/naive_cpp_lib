@@ -7,8 +7,8 @@
 
 #pragma once
 
-#ifndef SPDLOG_HEADER_ONLY
-#define SPDLOG_HEADER_ONLY 1
+#ifndef SPDLOG_COMPILED_LIB
+#define SPDLOG_COMPILED_LIB 1
 #endif
 
 #include <spdlog/spdlog.h>

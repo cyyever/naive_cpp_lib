@@ -173,8 +173,10 @@ namespace cyy::cxx_lib {
     }
 
     void wake_up_all_consumers() {
-      std::lock_guard<mutex_type> lock(container_mutex);
-      wake_up_flag = true;
+      {
+        std::lock_guard<mutex_type> lock(container_mutex);
+        wake_up_flag = true;
+      }
       new_element_cv.notify_all();
     }
 

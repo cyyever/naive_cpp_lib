@@ -9,13 +9,15 @@
 #include "../src/log.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
-  try{
-    std::string msg(reinterpret_cast<const char*>(Data),Size);
-    LOG_ERROR(msg.c_str());
-    LOG_INFO(msg.c_str());
-    LOG_DEBUG(msg.c_str());
-    LOG_WARN(msg.c_str());
-  }catch(...){
+  try {
+    if (Size == 0) {
+      return 0;
+    }
+    std::string fmt(reinterpret_cast<const char *>(Data), Size / 2);
+    std::string msg(reinterpret_cast<const char *>(Data + Size / 2),
+                    Size - Size / 2);
+    LOG_ERROR(fmt.c_str(), msg);
+  } catch (...) {
   }
   return 0; // Non-zero return values are reserved for future use.
 }

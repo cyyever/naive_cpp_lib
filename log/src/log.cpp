@@ -5,10 +5,14 @@
  * \date 2016-04-18
  */
 
+#ifndef SPDLOG_COMPILED_LIB
+#define SPDLOG_COMPILED_LIB 1
+#endif
+
 #define _CRT_SECURE_NO_WARNINGS
+#include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 
 #if __has_include(<unistd.h>)
 #include <sys/types.h>
@@ -18,7 +22,6 @@
 
 #include "log.hpp"
 namespace {
-  constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
 
   std::string now_str() {
     time_t t;
@@ -52,8 +55,9 @@ namespace {
     init() {
       // call this function on program starup to avoid race condition
       spdlog::details::registry::instance();
+      constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
+      spdlog::set_pattern(log_pattern);
       auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
-      console_logger->set_pattern(log_pattern);
       spdlog::set_default_logger(console_logger);
     }
   } initer;
@@ -75,9 +79,7 @@ namespace cyy::cxx_lib::log {
           max_file_num);
       file_logger->set_level(static_cast<level_enum>(l));
       file_logger->flush_on(static_cast<level_enum>(l));
-      file_logger->set_pattern(log_pattern);
     }
   }
 
-  void setup_console_logger() {}
 } // namespace cyy::cxx_lib::log
