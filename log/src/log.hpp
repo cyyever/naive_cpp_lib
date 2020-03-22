@@ -64,7 +64,7 @@ namespace cyy::cxx_lib::log {
     auto real_fmt = std::string(" [ ") + location.file_name() + ":" +
                     std::to_string(location.line()) + " ] " + std::move(fmt);
 
-    spdlog::apply_all([&](std::shared_ptr<spdlog::logger> logger) {
+    spdlog::apply_all([&](auto const & logger) {
       logger->log(level, real_fmt.c_str(), std::forward<Args>(args)...);
     });
   }
