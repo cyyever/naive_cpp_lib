@@ -81,5 +81,6 @@ namespace cyy::cxx_lib::log {
       file_logger->flush_on(static_cast<level_enum>(l));
     }
   }
+  void set_level(spdlog::level::level_enum level) { spdlog::set_level(level); }
 
 } // namespace cyy::cxx_lib::log

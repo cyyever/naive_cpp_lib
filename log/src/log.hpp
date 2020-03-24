@@ -52,6 +52,8 @@ namespace std {
 
 namespace cyy::cxx_lib::log {
 
+  void set_level(spdlog::level::level_enum level);
+
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
                          size_t max_file_size = 512 * 1024 * 1024,
@@ -64,7 +66,7 @@ namespace cyy::cxx_lib::log {
     auto real_fmt = std::string(" [ ") + location.file_name() + ":" +
                     std::to_string(location.line()) + " ] " + std::move(fmt);
 
-    spdlog::apply_all([&](auto const & logger) {
+    spdlog::apply_all([&](auto const &logger) {
       logger->log(level, real_fmt.c_str(), std::forward<Args>(args)...);
     });
   }
