@@ -22,7 +22,7 @@ foreach(submodule_name IN LISTS submodule_names)
   list(APPEND submodule_libs my_cxx_lib_${submodule_name})
 
   install(
-    DIRECTORY ${submodule_name}/src/
+    DIRECTORY ${submodule_name}/
     DESTINATION include/cyy/cpp_lib/${submodule_name}
     FILES_MATCHING
     PATTERN "*.hpp")
