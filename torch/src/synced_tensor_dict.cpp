@@ -1,6 +1,7 @@
-#include <cyy/cpp_lib/log/log.hpp>
+
 #include <stdexcept>
 
+#include "log/src/log.hpp"
 #include "synced_tensor_dict.hpp"
 #include "synced_tensor_dict_fetch_thread.hpp"
 #include "synced_tensor_dict_flush_thread.hpp"
