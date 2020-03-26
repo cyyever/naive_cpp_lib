@@ -8,7 +8,7 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/error.hpp"
+#include "util/error.hpp"
 
 #ifndef _WIN32
 TEST_CASE("errno_to_str") {

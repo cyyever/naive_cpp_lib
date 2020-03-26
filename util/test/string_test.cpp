@@ -8,7 +8,7 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/string.hpp"
+#include "util/string.hpp"
 
 TEST_CASE("split") {
   auto tmp = deepir::strings::split(" a b ", ' ');

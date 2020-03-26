@@ -1,6 +1,6 @@
 #include <stdexcept>
 
-#include "log/src/log.hpp"
+#include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
 namespace cyy::cxx_lib::pytorch {
 

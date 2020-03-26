@@ -8,6 +8,6 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/time.hpp"
+#include "util/time.hpp"
 
 TEST_CASE("now_ms") { CHECK(cyy::cxx::time::now_ms() > 0); }

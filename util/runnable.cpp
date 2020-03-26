@@ -4,7 +4,7 @@
  * \brief 封裝線程操作
  * \author cyy
  */
-#include "log/src/log.hpp"
+#include "log/log.hpp"
 
 #include "error.hpp"
 #include "runnable.hpp"

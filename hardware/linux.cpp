@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include "hardware.hpp"
-#include "util/src/error.hpp"
+#include "util/error.hpp"
 
 namespace cyy::cxx_lib::hardware {
 

@@ -8,8 +8,8 @@
 #include <functional>
 #include <iostream>
 
-#include "../src/runnable.hpp"
-#include "log/src/log.hpp"
+#include "util/runnable.hpp"
+#include "log/log.hpp"
 
 class test_class : public cyy::cxx_lib::runnable {
 public:

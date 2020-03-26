@@ -8,7 +8,7 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/log.hpp"
+#include "log/log.hpp"
 
 TEST_CASE("default console logger") {
   LOG_ERROR("hello world.....error");

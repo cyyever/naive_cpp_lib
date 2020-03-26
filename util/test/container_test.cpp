@@ -9,7 +9,7 @@
 #include <functional>
 #include <thread>
 
-#include "../src/thread_safe_container.hpp"
+#include "util/thread_safe_container.hpp"
 
 TEST_CASE("thread_safe_linear_container") {
   cyy::cxx_lib::thread_safe_linear_container<std::vector<int>> container;

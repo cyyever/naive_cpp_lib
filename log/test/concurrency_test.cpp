@@ -9,7 +9,7 @@
 #include <doctest/doctest.h>
 #include <thread>
 
-#include "../src/log.hpp"
+#include "log/log.hpp"
 
 TEST_CASE("concurrency") {
   cyy::cxx_lib::log::setup_file_logger(".", "file_logger",

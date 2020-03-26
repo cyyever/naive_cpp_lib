@@ -27,7 +27,7 @@
 #endif
 
 #include "hardware.hpp"
-#include "log/src/log.hpp"
+#include "log/log.hpp"
 
 namespace cyy::cxx_lib::hardware {
 

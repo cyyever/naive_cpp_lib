@@ -6,7 +6,7 @@
  */
 
 #include "cuda.hpp"
-#include "log/src/log.hpp"
+#include "log/log.hpp"
 
 #ifdef HAVE_CUDA
 namespace cyy::cxx_lib::hardware::cuda {

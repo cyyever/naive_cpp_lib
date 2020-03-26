@@ -1,4 +1,4 @@
-file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(my_cxx_lib_util ${SOURCE})
 

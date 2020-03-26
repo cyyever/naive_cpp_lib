@@ -8,8 +8,8 @@
 #include <doctest/doctest.h>
 #include <vector>
 
-#include "../src/hardware.hpp"
-#include "../src/cuda.hpp"
+#include "hardware/hardware.hpp"
+#include "hardware/cuda.hpp"
 
 #ifdef HAVE_CUDA
 #ifdef TEST_GPU

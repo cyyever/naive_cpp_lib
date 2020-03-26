@@ -8,7 +8,7 @@
 #include <doctest/doctest.h>
 #include <vector>
 
-#include "../src/hardware.hpp"
+#include "hardware/hardware.hpp"
 
 TEST_CASE("cpu_num") {
   CHECK(cyy::cxx_lib::hardware::cpu_num() > 0);

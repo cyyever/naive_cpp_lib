@@ -15,7 +15,7 @@
 #include <iostream>
 #include <memory>
 
-#include "log/src/log.hpp"
+#include "log/log.hpp"
 #include "string.hpp"
 
 namespace deepir::strings {
