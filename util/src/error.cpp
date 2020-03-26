@@ -11,7 +11,7 @@
 
 #include "error.hpp"
 
-namespace cyy::cxx::util {
+namespace cyy::cxx_lib::util {
 
 //! \brief 获取errno的字符串描述
 //! \note 本函数线程安全
@@ -48,4 +48,4 @@ std::string get_winapi_error_msg(DWORD winapi_errno) {
 }
 #endif
 
-} // namespace cyy::cxx::util
+} // namespace cyy::cxx_lib::util

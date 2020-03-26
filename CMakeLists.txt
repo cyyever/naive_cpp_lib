@@ -9,7 +9,7 @@ option(BUILD_TEST "Build test" ON)
 
 option(BUILD_FUZZING "Build fuzzing" OFF)
 
-set(submodule_names log util)
+set(submodule_names log util hardware)
 set(submodule_libs)
 
 include_directories(${CMAKE_SOURCE_DIR})

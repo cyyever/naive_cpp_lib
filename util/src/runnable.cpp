@@ -24,7 +24,7 @@ namespace cyy::cxx_lib {
             auto err = pthread_setname_np(pthread_self(), name.c_str());
             if (err != 0) {
               LOG_ERROR("pthread_setname_np failed:{}",
-                        cyy::cxx::util::errno_to_str(err));
+                        cyy::cxx_lib::util::errno_to_str(err));
             }
           }
 #endif
