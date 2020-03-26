@@ -4,15 +4,19 @@ project(MyCXXLib LANGUAGES CXX)
 
 include(cmake/all.cmake)
 
-# test
-option(BUILD_TEST "Build test" ON)
-
-option(BUILD_FUZZING "Build fuzzing" OFF)
+option(BUILD_ML "Build machine learning modules" OFF)
 
 set(submodule_names log util hardware)
-set(submodule_libs)
+if(BUILD_ML)
+
+endif()
+
+# test
+option(BUILD_TEST "Build test" ON)
+option(BUILD_FUZZING "Build fuzzing" OFF)
 
 include_directories(${CMAKE_SOURCE_DIR})
+set(submodule_libs)
 foreach(submodule_name IN LISTS submodule_names)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${submodule_name})
   list(APPEND submodule_libs my_cxx_lib_${submodule_name})
