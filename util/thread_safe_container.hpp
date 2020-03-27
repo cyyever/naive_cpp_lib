@@ -84,7 +84,6 @@ namespace cyy::cxx_lib {
     std::optional<value_type>
     back(const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-
       if (wait_for_condition(lock, rel_time,
                              [this]() { return !container.empty(); })) {
         return {container.back()};
@@ -96,7 +95,6 @@ namespace cyy::cxx_lib {
     std::optional<value_type>
     front(const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-
       if (wait_for_condition(lock, rel_time,
                              [this]() { return !container.empty(); })) {
         return {container.front()};
@@ -106,7 +104,7 @@ namespace cyy::cxx_lib {
 
     template <typename T> void push_back(T &&value) {
       {
-        std::lock_guard<mutex_type> lock(container_mutex);
+        std::lock_guard lock(container_mutex);
         container.push_back(std::forward<T>(value));
         if (max_size != 0) {
           while (container.size() > max_size) {
@@ -121,7 +119,7 @@ namespace cyy::cxx_lib {
 
     template <typename... Args> void emplace_back(Args &&... args) {
       {
-        std::lock_guard<mutex_type> lock(container_mutex);
+        std::lock_guard lock(container_mutex);
         container.emplace_back(std::forward<Args>(args)...);
         if (max_size != 0) {
           while (container.size() > max_size) {
@@ -135,7 +133,7 @@ namespace cyy::cxx_lib {
     }
 
     void pop_front() {
-      std::lock_guard<mutex_type> lock(container_mutex);
+      std::lock_guard lock(container_mutex);
       if (!container.empty()) {
         pop_front_wrapper();
       }
@@ -158,7 +156,7 @@ namespace cyy::cxx_lib {
     }
 
     void clear() {
-      std::lock_guard<mutex_type> lock(container_mutex);
+      std::lock_guard lock(container_mutex);
       container.clear();
     }
 
@@ -174,7 +172,7 @@ namespace cyy::cxx_lib {
 
     void wake_up_all_consumers() {
       {
-        std::lock_guard<mutex_type> lock(container_mutex);
+        std::lock_guard lock(container_mutex);
         wake_up_flag = true;
       }
       new_element_cv.notify_all();
@@ -227,7 +225,7 @@ namespace cyy::cxx_lib {
 
     template <typename CallBackType>
     void modify_value(const key_type &key, CallBackType cb) {
-      std::unique_lock<mutex_type> lock(container_mutex);
+      std::unique_lock lock(container_mutex);
       cb(container[key]);
     }
   };

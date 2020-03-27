@@ -42,4 +42,15 @@ TEST_CASE("thread_safe_linear_container") {
     CHECK(val.has_value());
     CHECK_EQ(val.value(), 1);
   }
+  SUBCASE("concurrent pop_front") {
+    container.clear();
+    std::vector<std::thread> thds;
+    for (int i = 0; i < 10; i++) {
+      thds.emplace_back(
+          [&container]() { container.pop_front(std::chrono::seconds(1)); });
+    }
+    for (auto &thd : thds) {
+      thd.join();
+    }
+  }
 }

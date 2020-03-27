@@ -8,7 +8,7 @@ option(BUILD_ML "Build machine learning modules" OFF)
 
 set(submodule_names log util hardware)
 if(BUILD_ML)
-  LIST(APPEND submodule_names torch)
+  list(APPEND submodule_names torch)
 endif()
 
 # test

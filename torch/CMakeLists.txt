@@ -3,6 +3,7 @@ file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 add_library(my_cxx_lib_torch ${SOURCE})
 add_library(MyCXXLib::torch ALIAS my_cxx_lib_torch)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::log)
+target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::util)
 
 find_package(Python3 REQUIRED)
 if(Python3_FOUND)
@@ -14,11 +15,13 @@ if(Python3_FOUND)
     message(FATAL_ERROR "failed to found pytorch path")
   endif()
   string(STRIP ${_path} _path)
-  list(PREPEND CMAKE_PREFIX_PATH ${_path}/share/cmake/Caffe2)
+  list(PREPEND CMAKE_PREFIX_PATH ${_path})
 endif()
 
-find_package(Caffe2 REQUIRED)
-target_include_directories(my_cxx_lib_torch PUBLIC ${CAFFE2_INCLUDE_DIRS})
-target_include_directories(
-  my_cxx_lib_torch PUBLIC "${CAFFE2_INCLUDE_DIRS}/torch/csrc/api/include")
-target_link_libraries(my_cxx_lib_torch PRIVATE ${Caffe2_MAIN_LIBS})
+find_package(Torch REQUIRED)
+
+target_link_libraries(my_cxx_lib_torch PUBLIC ${TORCH_LIBRARIES})
+
+if(BUILD_TEST)
+  add_subdirectory(test)
+endif()

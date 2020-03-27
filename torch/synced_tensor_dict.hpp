@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <torch/csrc/api/include/torch/all.h>
+#include <torch/torch.h>
 
 #include "util/ordered_dict.hpp"
 #include "util/runnable.hpp"
@@ -27,6 +27,7 @@ namespace cyy::cxx_lib::pytorch {
     void release();
     void emplace(const std::string &key, const torch::Tensor &value);
     torch::Tensor get(const std::string &key);
+    size_t size() const;
     void erase(const std::string &key);
     bool contains(const std::string &key) const;
     void enable_debug_logging(bool enable) const;
@@ -38,7 +39,7 @@ namespace cyy::cxx_lib::pytorch {
       in_memory_number = in_memory_number_;
     }
     void set_storage_dir(const std::string &storage_dir_);
-    void set_wait_flush_ratio(float wait_flush_ratio_);
+    void set_wait_flush_ratio(size_t wait_flush_ratio_);
 
     void set_permanent_storage() { permanent = true; }
 
@@ -54,18 +55,18 @@ namespace cyy::cxx_lib::pytorch {
     };
     class save_thread;
     class fetch_thread;
-    class flush_thread;
 
   private:
     bool change_state(const std::string &key, data_state old_state,
                       data_state new_state);
     std::filesystem::path get_tensor_file_path(const std::string &key) const;
+    bool need_flush() const;
 
     std::pair<bool, std::optional<torch::Tensor>>
     prefetch(const std::string &key);
     using save_task =
         std::tuple<std::string, torch::Tensor, std::filesystem::path>;
-    std::list<save_task> pop_expired_data(bool try_lock, size_t max_number);
+    std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);
 
   private:
@@ -88,14 +89,10 @@ namespace cyy::cxx_lib::pytorch {
     size_t fetch_thread_num{1};
     std::list<fetch_thread> fetch_threads;
 
-    size_t flush_thread_num{1};
-    std::list<flush_thread> flush_threads;
-
     size_t in_memory_number{128};
     bool permanent{false};
     std::condition_variable_any new_data_cv;
     std::condition_variable_any less_data_cv;
-    std::condition_variable_any flush_cv;
-    float wait_flush_ratio{1};
+    size_t wait_flush_ratio{1};
   };
 } // namespace cyy::cxx_lib::pytorch

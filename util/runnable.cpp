@@ -11,7 +11,7 @@
 
 namespace cyy::cxx_lib {
   void runnable::start() {
-    std::lock_guard<std::mutex> lock(sync_mutex);
+    std::lock_guard lock(sync_mutex);
     if (status != sync_status::no_thread) {
       throw std::runtime_error("thread is running");
     }
