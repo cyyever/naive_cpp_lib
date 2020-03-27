@@ -73,6 +73,7 @@ namespace cyy::cxx_lib::pytorch {
 
   torch::Tensor synced_tensor_dict::get(const std::string &key) {
     while (true) {
+      std::unique_lock lk(data_mutex);
       auto [result, value_opt] = prefetch(key);
       if (!result) {
         throw std::out_of_range(key);
@@ -81,8 +82,7 @@ namespace cyy::cxx_lib::pytorch {
         return value_opt.value();
       }
 
-      std::unique_lock lk(data_mutex);
-      LOG_WARN("wait data");
+      LOG_INFO("wait data");
       new_data_cv.wait(lk);
     }
     throw std::runtime_error("should not be here");
@@ -96,7 +96,7 @@ namespace cyy::cxx_lib::pytorch {
       flush();
       if (data.size() + saving_data.size() >
           in_memory_number * wait_flush_ratio) {
-        LOG_WARN("wait flush saving_data size is {} ratio is {} data is {} "
+        LOG_INFO("wait flush saving_data size is {} ratio is {} data is {} "
                  "in_memory_number is {}",
                  saving_data.size(), wait_flush_ratio, data.size(),
                  in_memory_number);
