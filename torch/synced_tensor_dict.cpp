@@ -93,12 +93,9 @@ namespace cyy::cxx_lib::pytorch {
     data.emplace(key, value);
     data_info[key] = data_state::IN_MEMORY_NEW_DATA;
     if (data.size() > in_memory_number) {
-      auto save_tasks = pop_expired_data(1);
-      lk.unlock();
-      flush(save_tasks);
-      lk.lock();
-      while (data.size() + saving_data.size() >
-             in_memory_number * wait_flush_ratio) {
+      flush();
+      if (data.size() + saving_data.size() >
+          in_memory_number * wait_flush_ratio) {
         LOG_WARN("wait flush saving_data size is {} ratio is {} data is {} "
                  "in_memory_number is {}",
                  saving_data.size(), wait_flush_ratio, data.size(),
