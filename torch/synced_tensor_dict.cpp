@@ -67,7 +67,7 @@ namespace cyy::cxx_lib::pytorch {
     saving_data.clear();
 
     if (!permanent && !storage_dir.empty()) {
-      LOG_WARN("remove {}", storage_dir.string());
+      LOG_INFO("remove {}", storage_dir.string());
       std::filesystem::remove_all(storage_dir);
     }
   }
