@@ -33,6 +33,7 @@ namespace cyy::cxx_lib::pytorch {
     void enable_debug_logging(bool enable) const;
     void flush_all();
     void flush();
+    void clear();
     void prefetch(const std::vector<std::string> &keys);
     void set_in_memory_number(size_t in_memory_number_) {
       std::lock_guard lk(data_mutex);

@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <stdexcept>
 
 #include "log/log.hpp"
@@ -6,7 +7,7 @@ namespace cyy::cxx_lib::pytorch {
 
   class synced_tensor_dict::save_thread final : public cyy::cxx_lib::runnable {
   public:
-    save_thread(synced_tensor_dict &dict_) : dict(dict_) {}
+    explicit save_thread(synced_tensor_dict &dict_) : dict(dict_) {}
 
   private:
     void run() override {
@@ -26,6 +27,10 @@ namespace cyy::cxx_lib::pytorch {
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
             dict.saving_data.erase(key);
             dict.less_data_cv.notify_all();
+            continue;
+          }
+          if (!dict.data_info.count(key)) {
+            std::filesystem::remove(path);
           }
         } catch (const std::exception &e) {
           LOG_ERROR("torch::save {} failed,drop it:{}", path.string(),

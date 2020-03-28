@@ -52,18 +52,19 @@ namespace cyy::cxx_lib::pytorch {
       fetch_request_queue.emplace_back();
     }
     fetch_request_queue.wake_up_all_consumers();
-    for (auto &t : fetch_threads) {
-      t.stop();
-    }
     for (size_t i = 0; i < save_thread_num; i++) {
       save_request_queue.emplace_back();
     }
     save_request_queue.wake_up_all_consumers();
+    for (auto &t : fetch_threads) {
+      t.stop();
+    }
     for (auto &t : save_threads) {
       t.stop();
     }
     data.clear();
     data_info.clear();
+    saving_data.clear();
 
     if (!permanent && !storage_dir.empty()) {
       LOG_WARN("remove {}", storage_dir.string());
@@ -116,7 +117,22 @@ namespace cyy::cxx_lib::pytorch {
     }
     data.erase(key);
     saving_data.erase(key);
+    if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
+      std::filesystem::remove(get_tensor_file_path(key));
+    }
   }
+
+  void synced_tensor_dict::clear() {
+    std::lock_guard lk(data_mutex);
+    data_info.clear();
+    data.clear();
+    saving_data.clear();
+    if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
+      std::filesystem::remove_all(storage_dir);
+      set_storage_dir(storage_dir);
+    }
+  }
+
   bool synced_tensor_dict::contains(const std::string &key) const {
     std::lock_guard lk(data_mutex);
     return data_info.find(key) != data_info.end();
