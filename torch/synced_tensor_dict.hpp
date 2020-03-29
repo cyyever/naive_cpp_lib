@@ -41,6 +41,8 @@ namespace cyy::cxx_lib::pytorch {
     }
     void set_storage_dir(const std::string &storage_dir_);
     void set_wait_flush_ratio(size_t wait_flush_ratio_);
+    void set_saving_thread_number(size_t saving_thread_number_);
+    void set_fetch_thread_number(size_t fetch_thread_number_);
 
     void set_permanent_storage() { permanent = true; }
 
@@ -57,7 +59,6 @@ namespace cyy::cxx_lib::pytorch {
     class save_thread;
     class fetch_thread;
 
-  private:
     bool change_state(const std::string &key, data_state old_state,
                       data_state new_state);
     std::filesystem::path get_tensor_file_path(const std::string &key) const;
@@ -70,7 +71,6 @@ namespace cyy::cxx_lib::pytorch {
     std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);
 
-  private:
     mutable std::recursive_mutex data_mutex;
     std::filesystem::path storage_dir;
     cyy::cxx_lib::ordered_dict<std::string, torch::Tensor> data;
@@ -80,14 +80,14 @@ namespace cyy::cxx_lib::pytorch {
     using save_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
-    size_t save_thread_num{2};
-    std::list<save_thread> save_threads;
+    size_t saving_thread_num{2};
+    std::list<save_thread> saving_threads;
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
     using fetch_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<fetch_task>>>;
     fetch_request_queue_type fetch_request_queue;
-    size_t fetch_thread_num{1};
+    size_t fetch_thread_num{2};
     std::list<fetch_thread> fetch_threads;
 
     size_t in_memory_number{128};

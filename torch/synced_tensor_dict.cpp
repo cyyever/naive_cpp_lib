@@ -27,10 +27,10 @@ namespace cyy::cxx_lib::pytorch {
         std::filesystem::create_directories(storage_dir);
       }
     }
-    for (size_t i = 0; i < save_thread_num; i++) {
-      save_threads.emplace_back(*this);
+    for (size_t i = 0; i < saving_thread_num; i++) {
+      saving_threads.emplace_back(*this);
     }
-    for (auto &t : save_threads) {
+    for (auto &t : saving_threads) {
       t.start();
     }
     for (size_t i = 0; i < fetch_thread_num; i++) {
@@ -52,14 +52,14 @@ namespace cyy::cxx_lib::pytorch {
       fetch_request_queue.emplace_back();
     }
     fetch_request_queue.wake_up_all_consumers();
-    for (size_t i = 0; i < save_thread_num; i++) {
+    for (size_t i = 0; i < saving_thread_num; i++) {
       save_request_queue.emplace_back();
     }
     save_request_queue.wake_up_all_consumers();
     for (auto &t : fetch_threads) {
       t.stop();
     }
-    for (auto &t : save_threads) {
+    for (auto &t : saving_threads) {
       t.stop();
     }
     data.clear();
@@ -73,6 +73,7 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   torch::Tensor synced_tensor_dict::get(const std::string &key) {
+    bool flag = true;
     while (true) {
       std::unique_lock lk(data_mutex);
       auto [result, value_opt] = prefetch(key);
@@ -83,7 +84,10 @@ namespace cyy::cxx_lib::pytorch {
         return value_opt.value();
       }
 
-      LOG_INFO("wait data");
+      if (flag) {
+        LOG_INFO("wait data");
+        flag = false;
+      }
       new_data_cv.wait(lk);
     }
     throw std::runtime_error("should not be here");
@@ -266,4 +270,33 @@ namespace cyy::cxx_lib::pytorch {
     return true;
   }
 
+  void synced_tensor_dict::set_saving_thread_number(size_t saving_thread_num_) {
+    if (saving_thread_num_ == 0) {
+      throw std::runtime_error("saving_thread_num_ is 0");
+    }
+    std::unique_lock lk(data_mutex);
+    if (saving_thread_num_ < saving_thread_num) {
+      throw std::runtime_error("can't shrink threads");
+    }
+    for (size_t i = 0; i < saving_thread_num_ - saving_thread_num; i++) {
+      saving_threads.emplace_back(*this);
+      saving_threads.back().start();
+    }
+    saving_thread_num = saving_thread_num_;
+  }
+
+  void synced_tensor_dict::set_fetch_thread_number(size_t fetch_thread_num_) {
+    if (fetch_thread_num_ == 0) {
+      throw std::runtime_error("fetch_thread_num_ is 0");
+    }
+    std::unique_lock lk(data_mutex);
+    if (fetch_thread_num_ < fetch_thread_num) {
+      throw std::runtime_error("can't shrink threads");
+    }
+    for (size_t i = 0; i < fetch_thread_num_ - fetch_thread_num; i++) {
+      fetch_threads.emplace_back(*this);
+      fetch_threads.back().start();
+    }
+    fetch_thread_num = fetch_thread_num_;
+  }
 } // namespace cyy::cxx_lib::pytorch
