@@ -51,6 +51,7 @@ namespace cyy::cxx_lib::pytorch {
       IN_MEMORY,
       IN_MEMORY_NEW_DATA,
       IN_DISK,
+      PRE_SAVING,
       SAVING,
       PRE_LOAD,
       LOADING,
@@ -67,7 +68,7 @@ namespace cyy::cxx_lib::pytorch {
     std::pair<bool, std::optional<torch::Tensor>>
     prefetch(const std::string &key);
     using save_task =
-        std::tuple<std::string, torch::Tensor, std::filesystem::path>;
+        std::tuple<std::string, std::filesystem::path>;
     std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);
 

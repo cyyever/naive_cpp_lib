@@ -175,11 +175,10 @@ namespace cyy::cxx_lib::pytorch {
           break;
         }
         std::tie(key, value) = data.pop_front();
-        data_info[key] = data_state::SAVING;
+        data_info[key] = data_state::PRE_SAVING;
         saving_data[key] = value;
       }
-      expired_data.emplace_back(
-          save_task{key, std::move(value), get_tensor_file_path(key)});
+      expired_data.emplace_back(save_task{key, get_tensor_file_path(key)});
     }
     return expired_data;
   }
@@ -222,7 +221,8 @@ namespace cyy::cxx_lib::pytorch {
       if (it == data_info.end()) {
         return {false, {}};
       }
-      if (it->second == data_state::SAVING) {
+      if (it->second == data_state::PRE_SAVING ||
+          it->second == data_state::SAVING) {
         auto node = saving_data.extract(key);
         data.emplace(key, node.mapped());
         it->second = data_state::IN_MEMORY_NEW_DATA;

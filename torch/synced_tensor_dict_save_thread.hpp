@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <mutex>
 #include <stdexcept>
 
 #include "log/log.hpp"
@@ -20,10 +21,17 @@ namespace cyy::cxx_lib::pytorch {
         if (!(*value_opt).has_value()) {
           return;
         }
-        auto &[key, value, path] = value_opt.value().value();
+        auto &[key, path] = value_opt.value().value();
         try {
+          std::unique_lock lk(dict.data_mutex);
+          if (!dict.change_state(key, data_state::PRE_SAVING,
+                                data_state::SAVING)) {
+            continue;
+          }
+          auto value = dict.saving_data[key];
+          lk.unlock();
           torch::save(value, path.string());
-          std::lock_guard lk(dict.data_mutex);
+          lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
             dict.saving_data.erase(key);
             dict.less_data_cv.notify_all();
