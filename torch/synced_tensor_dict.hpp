@@ -45,7 +45,8 @@ namespace cyy::cxx_lib::pytorch {
     void set_saving_thread_number(size_t saving_thread_number_);
     void set_fetch_thread_number(size_t fetch_thread_number_);
 
-    void set_permanent_storage() { permanent = true; }
+    void enable_permanent_storage() { permanent = true; }
+    void disable_permanent_storage() { permanent =false; }
 
   private:
     enum class data_state {

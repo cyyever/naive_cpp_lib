@@ -20,8 +20,9 @@ namespace cyy::cxx_lib::pytorch {
                                       " is not a directory");
         }
         for (const auto &f : std::filesystem::directory_iterator(storage_dir)) {
-          auto key = f.path().c_str();
+          auto key = f.path().filename().string();
           data_info[key] = data_state::IN_DISK;
+          LOG_DEBUG("load key {}",key);
         }
       } else {
         std::filesystem::create_directories(storage_dir);

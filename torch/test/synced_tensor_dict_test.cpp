@@ -65,12 +65,11 @@ TEST_CASE("synced_tensor_dict") {
     thd.join();
   }
   CHECK_EQ(dict.size(), 100);
-
-  dict.clear();
-  CHECK_EQ(dict.size(), 0);
-
-  dict.set_permanent_storage();
-
+  dict.enable_permanent_storage();
   dict.release();
-  CHECK_EQ(dict.size(), 0);
+  cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir");
+  CHECK_EQ(dict2.size(), 100);
+  std::cout<<     dict2.keys()[0];
+  dict2.clear();
+  CHECK_EQ(dict2.size(), 0);
 }
