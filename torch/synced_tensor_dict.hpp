@@ -49,8 +49,8 @@ namespace cyy::cxx_lib::pytorch {
     void disable_permanent_storage() { permanent =false; }
 
   private:
-    enum class data_state {
-      IN_MEMORY,
+    enum class data_state:int {
+      IN_MEMORY=0,
       IN_MEMORY_NEW_DATA,
       IN_DISK,
       PRE_SAVING,

@@ -22,7 +22,7 @@ namespace cyy::cxx_lib::pytorch {
         for (const auto &f : std::filesystem::directory_iterator(storage_dir)) {
           auto key = f.path().filename().string();
           data_info[key] = data_state::IN_DISK;
-          LOG_DEBUG("load key {}",key);
+          LOG_DEBUG("load key {}", key);
         }
       } else {
         std::filesystem::create_directories(storage_dir);
@@ -185,7 +185,20 @@ namespace cyy::cxx_lib::pytorch {
           break;
         }
         std::tie(key, value) = data.pop_front();
-        data_info[key] = data_state::PRE_SAVING;
+        auto it = data_info.find(key);
+        if (it == data_info.end()) {
+          throw std::runtime_error(std::string("can't find info :" + key));
+        }
+        if (it->second == data_state::IN_MEMORY) {
+          it->second = data_state::IN_DISK;
+          continue;
+        }
+        if (it->second != data_state::IN_MEMORY_NEW_DATA) {
+          throw std::runtime_error(std::string("invalid state " +
+                                               std::to_string(static_cast<int>(it->second)) +
+                                               " of key:" + key));
+        }
+        it->second = data_state::PRE_SAVING;
         saving_data[key] = value;
       }
       expired_data.emplace_back(save_task{key, get_tensor_file_path(key)});
