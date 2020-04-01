@@ -117,7 +117,7 @@ namespace cyy::cxx_lib::pytorch {
     std::lock_guard lk(data_mutex);
     std::vector<std::string> res;
     res.reserve(data_info.size());
-    for(auto const &[key,__]:data_info) {
+    for (auto const &[key, __] : data_info) {
       res.emplace_back(key);
     }
     return res;

@@ -93,7 +93,7 @@ namespace cyy::cxx_lib::pytorch {
     std::list<fetch_thread> fetch_threads;
 
     size_t in_memory_number{128};
-    bool permanent{false};
+    bool permanent{true};
     std::condition_variable_any new_data_cv;
     std::condition_variable_any less_data_cv;
     size_t wait_flush_ratio{1};
