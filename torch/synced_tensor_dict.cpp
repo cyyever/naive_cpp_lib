@@ -113,6 +113,15 @@ namespace cyy::cxx_lib::pytorch {
     std::lock_guard lk(data_mutex);
     return data_info.size();
   }
+  std::vector<std::string> synced_tensor_dict::keys() const {
+    std::lock_guard lk(data_mutex);
+    std::vector<std::string> res;
+    res.reserve(data_info.size());
+    for(auto const &[key,__]:data_info) {
+      res.emplace_back(key);
+    }
+    return res;
+  }
 
   void synced_tensor_dict::erase(const std::string &key) {
     std::lock_guard lk(data_mutex);
