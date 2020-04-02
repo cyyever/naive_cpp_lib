@@ -51,6 +51,7 @@ TEST_CASE("synced_tensor_dict") {
         keys.emplace_back(std::to_string(i * 10 + j));
       }
   }
+  dict.flush_all();
 
   dict.prefetch(keys);
 
@@ -69,7 +70,6 @@ TEST_CASE("synced_tensor_dict") {
   dict.release();
   cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir");
   CHECK_EQ(dict2.size(), 100);
-  std::cout<<     dict2.keys()[0];
   dict2.clear();
   CHECK_EQ(dict2.size(), 0);
 }

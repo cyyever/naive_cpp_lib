@@ -17,6 +17,8 @@ TEST_CASE("ordered_dict") {
     container.emplace(1, "");
     CHECK(!container.empty());
     CHECK_EQ(container.size(), 1);
+    container.emplace(1, "");
+    CHECK_EQ(container.size(), 1);
   }
 
   SUBCASE("find") {

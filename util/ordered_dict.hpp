@@ -46,9 +46,13 @@ namespace cyy::cxx_lib {
     bool emplace(KeyArg &&key, Args &&... args) {
       auto [it, inserted] =
           data_index.emplace(std::forward<KeyArg>(key), data.end());
-      if (!inserted && !move_to_end_in_update) {
-        (*(it->second)).second = mapped_type(std::forward<Args>(args)...);
-        return false;
+      if (!inserted) {
+        if (move_to_end_in_update) {
+          data.erase(it->second);
+        } else {
+          (*(it->second)).second = mapped_type(std::forward<Args>(args)...);
+          return false;
+        }
       }
       data.emplace_back(it->first, mapped_type(std::forward<Args>(args)...));
       auto it2 = data.end();
@@ -107,7 +111,6 @@ namespace cyy::cxx_lib {
       return iterator(real_it);
     }
 
-  public:
     bool move_to_end_in_finding{true};
     bool move_to_end_in_update{true};
 
