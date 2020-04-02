@@ -16,8 +16,8 @@ TEST_CASE("synced_tensor_dict") {
   CHECK_EQ(dict.size(), 0);
 
   dict.set_in_memory_number(3);
-  /* dict.set_saving_thread_number(10); */
-  /* dict.set_fetch_thread_number(10); */
+  dict.set_saving_thread_number(5);
+  dict.set_fetch_thread_number(5);
 
   // save sparse tensor
   auto sparse_tensor= torch::eye(3).to_sparse();
@@ -53,6 +53,8 @@ TEST_CASE("synced_tensor_dict") {
   }
   dict.flush_all();
 
+  CHECK(dict.contains("0"));
+
   dict.prefetch(keys);
 
   for (int i = 0; i < 10; i++) {
@@ -70,6 +72,7 @@ TEST_CASE("synced_tensor_dict") {
   dict.release();
   cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir");
   CHECK_EQ(dict2.size(), 100);
+  dict2.disable_permanent_storage();
   dict2.clear();
   CHECK_EQ(dict2.size(), 0);
 }
