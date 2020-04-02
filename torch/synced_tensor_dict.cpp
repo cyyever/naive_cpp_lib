@@ -98,6 +98,7 @@ namespace cyy::cxx_lib::pytorch {
     std::unique_lock lk(data_mutex);
     data.emplace(key, value);
     data_info[key] = data_state::IN_MEMORY_NEW_DATA;
+    saving_data.erase(key);
     if (data.size() > in_memory_number) {
       flush();
       if (data.size() + saving_data.size() >
@@ -194,9 +195,9 @@ namespace cyy::cxx_lib::pytorch {
           continue;
         }
         if (it->second != data_state::IN_MEMORY_NEW_DATA) {
-          throw std::runtime_error(std::string("invalid state " +
-                                               std::to_string(static_cast<int>(it->second)) +
-                                               " of key:" + key));
+          throw std::runtime_error(std::string(
+              "invalid state " + std::to_string(static_cast<int>(it->second)) +
+              " of key:" + key));
         }
         it->second = data_state::PRE_SAVING;
         saving_data[key] = value;
