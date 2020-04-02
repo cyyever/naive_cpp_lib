@@ -8,8 +8,8 @@
 #include <functional>
 #include <iostream>
 
-#include "util/runnable.hpp"
 #include "log/log.hpp"
+#include "util/runnable.hpp"
 
 class test_class : public cyy::cxx_lib::runnable {
 public:
@@ -71,7 +71,7 @@ private:
     } while (!needs_stop());
   }
 
-private:
+
   std::string thread_name;
   bool throw_exception{false};
 };
@@ -81,6 +81,10 @@ TEST_CASE("runnable") {
   SUBCASE("stop") { tester.test_stop(); }
 
   SUBCASE("restart") { tester.test_restart(); }
+  SUBCASE("start twice") {
+    tester.start();
+    CHECK_THROWS(tester.start());
+  }
 
 #if defined(__linux__)
   SUBCASE("name") { tester.test_name(); }

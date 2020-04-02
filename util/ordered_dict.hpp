@@ -36,6 +36,14 @@ namespace cyy::cxx_lib {
       }
     };
 
+    struct reverse_iterator : public data_list_type::reverse_iterator {
+      explicit reverse_iterator(typename data_list_type::reverse_iterator rhs)
+          : data_list_type::reverse_iterator{rhs} {}
+      const auto &operator*() const {
+        return data_list_type::reverse_iterator::operator*().second;
+      }
+    };
+
     bool empty() const noexcept { return data.empty(); }
     auto size() const noexcept { return data.size(); }
     void clear() noexcept {
@@ -73,9 +81,11 @@ namespace cyy::cxx_lib {
       return true;
     }
     auto begin() noexcept { return iterator(data.begin()); }
+    auto rbegin() noexcept { return reverse_iterator(data.rbegin()); }
     auto begin() const noexcept { return const_iterator(data.begin()); }
     auto cbegin() const noexcept { return const_iterator(data.cbegin()); }
     auto end() noexcept { return iterator(data.end()); }
+    auto rend() noexcept { return reverse_iterator(data.rend()); }
     auto end() const noexcept { return const_iterator(data.end()); }
     auto cend() const noexcept { return const_iterator(data.cend()); }
     iterator find(const Key &key) {
@@ -101,6 +111,10 @@ namespace cyy::cxx_lib {
       return {key, value};
     }
 
+    bool move_to_end_in_finding{true};
+    bool move_to_end_in_update{true};
+
+  private:
     iterator move_to_end(iterator it) {
       auto real_it = static_cast<typename data_list_type::iterator>(it);
       data.emplace_back(std::move(*real_it));
@@ -111,10 +125,7 @@ namespace cyy::cxx_lib {
       return iterator(real_it);
     }
 
-    bool move_to_end_in_finding{true};
-    bool move_to_end_in_update{true};
-
-  private:
+  
     data_list_type data;
     data_index_type data_index;
   };

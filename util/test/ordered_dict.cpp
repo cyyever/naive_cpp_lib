@@ -17,16 +17,31 @@ TEST_CASE("ordered_dict") {
     container.emplace(1, "");
     CHECK(!container.empty());
     CHECK_EQ(container.size(), 1);
-    container.emplace(1, "");
+    container.emplace(1, "hello");
     CHECK_EQ(container.size(), 1);
+    CHECK_EQ(*container.rbegin(), "hello");
+    container.clear();
+    CHECK(container.empty());
   }
 
   SUBCASE("find") {
+    CHECK_EQ(container.find(1), container.end());
+    CHECK_EQ(container.begin(), container.end());
+    CHECK_EQ(container.rbegin(), container.rend());
+
+    container.emplace(1, "a");
+    container.emplace(2, "b");
+    auto it = container.begin();
+    CHECK_EQ(*it, "a");
+    it++;
+    CHECK_EQ(*it, "b");
+
+    container.find(1);
+    it = container.begin();
+    CHECK_EQ(*it, "b");
+    it++;
+    CHECK_EQ(*it, "a");
     container.clear();
-    container.emplace(1, "hello");
-    auto it = container.find(1);
-    CHECK_NE(it, container.end());
-    CHECK_EQ(*it, "hello");
   }
 
   SUBCASE("pop_front") {
@@ -34,24 +49,44 @@ TEST_CASE("ordered_dict") {
     container.emplace(2, "b");
     CHECK(!container.empty());
     CHECK_EQ(container.size(), 2);
-    auto [k,v]=container.pop_front();
+    auto [k, v] = container.pop_front();
     CHECK_EQ(k, 1);
     CHECK_EQ(v, "a");
-    std::tie(k,v)=container.pop_front();
+    std::tie(k, v) = container.pop_front();
     CHECK_EQ(k, 2);
     CHECK_EQ(v, "b");
+    CHECK(container.empty());
+    CHECK_THROWS(container.pop_front());
   }
-  SUBCASE("move_to_end") {
+
+  SUBCASE("no move_to_end") {
+    container.move_to_end_in_update = false;
     container.emplace(1, "a");
     container.emplace(2, "b");
-    CHECK(!container.empty());
+    container.emplace(1, "c");
     CHECK_EQ(container.size(), 2);
-      container.move_to_end(container.begin());
-    auto [k,v]=container.pop_front();
+
+    auto [k, v] = container.pop_front();
+    CHECK_EQ(k, 1);
+    CHECK_EQ(v, "c");
+    std::tie(k, v) = container.pop_front();
     CHECK_EQ(k, 2);
     CHECK_EQ(v, "b");
-    std::tie(k,v)=container.pop_front();
+    container.move_to_end_in_update = true;
+    container.clear();
+  }
+  SUBCASE("no find_to_end") {
+    container.move_to_end_in_finding = false;
+    container.emplace(1, "a");
+    container.emplace(2, "b");
+    container.find(1);
+
+    auto [k, v] = container.pop_front();
     CHECK_EQ(k, 1);
     CHECK_EQ(v, "a");
+    std::tie(k, v) = container.pop_front();
+    CHECK_EQ(k, 2);
+    CHECK_EQ(v, "b");
+    container.move_to_end_in_finding = true;
   }
 }

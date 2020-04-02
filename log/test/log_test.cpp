@@ -7,6 +7,7 @@
  */
 
 #include <doctest/doctest.h>
+#include <spdlog/common.h>
 
 #include "log/log.hpp"
 
@@ -15,6 +16,12 @@ TEST_CASE("default console logger") {
   LOG_INFO("hello world.....info");
   LOG_DEBUG("hello world.....debug");
   LOG_WARN("hello world.....warn");
+}
+
+TEST_CASE("set logger level") {
+  cyy::cxx_lib::log::set_level(spdlog::level::err);
+  LOG_WARN("no warns");
+  LOG_ERROR("an error");
 }
 
 TEST_CASE("single message") { LOG_ERROR("{} {}"); }
