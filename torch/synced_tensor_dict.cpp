@@ -215,6 +215,11 @@ namespace cyy::cxx_lib::pytorch {
     }
   }
 
+  std::string synced_tensor_dict::get_storage_dir() const  {
+    std::lock_guard lk(data_mutex);
+    return storage_dir.string();
+  }
+
   void synced_tensor_dict::set_wait_flush_ratio(size_t wait_flush_ratio_) {
     std::lock_guard lk(data_mutex);
     wait_flush_ratio = wait_flush_ratio_;

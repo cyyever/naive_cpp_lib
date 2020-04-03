@@ -41,6 +41,7 @@ namespace cyy::cxx_lib::pytorch {
       in_memory_number = in_memory_number_;
     }
     void set_storage_dir(const std::string &storage_dir_);
+    std::string get_storage_dir() const ;
     void set_wait_flush_ratio(size_t wait_flush_ratio_);
     void set_saving_thread_number(size_t saving_thread_number_);
     void set_fetch_thread_number(size_t fetch_thread_number_);
