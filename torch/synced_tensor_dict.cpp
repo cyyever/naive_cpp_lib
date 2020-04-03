@@ -47,7 +47,7 @@ namespace cyy::cxx_lib::pytorch {
 
   void synced_tensor_dict::release() {
     if (permanent) {
-      flush_all();
+      flush_all(true);
     }
     for (size_t i = 0; i < fetch_thread_num; i++) {
       fetch_request_queue.emplace_back();
@@ -215,7 +215,7 @@ namespace cyy::cxx_lib::pytorch {
     }
   }
 
-  std::string synced_tensor_dict::get_storage_dir() const  {
+  std::string synced_tensor_dict::get_storage_dir() const {
     std::lock_guard lk(data_mutex);
     return storage_dir.string();
   }
@@ -225,11 +225,19 @@ namespace cyy::cxx_lib::pytorch {
     wait_flush_ratio = wait_flush_ratio_;
   }
 
-  void synced_tensor_dict::flush_all() {
-    std::lock_guard lk(data_mutex);
+  void synced_tensor_dict::flush_all(bool wait) {
+    std::unique_lock lk(data_mutex);
     auto old_in_memory_number = in_memory_number;
     in_memory_number = 0;
     flush();
+    if (wait) {
+      while (!data.empty()) {
+        flush();
+        LOG_INFO("wait flush saving_data size is {} data is {} ",
+                 saving_data.size(), data.size());
+        less_data_cv.wait(lk);
+      }
+    }
     in_memory_number = old_in_memory_number;
   }
 

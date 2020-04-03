@@ -32,7 +32,7 @@ namespace cyy::cxx_lib::pytorch {
     bool contains(const std::string &key) const;
     void enable_debug_logging(bool enable) const;
     std::vector<std::string> keys() const;
-    void flush_all();
+    void flush_all(bool wait=false);
     void flush();
     void clear();
     void prefetch(const std::vector<std::string> &keys);
