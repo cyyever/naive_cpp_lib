@@ -18,7 +18,7 @@
 #include "log/log.hpp"
 #include "string.hpp"
 
-namespace deepir::strings {
+namespace cyy::cxx_lib::strings {
 
 std::vector<std::string> split(const std::string &s, char c) {
   std::string buff;
@@ -151,4 +151,4 @@ std::string UTF8_to_GBK(const std::string &str) {
 }
 #endif
 
-} // namespace deepir::strings
+} // namespace cyy::cxx_lib::strings

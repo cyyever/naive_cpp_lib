@@ -28,13 +28,13 @@
 #pragma comment(lib, "IPHLPAPI.lib")
 #pragma comment(lib, "Ws2_32.lib")
 
-#include <deepir/log/log.hpp>
-#include <deepir/util/error.hpp>
-#include <deepir/util/string.hpp>
+#include "log/log.hpp"
+#include "util/error.hpp"
+#include "util/string.hpp"
 
 #include "hardware.hpp"
 
-namespace deepir::hardware {
+namespace cyy::cxx_lib::hardware {
 
 std::set<std::string> mac_address() {
   DWORD dwRetVal = 0;
@@ -299,7 +299,7 @@ std::string UUID() {
     if (FAILED(res)) {
       return {};
     }
-    UUID = ::deepir::strings::UTF16_to_UTF8(
+    UUID = ::cyy::cxx_lib::strings::UTF16_to_UTF8(
         reinterpret_cast<char *>(vtProp.bstrVal),
         ::SysStringLen(vtProp.bstrVal));
     //去除空格
@@ -497,7 +497,7 @@ std::string disk_serial_number() {
     if (FAILED(res)) {
       return {};
     }
-    disk_serial_number = ::deepir::strings::UTF16_to_UTF8(
+    disk_serial_number = ::cyy::cxx_lib::strings::UTF16_to_UTF8(
         reinterpret_cast<char *>(vtProp.bstrVal),
         ::SysStringLen(vtProp.bstrVal));
     //去除空格
@@ -520,7 +520,7 @@ std::string get_mac_address_by_ipv4(const std::string &ipv4_addr) {
   DWORD dwAddr;
   {
     if (InetPton(AF_INET, ipv4_addr.c_str(), &dwAddr) != 1) {
-      DLOG_ERROR("InetPton failed:{}", WSAGetLastError());
+      LOG_ERROR("InetPton failed:{}", WSAGetLastError());
       return "";
     }
   }
@@ -568,5 +568,5 @@ std::string get_mac_address_by_ipv4(const std::string &ipv4_addr) {
   return "";
 }
 
-} // namespace deepir::hardware
+} // namespace cyy::cxx_lib::hardware
 #endif
