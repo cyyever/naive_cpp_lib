@@ -144,7 +144,7 @@ namespace cyy::cxx_lib::pytorch {
     saving_data.clear();
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove_all(storage_dir);
-      set_storage_dir(storage_dir);
+      set_storage_dir(storage_dir.string());
     }
   }
 
@@ -207,9 +207,9 @@ namespace cyy::cxx_lib::pytorch {
     return expired_data;
   }
 
-  void synced_tensor_dict::set_storage_dir(const std::string &storage_dir_) {
+  void synced_tensor_dict::set_storage_dir(std::string storage_dir_) {
     std::lock_guard lk(data_mutex);
-    storage_dir = storage_dir_;
+    storage_dir = std::move(storage_dir_);
     if (!std::filesystem::exists(storage_dir)) {
       std::filesystem::create_directories(storage_dir);
     }
