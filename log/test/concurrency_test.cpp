@@ -13,7 +13,7 @@
 
 TEST_CASE("concurrency") {
   cyy::cxx_lib::log::setup_file_logger(".", "file_logger",
-                                 spdlog::level::level_enum::info);
+                                       spdlog::level::level_enum::info);
   std::vector<std::thread> thds;
 
   for (int i = 0; i < 100; i++) {
