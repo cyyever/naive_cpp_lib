@@ -32,7 +32,7 @@ namespace cyy::cxx_lib::pytorch {
     bool contains(const std::string &key) const;
     void enable_debug_logging(bool enable) const;
     std::vector<std::string> keys() const;
-    void flush_all(bool wait=false);
+    void flush_all(bool wait = false);
     void flush();
     void clear();
     void prefetch(const std::vector<std::string> &keys);
@@ -41,17 +41,17 @@ namespace cyy::cxx_lib::pytorch {
       in_memory_number = in_memory_number_;
     }
     void set_storage_dir(const std::string &storage_dir_);
-    std::string get_storage_dir() const ;
+    std::string get_storage_dir() const;
     void set_wait_flush_ratio(size_t wait_flush_ratio_);
     void set_saving_thread_number(size_t saving_thread_number_);
     void set_fetch_thread_number(size_t fetch_thread_number_);
 
     void enable_permanent_storage() { permanent = true; }
-    void disable_permanent_storage() { permanent =false; }
+    void disable_permanent_storage() { permanent = false; }
 
   private:
-    enum class data_state:int {
-      IN_MEMORY=0,
+    enum class data_state : int {
+      IN_MEMORY = 0,
       IN_MEMORY_NEW_DATA,
       IN_DISK,
       PRE_SAVING,
@@ -70,8 +70,7 @@ namespace cyy::cxx_lib::pytorch {
 
     std::pair<bool, std::optional<torch::Tensor>>
     prefetch(const std::string &key);
-    using save_task =
-        std::tuple<std::string, std::filesystem::path>;
+    using save_task = std::tuple<std::string, std::filesystem::path>;
     std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);
 

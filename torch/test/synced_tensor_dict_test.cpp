@@ -20,8 +20,8 @@ TEST_CASE("synced_tensor_dict") {
   dict.set_fetch_thread_number(5);
 
   // save sparse tensor
-  auto sparse_tensor= torch::eye(3).to_sparse();
-  dict.emplace("sparse_tensor",sparse_tensor);
+  auto sparse_tensor = torch::eye(3).to_sparse();
+  dict.emplace("sparse_tensor", sparse_tensor);
 
   CHECK_EQ(dict.size(), 1);
   CHECK_EQ(dict.keys().size(), 1);
@@ -29,12 +29,11 @@ TEST_CASE("synced_tensor_dict") {
 
   CHECK_EQ(dict.size(), 0);
 
-
   std::vector<std::thread> thds;
   for (int i = 0; i < 10; i++) {
     thds.emplace_back([i, &dict]() {
       for (int j = 0; j < 10; j++) {
-        dict.emplace(std::to_string(i * 10 + j), torch::rand({1,200*1024}));
+        dict.emplace(std::to_string(i * 10 + j), torch::rand({1, 200 * 1024}));
       }
     });
   }
@@ -47,9 +46,9 @@ TEST_CASE("synced_tensor_dict") {
 
   std::vector<std::string> keys;
   for (int i = 0; i < 10; i++) {
-      for (int j = 0; j < 10; j++) {
-        keys.emplace_back(std::to_string(i * 10 + j));
-      }
+    for (int j = 0; j < 10; j++) {
+      keys.emplace_back(std::to_string(i * 10 + j));
+    }
   }
   dict.flush_all();
 

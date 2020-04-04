@@ -71,7 +71,6 @@ private:
     } while (!needs_stop());
   }
 
-
   std::string thread_name;
   bool throw_exception{false};
 };

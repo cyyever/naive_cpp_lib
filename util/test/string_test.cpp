@@ -27,7 +27,7 @@ TEST_CASE("has_suffix") {
 #ifdef _WIN32
 TEST_CASE("UTF8_and_GBK_conv") {
   std::string test_str = "a123";
-  CHECK(cyy::cxx_lib::strings::GBK_to_UTF8(cyy::cxx_lib::strings::UTF8_to_GBK(test_str)) ==
-        test_str);
+  CHECK(cyy::cxx_lib::strings::GBK_to_UTF8(
+            cyy::cxx_lib::strings::UTF8_to_GBK(test_str)) == test_str);
 }
 #endif

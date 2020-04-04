@@ -25,7 +25,7 @@ namespace cyy::cxx_lib::pytorch {
         try {
           std::unique_lock lk(dict.data_mutex);
           if (!dict.change_state(key, data_state::PRE_SAVING,
-                                data_state::SAVING)) {
+                                 data_state::SAVING)) {
             continue;
           }
           auto value = dict.saving_data[key];

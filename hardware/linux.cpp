@@ -76,8 +76,9 @@ namespace cyy::cxx_lib::hardware {
       if (ioctl(fd, SIOCGIFFLAGS, &ifr) != 0) {
         auto socket_errno = errno;
         close(fd);
-        throw std::runtime_error(std::string("ioctl failed: ") +
-                                 cyy::cxx_lib::util::errno_to_str(socket_errno));
+        throw std::runtime_error(
+            std::string("ioctl failed: ") +
+            cyy::cxx_lib::util::errno_to_str(socket_errno));
       }
       if (ifr.ifr_flags & IFF_LOOPBACK) {
         continue;
@@ -85,8 +86,9 @@ namespace cyy::cxx_lib::hardware {
       if (ioctl(fd, SIOCGIFHWADDR, &ifr) != 0) {
         auto socket_errno = errno;
         close(fd);
-        throw std::runtime_error(std::string("ioctl failed: ") +
-                                 cyy::cxx_lib::util::errno_to_str(socket_errno));
+        throw std::runtime_error(
+            std::string("ioctl failed: ") +
+            cyy::cxx_lib::util::errno_to_str(socket_errno));
       }
 
       const char *hex = "0123456789ABCDEF";
