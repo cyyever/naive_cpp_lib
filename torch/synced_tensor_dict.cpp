@@ -231,11 +231,23 @@ namespace cyy::cxx_lib::pytorch {
     in_memory_number = 0;
     flush();
     if (wait) {
-      while (!data.empty()) {
-        flush();
+      while (true) {
+        bool has_saving = false;
+        for (auto const &[_, state] : data_info) {
+          if (state == data_state::IN_MEMORY_NEW_DATA ||
+              state == data_state::SAVING || state == data_state::PRE_SAVING) {
+            has_saving = true;
+            break;
+          }
+        }
+        if (!has_saving) {
+          break;
+        }
+
         LOG_INFO("wait flush saving_data size is {} data is {} ",
                  saving_data.size(), data.size());
         less_data_cv.wait(lk);
+        flush();
       }
     }
     in_memory_number = old_in_memory_number;
