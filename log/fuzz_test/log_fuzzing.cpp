@@ -6,7 +6,7 @@
  * \date 2017-01-17
  */
 
-#include "../src/log.hpp"
+#include "log/log.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   try {

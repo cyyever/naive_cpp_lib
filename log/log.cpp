@@ -10,9 +10,9 @@
 #endif
 
 #define _CRT_SECURE_NO_WARNINGS
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #if __has_include(<unistd.h>)
 #include <sys/types.h>

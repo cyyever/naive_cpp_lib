@@ -9,5 +9,5 @@ foreach(fuzzing_source IN LISTS fuzzing_sources)
   add_executable(fuzz_${fuzzing_prog}
                  ${CMAKE_CURRENT_LIST_DIR}/${fuzzing_prog}.cpp)
   target_link_libraries(fuzz_${fuzzing_prog} PRIVATE MyCXXLib::log)
-  add_fuzzing(TARGET fuzz_${fuzzing_prog} UBSAN FALSE)
+  add_fuzzing(TARGET fuzz_${fuzzing_prog})
 endforeach()
