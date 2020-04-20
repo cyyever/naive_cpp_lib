@@ -4,35 +4,26 @@
  * \brief 测试mat相关函数
  * \author cyy
  */
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <deepir/image/image.hpp>
-#include <doctest.h>
-#ifdef USE_GPU
-#include <deepir/allocator/buddy_pool.hpp>
-#endif
+#include <doctest/doctest.h>
 #include <functional>
 #include <iostream>
 #include <mutex>
 #include <thread>
 
-#include "../src/mat.hpp"
+#include "cv/mat.hpp"
 
 #define STR_H(x) #x
 #define STR_HELPER(x) STR_H(x)
 
 TEST_CASE("mat") {
   {
-    deepir::allocator::buddy_pool::set_device_pool_size(0, 28);
-    deepir::allocator::buddy_pool::set_host_pool_size(28);
 
-    auto tmp_mat = deepir::image::load(STR_HELPER(IN_IMAGE));
+    auto tmp_mat = cyy::cxx_lib::math::mat::load(STR_HELPER(IN_IMAGE));
     CHECK(tmp_mat);
-    deepir::math::mat image_mat = tmp_mat.value();
+    cyy::cxx_lib::math::mat image_mat = tmp_mat.value();
 
     image_mat.use_gpu(true);
 
-    CHECK_EQ(image_mat.width(), tmp_mat->cols);
-    CHECK_EQ(image_mat.height(), tmp_mat->rows);
     CHECK_EQ(image_mat.channels(), 3);
 
     SUBCASE("resize") {

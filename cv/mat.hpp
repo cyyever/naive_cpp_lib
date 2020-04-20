@@ -14,7 +14,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace cyy::cxx_lib::math {
+namespace cyy::cxx_lib::math{
 
 //! \brief cv::Mat的cpu/gpu操作
 class mat final {

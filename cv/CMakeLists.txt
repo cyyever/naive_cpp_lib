@@ -8,7 +8,7 @@ target_link_libraries(my_cxx_lib_cv PRIVATE MyCXXLib::hardware)
 
 find_package(
   OpenCV REQUIRED
-  COMPONENTS core imgproc
+  COMPONENTS core imgproc imgcodecs
   OPTIONAL_COMPONENTS cudaarithm cudaimgproc)
 
 target_include_directories(my_cxx_lib_cv PUBLIC ${OpenCV_INCLUDE_DIRS})
@@ -21,11 +21,12 @@ if("opencv_cudaarithm" IN_LIST OpenCV_LIB_COMPONENTS)
   target_link_libraries(my_cxx_lib_cv PRIVATE CUDA::cudart CUDA::cudart_static)
   find_package(CUDABuddyAllocator REQUIRED)
   find_package(spdlog REQUIRED)
+  find_package(Threads REQUIRED)
   target_link_libraries(my_cxx_lib_cv PRIVATE CUDABuddyAllocator)
+  target_link_libraries(my_cxx_lib_cv PRIVATE Threads::Threads)
 endif()
 
 if(BUILD_TEST)
-  # add_subdirectory(test)
+  add_subdirectory(test)
 endif()
-# if(BUILD_FUZZING)
-# add_subdirectory(fuzz_test) endif()
+# if(BUILD_FUZZING) add_subdirectory(fuzz_test) endif()
