@@ -9,7 +9,7 @@ option(BUILD_ML "Build machine learning modules" OFF)
 
 set(submodule_names log util hardware)
 if(BUILD_ML)
-  list(APPEND submodule_names torch)
+  list(APPEND submodule_names torch cv)
 endif()
 
 # test
@@ -31,7 +31,7 @@ endforeach()
 
 install(
   TARGETS ${submodule_libs}
-  EXPORT MyCXXLib
+  EXPORT MyCXXLibConfig
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib COMPONENT library
@@ -39,6 +39,6 @@ install(
   DESTINATION include)
 
 install(
-  EXPORT MyCXXLib
+  EXPORT MyCXXLibConfig
   DESTINATION lib/cmake/${PROJECT_NAME}
   NAMESPACE MyCXXLib)
