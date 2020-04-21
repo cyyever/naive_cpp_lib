@@ -103,10 +103,10 @@ TEST_CASE("mat") {
     SUBCASE("cvt_color") {
       auto new_image_mat = image_mat.clone();
       new_image_mat.cvt_color(cv::COLOR_BGR2RGB);
-      CHECK_NE(image_mat.elem_size(), new_image_mat.elem_size());
-      CHECK_NE(image_mat.channels(), new_image_mat.channels());
-      CHECK_NE(image_mat.width(), new_image_mat.width());
-      CHECK_NE(image_mat.height(), new_image_mat.height());
+      CHECK_EQ(image_mat.elem_size(), new_image_mat.elem_size());
+      CHECK_EQ(image_mat.channels(), new_image_mat.channels());
+      CHECK_EQ(image_mat.width(), new_image_mat.width());
+      CHECK_EQ(image_mat.height(), new_image_mat.height());
 
       auto channels = image_mat.split();
       auto new_channels = new_image_mat.split();

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#ifndef SPDLOG_COMPILED_LIB
-#define SPDLOG_COMPILED_LIB 1
-#endif
+/* #ifndef SPDLOG_COMPILED_LIB */
+/* #define SPDLOG_COMPILED_LIB 1 */
+/* #endif */
 
 #include <spdlog/spdlog.h>
 #include <string>

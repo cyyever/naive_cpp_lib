@@ -118,6 +118,7 @@ struct buddy_allocator_initer final {
     if (!has_nvidia_driver) {
       return;
     }
+    cuda_buddy::pool::set_device_pool_size(40);
     device_allocator_ptr = std::make_unique<device_allocator>();
     cv::cuda::setBufferPoolUsage(false);
     cv::cuda::GpuMat::setDefaultAllocator(device_allocator_ptr.get());

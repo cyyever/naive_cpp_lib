@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.9)
-
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
 
 find_package(doctest REQUIRED)
@@ -8,6 +6,7 @@ find_package(Threads REQUIRED)
 set(TEST_IMAGE_DIR ${CMAKE_CURRENT_LIST_DIR}/test_images)
 file(GLOB test_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp)
+get_target_property(def_list MyCXXLib::cv INTERFACE_COMPILE_DEFINITIONS)
 foreach(test_source IN LISTS test_sources)
   get_filename_component(test_prog ${test_source} NAME_WE)
   add_executable(${test_prog} ${CMAKE_CURRENT_LIST_DIR}/${test_prog}.cpp)
@@ -19,10 +18,25 @@ foreach(test_source IN LISTS test_sources)
 
   target_compile_definitions(${test_prog}
                              PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
-  if(NOT test_prog STREQUAL "cpu_mat_test")
+
+  if("HAVE_GPU_MAT" IN_LIST def_list)
     target_compile_definitions(${test_prog} PRIVATE USE_GPU)
-    add_test_with_runtime_analysis( TARGET ${test_prog} WITH_CPU_ANALYSIS FALSE CUDA-MEMCHECK FALSE CUDA-SYNCCHECK TRUE CUDA-RACECHECK TRUE TSAN TRUE HELGRIND TRUE) 
+    add_test_with_runtime_analysis(
+      TARGET
+      ${test_prog}
+      WITH_CPU_ANALYSIS
+      TRUE
+      CUDA-MEMCHECK
+      FALSE
+      CUDA-SYNCCHECK
+      TRUE
+      CUDA-RACECHECK
+      TRUE
+      TSAN
+      TRUE
+      HELGRIND
+      TRUE)
   else()
-    add_test_with_runtime_analysis(TARGET ${test_prog})
+    add_test_with_runtime_analysis(TARGET ${test_prog} WITH_GPU_ANALYSIS FALSE)
   endif()
 endforeach()

@@ -5,9 +5,9 @@
  * \date 2016-04-18
  */
 
-#ifndef SPDLOG_COMPILED_LIB
-#define SPDLOG_COMPILED_LIB 1
-#endif
+/* #ifndef SPDLOG_COMPILED_LIB */
+/* #define SPDLOG_COMPILED_LIB 1 */
+/* #endif */
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <spdlog/sinks/rotating_file_sink.h>
