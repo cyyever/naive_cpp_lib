@@ -6,12 +6,13 @@
  * \data 2017-01-17
  */
 
-#include <fcntl.h>
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <fcntl.h>
 #ifdef WIN32
 #include <io.h>
 #else
