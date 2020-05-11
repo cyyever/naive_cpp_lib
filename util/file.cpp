@@ -5,6 +5,9 @@
  * \author cyy
  * \data 2017-01-17
  */
+#ifdef WIN32
+#define NOMINMAX 
+#endif
 
 #include <algorithm>
 #include <fstream>
