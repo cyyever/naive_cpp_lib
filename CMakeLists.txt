@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
 project(MyCXXLib LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 17)
 
 include(cmake/all.cmake)
 
@@ -13,7 +12,6 @@ if(BUILD_ML)
 endif()
 
 # test
-option(BUILD_TEST "Build test" ON)
 option(BUILD_FUZZING "Build fuzzing" OFF)
 
 include_directories(${CMAKE_SOURCE_DIR})
