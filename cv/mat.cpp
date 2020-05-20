@@ -23,11 +23,11 @@
 #include <shared_mutex>
 #include <cuda_buddy/pool.hpp>
 
-#include "log/log.hpp"
-#include "util/file.hpp"
 #include "hardware/cuda.hpp"
 #include "hardware/hardware.hpp"
 #endif
+#include "log/log.hpp"
+#include "util/file.hpp"
 
 #include "mat.hpp"
 
@@ -161,8 +161,8 @@ public:
     download();
     rhs.download();
 
-    auto diff = (cpu_mat != rhs.cpu_mat);
-    return cv::countNonZero(diff) == 0;
+    return cpu_mat.type()==rhs.cpu_mat.type() && cpu_mat.size()==rhs.cpu_mat.size() &&
+      std::equal(cpu_mat.begin<uchar>(), cpu_mat.end<uchar>(), rhs.cpu_mat.begin<uchar>());
   }
 
   void use_gpu(bool use) const {

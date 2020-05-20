@@ -119,10 +119,8 @@ TEST_CASE("mat") {
     SUBCASE("elem_size") { CHECK(image_mat.elem_size() > 0); }
 
     SUBCASE("transpose") {
-#ifndef USE_GPU
       auto image_mat2 = image_mat.transpose().transpose();
       CHECK(image_mat == image_mat2);
-#endif
     }
     SUBCASE("split") { CHECK(image_mat.split().size() == 3); }
     SUBCASE("resize") {
