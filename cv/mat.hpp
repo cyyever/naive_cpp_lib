@@ -7,103 +7,102 @@
 
 #pragma once
 
-#include <memory>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
 
-namespace cyy::cxx_lib::math{
+namespace cyy::cxx_lib::math {
 
-//! \brief cv::Mat的cpu/gpu操作
-class mat final {
-public:
-  mat();
+  //! \brief cv::Mat的cpu/gpu操作
+  class mat final {
+  public:
+    mat();
 
-  mat(const cv::Mat &cv_mat);
+    mat(const cv::Mat &cv_mat);
 #ifdef HAVE_GPU_MAT
-  mat(const cv::cuda::GpuMat &cv_gpu_mat);
+    mat(const cv::cuda::GpuMat &cv_gpu_mat);
 #endif
 
-  mat(const mat &);
-  mat &operator=(const mat &);
+    mat(const mat &);
+    mat &operator=(const mat &);
 
-  mat(mat &&) noexcept;
-  mat &operator=(mat &&) noexcept;
+    mat(mat &&) noexcept;
+    mat &operator=(mat &&) noexcept;
 
-  ~mat();
+    ~mat();
 
-  mat &operator+=(float scalar);
-  mat &operator+=(const cv::Scalar &scalar);
+    mat &operator+=(float scalar);
+    mat &operator+=(const cv::Scalar &scalar);
 
-  mat &operator/=(float scalar);
+    mat &operator/=(float scalar);
 
-  mat operator()(const cv::Rect &roi) const;
+    mat operator()(const cv::Rect &roi) const;
 
-  bool operator==(const mat &rhs) const;
+    bool operator==(const mat &rhs) const;
 
-  //! \brief 使用GPU
-  const mat &use_gpu(bool use) const;
+    //! \brief 使用GPU
+    const mat &use_gpu(bool use) const;
 
-  //! \brief 获取封装的cv::Mat
-  const cv::Mat &get_cv_mat() const;
-
-#ifdef HAVE_GPU_MAT
-  //! \brief 获取封装的cv::cuda::GpuMat
-  const cv::cuda::GpuMat &get_cv_gpu_mat() const;
-#endif
-
-  //! \brief 复制mat内容到cpu buffer
-  void to_cpu_buffer(float *buf) const;
+    //! \brief 获取封装的cv::Mat
+    const cv::Mat &get_cv_mat() const;
 
 #ifdef HAVE_GPU_MAT
-  //! \brief 复制mat内容到gpu buffer
-  void to_gpu_buffer(float *buf) const;
+    //! \brief 获取封装的cv::cuda::GpuMat
+    const cv::cuda::GpuMat &get_cv_gpu_mat() const;
 #endif
 
-  int width() const;
+    //! \brief 复制mat内容到cpu buffer
+    void to_cpu_buffer(float *buf) const;
 
-  int height() const;
+#ifdef HAVE_GPU_MAT
+    //! \brief 复制mat内容到gpu buffer
+    void to_gpu_buffer(float *buf) const;
+#endif
 
-  int channels() const;
+    int width() const;
 
-  int type() const;
+    int height() const;
 
-  size_t elem_size() const;
+    int channels() const;
 
-  mat clone() const;
+    int type() const;
 
-  mat transpose() const;
+    size_t elem_size() const;
 
-  mat resize(int new_width, int new_height,
-             int interpolation = cv::INTER_LINEAR) const;
+    mat clone() const;
 
-  mat convert_to(int rtype, double alpha = 1, double beta = 0) const;
+    mat transpose() const;
 
-  void cvt_color(int code);
+    mat resize(int new_width, int new_height,
+               int interpolation = cv::INTER_LINEAR) const;
 
-  mat copy_make_border(int top, int bottom, int left, int right,
-                       const ::cv::Scalar &value) const;
+    mat convert_to(int rtype, double alpha = 1, double beta = 0) const;
 
-  std::vector<mat> split() const;
+    void cvt_color(int code);
 
-  mat flip(int flip_code) const;
+    mat copy_make_border(int top, int bottom, int left, int right,
+                         const ::cv::Scalar &value) const;
 
+    std::vector<mat> split() const;
 
-  //! \brief 加载指定路径的图片
-  //! \return 如果不成功，返回空，否則返回讀取到的Mat
-static std::optional<mat> load(const std::filesystem::path &image_path);
-  //! \brief 从内存流中加载图片
-  //! \return 如果不成功，返回空，否則返回讀取到的Mat
-static std::optional<mat> load(const void *buf, size_t size);
+    mat flip(int flip_code) const;
 
-private:
-  class mat_impl;
-  mat(mat_impl &&);
+    //! \brief 加载指定路径的图片
+    //! \return 如果不成功，返回空，否則返回讀取到的Mat
+    static std::optional<mat> load(const std::filesystem::path &image_path);
+    //! \brief 从内存流中加载图片
+    //! \return 如果不成功，返回空，否則返回讀取到的Mat
+    static std::optional<mat> load(const void *buf, size_t size);
 
-private:
-  std::unique_ptr<mat_impl> pimpl;
-};
+  private:
+    class mat_impl;
+    mat(mat_impl &&);
+
+  private:
+    std::unique_ptr<mat_impl> pimpl;
+  };
 
 } // namespace cyy::cxx_lib::math

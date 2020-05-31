@@ -23,9 +23,7 @@ find_package(Torch REQUIRED)
 
 target_link_libraries(my_cxx_lib_torch PUBLIC ${TORCH_LIBRARIES})
 
-if(BUILD_TEST)
-  add_subdirectory(test)
-endif()
+add_subdirectory(test)
 if(BUILD_FUZZING)
   add_subdirectory(fuzz_test)
 endif()

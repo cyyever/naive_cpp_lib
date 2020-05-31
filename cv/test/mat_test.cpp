@@ -4,7 +4,6 @@
  * \brief 测试mat相关函数
  * \author cyy
  */
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 #include <functional>
 #include <iostream>
