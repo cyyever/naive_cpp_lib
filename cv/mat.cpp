@@ -329,6 +329,7 @@ namespace cyy::cxx_lib::math {
     }
 
     mat_impl transpose() const {
+      /*
 #ifdef HAVE_GPU_MAT
       upload();
       if (location != storage_location::cpu) {
@@ -337,6 +338,7 @@ namespace cyy::cxx_lib::math {
         return {tmp};
       }
 #endif
+*/
       cv::Mat tmp;
       cv::transpose(cpu_mat, tmp);
       return {tmp};
