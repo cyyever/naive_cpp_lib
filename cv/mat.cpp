@@ -274,7 +274,7 @@ namespace cyy::cxx_lib::math {
           cv::cuda::StreamAccessor::getStream(get_thread_stream())));
 
       //参考opencv-3.2.0/modules/core/src/cuda/gpu_mat.cu
-      //cv::cuda::GpuMat::copyTo
+      // cv::cuda::GpuMat::copyTo
       cudaSafeCall(cudaMemcpy2DAsync(
           buf, gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.data, gpu_mat.step,
           gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.rows,
