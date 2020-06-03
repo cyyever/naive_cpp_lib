@@ -5,11 +5,11 @@
 namespace cyy::cxx_lib::pytorch {
   class synced_sparse_tensor_dict : public synced_tensor_dict {
   public:
-    synced_sparse_tensor_dict(const std::string &storage_dir_,
-                              torch::Tensor mask_,
-                              torch::IntArrayRef value_shape_)
+    synced_sparse_tensor_dict(torch::Tensor mask_,
+                              torch::IntArrayRef tensor_shape_,
+                              const std::string &storage_dir_)
         : synced_tensor_dict(storage_dir_), mask{std::move(mask_)},
-          value_shape{std::move(value_shape_)} {
+          tensor_shape{std::move(tensor_shape_)} {
       if (!mask.is_sparse()) {
         mask = mask.to_sparse();
       }
@@ -20,6 +20,6 @@ namespace cyy::cxx_lib::pytorch {
 
   private:
     torch::Tensor mask;
-    torch::IntArrayRef value_shape;
+    torch::IntArrayRef tensor_shape;
   };
 } // namespace cyy::cxx_lib::pytorch

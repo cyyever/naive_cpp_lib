@@ -9,6 +9,6 @@ namespace cyy::cxx_lib::pytorch {
   }
   torch::Tensor synced_sparse_tensor_dict::get(const std::string &key) {
     auto value = synced_tensor_dict::get(key);
-    return sparse_coo_tensor(mask._indices(), value, value_shape).to_dense();
+    return sparse_coo_tensor(mask._indices(), value, tensor_shape).to_dense();
   }
 } // namespace cyy::cxx_lib::pytorch
