@@ -23,7 +23,7 @@ namespace cyy::cxx_lib::pytorch {
           if(f.is_regular_file()) {
             auto key = f.path().filename().string();
             data_info[key] = data_state::IN_DISK;
-            LOG_INFO("load key {}", key);
+            LOG_DEBUG("load key {}", key);
           }
         }
         if(data_info.empty()) {
