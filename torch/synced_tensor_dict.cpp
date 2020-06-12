@@ -20,9 +20,16 @@ namespace cyy::cxx_lib::pytorch {
                                       " is not a directory");
         }
         for (const auto &f : std::filesystem::directory_iterator(storage_dir)) {
-          auto key = f.path().filename().string();
-          data_info[key] = data_state::IN_DISK;
-          LOG_DEBUG("load key {}", key);
+          if(f.is_regular_file()) {
+            auto key = f.path().filename().string();
+            data_info[key] = data_state::IN_DISK;
+            LOG_INFO("load key {}", key);
+          }
+        }
+        if(data_info.empty()) {
+            LOG_WARN("no key to load");
+        } else {
+            LOG_WARN("load {} keys",data_info.size());
         }
       } else {
         std::filesystem::create_directories(storage_dir);
@@ -156,7 +163,7 @@ namespace cyy::cxx_lib::pytorch {
     if (enable) {
       cyy::cxx_lib::log::set_level(spdlog::level::level_enum::debug);
     } else {
-      cyy::cxx_lib::log::set_level(spdlog::level::level_enum::err);
+      cyy::cxx_lib::log::set_level(spdlog::level::level_enum::warn);
     }
   }
 
@@ -208,10 +215,18 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   void synced_tensor_dict::set_storage_dir(std::string storage_dir_) {
+    if (storage_dir_.empty()) {
+      throw std::invalid_argument(storage_dir_ + " is not a directory");
+    }
     std::lock_guard lk(data_mutex);
     storage_dir = std::move(storage_dir_);
     if (!std::filesystem::exists(storage_dir)) {
       std::filesystem::create_directories(storage_dir);
+    } else {
+      if (!std::filesystem::is_directory(storage_dir)) {
+        throw std::invalid_argument(storage_dir.string() +
+                                    " is not a directory");
+      }
     }
   }
 
