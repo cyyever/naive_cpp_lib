@@ -19,6 +19,7 @@ namespace cyy::cxx_lib::pytorch {
 
     tensor_shape = tensor_shape_.vec();
   }
+  synced_sparse_tensor_dict::~synced_sparse_tensor_dict() { release(); }
   void synced_sparse_tensor_dict::emplace(const std::string &key,
                                           const torch::Tensor &value) {
 

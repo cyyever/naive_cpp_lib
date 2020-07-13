@@ -9,7 +9,7 @@
 
 #include "torch/synced_sparse_tensor_dict.hpp"
 
-TEST_CASE("synced_tensor_dict") {
+TEST_CASE("synced_sparse_tensor_dict") {
   auto sparse_tensor = torch::eye(3);
   auto mask = (sparse_tensor != 0);
 

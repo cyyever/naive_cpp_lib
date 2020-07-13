@@ -70,6 +70,8 @@ namespace cyy::cxx_lib::pytorch {
     for (auto &t : saving_threads) {
       t.stop();
     }
+    fetch_request_queue.clear();
+    save_request_queue.clear();
     data.clear();
     data_info.clear();
     saving_data.clear();
