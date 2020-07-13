@@ -363,4 +363,9 @@ namespace cyy::cxx_lib::pytorch {
     }
     fetch_thread_num = fetch_thread_num_;
   }
+  void synced_tensor_dict::set_in_memory_number(size_t in_memory_number_) {
+    LOG_WARN("set in_memory_number {}", in_memory_number_);
+    std::lock_guard lk(data_mutex);
+    in_memory_number = in_memory_number_;
+  }
 } // namespace cyy::cxx_lib::pytorch
