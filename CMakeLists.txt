@@ -11,13 +11,19 @@ if(BUILD_ML)
   list(APPEND submodule_names torch cv)
 endif()
 
-# test
+option(WITH_ASAN "Build with address sanitizer" OFF)
+
 option(BUILD_FUZZING "Build fuzzing" OFF)
 
 include_directories(${CMAKE_SOURCE_DIR})
 set(submodule_libs)
 foreach(submodule_name IN LISTS submodule_names)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${submodule_name})
+  if(WITH_ASAN)
+    find_package(GoogleSanitizer)
+    target_link_libraries(my_cxx_lib_${submodule_name} PUBLIC GoogleSanitizer::address)
+  endif()
+
   list(APPEND submodule_libs my_cxx_lib_${submodule_name})
 
   install(
