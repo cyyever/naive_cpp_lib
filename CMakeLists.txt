@@ -8,7 +8,8 @@ option(BUILD_ML "Build machine learning modules" OFF)
 
 set(submodule_names log util hardware)
 if(BUILD_ML)
-  list(APPEND submodule_names torch cv)
+  # list(APPEND submodule_names torch cv)
+  list(APPEND submodule_names torch)
 endif()
 
 option(WITH_ASAN "Build with address sanitizer" OFF)
