@@ -153,7 +153,6 @@ namespace cyy::cxx_lib::pytorch {
     saving_data.clear();
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove_all(storage_dir);
-      set_storage_dir(storage_dir.string());
     }
   }
 
