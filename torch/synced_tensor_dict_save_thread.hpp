@@ -30,6 +30,9 @@ namespace cyy::cxx_lib::pytorch {
           }
           auto value = dict.saving_data[key];
           lk.unlock();
+      if (std::filesystem::is_regular_file(path)) {
+      std::filesystem::remove_all(path);
+      }
           torch::save(value, path.string());
           lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
