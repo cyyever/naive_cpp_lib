@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < 100; i++) {
     dict.emplace(std::to_string(i), torch::zeros({1, 200 * 1024}));
   }
+  dict.flush_all(true);
   auto end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   std::cout<<"insertion used "<<end_ms-begin_ms<<" ms"<<std::endl;
 

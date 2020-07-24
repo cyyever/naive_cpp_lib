@@ -247,27 +247,31 @@ namespace cyy::cxx_lib::pytorch {
     auto old_in_memory_number = in_memory_number;
     in_memory_number = 0;
     flush();
-    if (wait) {
-      while (true) {
-        bool has_saving = false;
-        for (auto const &[_, state] : data_info) {
-          if (state == data_state::IN_MEMORY_NEW_DATA ||
-              state == data_state::SAVING || state == data_state::PRE_SAVING) {
-            has_saving = true;
-            break;
-          }
-        }
-        if (!has_saving) {
+    in_memory_number = old_in_memory_number;
+    if (!wait) {
+      return;
+    }
+    while (true) {
+      bool has_saving = false;
+      for (auto const &[_, state] : data_info) {
+        if (state == data_state::IN_MEMORY_NEW_DATA ||
+            state == data_state::SAVING || state == data_state::PRE_SAVING) {
+          has_saving = true;
           break;
         }
-
-        LOG_INFO("wait flush saving_data size is {} data is {} ",
-                 saving_data.size(), data.size());
-        less_data_cv.wait(lk);
-        flush();
       }
+      if (!has_saving) {
+        break;
+      }
+
+      LOG_INFO("wait flush saving_data size is {} data is {} ",
+               saving_data.size(), data.size());
+      less_data_cv.wait(lk);
+      old_in_memory_number=in_memory_number;
+      in_memory_number = 0;
+      flush();
+      in_memory_number = old_in_memory_number;
     }
-    in_memory_number = old_in_memory_number;
   }
 
   std::filesystem::path
