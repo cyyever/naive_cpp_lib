@@ -8,9 +8,9 @@
 #include <chrono>
 #include <torch/torch.h>
 
+#include "log/log.hpp"
 #include "torch/synced_tensor_dict.hpp"
 #include "util/time.hpp"
-#include "log/log.hpp"
 int main(int argc, char **argv) {
   cyy::cxx_lib::log::set_level(spdlog::level::level_enum::err);
   cyy::cxx_lib::pytorch::synced_tensor_dict dict("tensor_dir_profiling");
@@ -19,13 +19,13 @@ int main(int argc, char **argv) {
   dict.enable_permanent_storage();
 
   auto begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
-   auto tensor= torch::randn({1, 200 * 1024});
+  auto tensor = torch::randn({1, 200 * 1024});
   for (int i = 0; i < 100; i++) {
     dict.emplace(std::to_string(i), tensor);
   }
   dict.flush_all(true);
   auto end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
-  std::cout<<"insertion used "<<end_ms-begin_ms<<" ms"<<std::endl;
+  std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
 
   begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir_profiling");
@@ -34,9 +34,10 @@ int main(int argc, char **argv) {
   dict2.enable_permanent_storage();
 
   for (int i = 0; i < 100; i++) {
- tensor=dict2.get(std::to_string(i));
+    tensor = dict2.get(std::to_string(i));
   }
-  std::cout<<"read used "<<end_ms-begin_ms<<" ms"<<std::endl;
+  end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
+  std::cout << "read used " << end_ms - begin_ms << " ms" << std::endl;
   /* dict2.clear(); */
   return 0;
 }
