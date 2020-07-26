@@ -45,6 +45,7 @@ namespace cyy::cxx_lib::pytorch {
           if (!res) {
             LOG_ERROR("lmdb put {} failed,drop it", key);
             dict.erase(key);
+            continue;
           }
 
           lk.lock();
