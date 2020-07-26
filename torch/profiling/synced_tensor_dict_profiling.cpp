@@ -27,12 +27,17 @@ int main(int argc, char **argv) {
   auto end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
 
-  begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir_profiling");
 
   dict2.set_in_memory_number(1024);
   dict2.enable_permanent_storage();
 
+  begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
+  std::vector<std::string> keys;
+  for (int i = 0; i < 1024; i++) {
+    keys.push_back(std::to_string(i));
+  }
+  dict2.prefetch(keys);
   for (int i = 0; i < 1024; i++) {
     tensor = dict2.get(std::to_string(i));
   }

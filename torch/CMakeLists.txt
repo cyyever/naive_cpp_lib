@@ -4,6 +4,7 @@ add_library(my_cxx_lib_torch ${SOURCE})
 set_target_properties(my_cxx_lib_torch PROPERTIES CXX_STANDARD 17)
 add_library(MyCXXLib::torch ALIAS my_cxx_lib_torch)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::log)
+target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::hardware)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::util)
 
 find_package(Python3 REQUIRED)

@@ -4,6 +4,7 @@
 #include <mutex>
 #include <stdexcept>
 
+#include "hardware/hardware.hpp"
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
 #include "synced_tensor_dict_fetch_thread.hpp"
@@ -12,7 +13,9 @@ namespace cyy::cxx_lib::pytorch {
 
   synced_tensor_dict::synced_tensor_dict(const std::string &storage_dir_)
       : storage_dir(storage_dir_) {
-
+    auto cpu_num = cyy::cxx_lib::hardware::cpu_num();
+    saving_thread_num = cpu_num;
+    fetch_thread_num = cpu_num;
     if (!storage_dir.empty()) {
       if (std::filesystem::exists(storage_dir)) {
         if (!std::filesystem::is_directory(storage_dir)) {
@@ -266,7 +269,7 @@ namespace cyy::cxx_lib::pytorch {
       LOG_INFO("wait flush saving_data size is {} data is {} ",
                saving_data.size(), data.size());
       less_data_cv.wait(lk);
-      old_in_memory_number=in_memory_number;
+      old_in_memory_number = in_memory_number;
       in_memory_number = 0;
       flush();
       in_memory_number = old_in_memory_number;
