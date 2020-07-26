@@ -85,14 +85,14 @@ namespace cyy::cxx_lib::pytorch {
     using save_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
-    size_t saving_thread_num{10};
+    size_t saving_thread_num{1};
     std::list<save_thread> saving_threads;
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
     using fetch_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<fetch_task>>>;
     fetch_request_queue_type fetch_request_queue;
-    size_t fetch_thread_num{2};
+    size_t fetch_thread_num{1};
     std::list<fetch_thread> fetch_threads;
 
     size_t in_memory_number{128};

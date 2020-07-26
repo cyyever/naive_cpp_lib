@@ -26,7 +26,7 @@ namespace cyy::cxx_lib::pytorch {
     }
     auto env = std::make_shared<lmdb::env>(lmdb::env::create());
     env->set_mapsize(100ULL * 1024ULL * 1024ULL * 1024ULL); /* 100 GiB */
-    env->open(storage_dir.c_str(), MDB_NOSYNC | MDB_NOMETASYNC);
+    env->open(storage_dir.c_str(), MDB_NOSYNC | MDB_NOMETASYNC|MDB_NORDAHEAD|MDB_WRITEMAP|MDB_MAPASYNC        );
     storage_handle = env;
     auto txn = lmdb::txn::begin(*env);
     auto dbi = lmdb::dbi::open(txn, nullptr, MDB_CREATE);
