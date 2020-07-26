@@ -34,23 +34,23 @@ namespace cyy::cxx_lib::pytorch {
           }
           auto value = dict.saving_data[key];
           lk.unlock();
-          if (std::filesystem::is_regular_file(path)) {
-            std::filesystem::remove_all(path);
-          }
           std::ostringstream os;
           torch::save(value, os);
-          lmdb::val lmdb_key(key);
-          lmdb::val lmdb_val(os.str());
+          os.flush();
+          auto tensor_str = os.str();
           auto txn = lmdb::txn::begin(*env);
           auto dbi = lmdb::dbi::open(txn);
-          dbi.put(txn, lmdb_key, lmdb_val);
+          auto res = dbi.put(txn, key, tensor_str);
           txn.commit();
-            LOG_ERROR("torch::save {} succ", path.string());
+          if (!res) {
+            LOG_ERROR("lmdb put {} failed,drop it", key);
+            dict.erase(key);
+          }
 
           lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
             dict.saving_data.erase(key);
-            LOG_DEBUG("torch::save {} succ", path.string());
+            LOG_DEBUG("torch::save {} succ", key);
             dict.less_data_cv.notify_all();
             continue;
           }
@@ -58,8 +58,7 @@ namespace cyy::cxx_lib::pytorch {
             std::filesystem::remove(path);
           }
         } catch (const std::exception &e) {
-          LOG_ERROR("torch::save {} failed,drop it:{}", path.string(),
-                    e.what());
+          LOG_ERROR("torch::save {} failed,drop it:{}", key, e.what());
           dict.erase(key);
         }
       }

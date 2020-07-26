@@ -1,6 +1,8 @@
 #include <lmdb++.h>
+#include <sstream>
 #include <stdexcept>
 
+#include <string_view>
 #include <torch/csrc/api/include/torch/serialize.h>
 
 #include "log/log.hpp"
@@ -34,12 +36,11 @@ namespace cyy::cxx_lib::pytorch {
             }
           }
 
-          auto txn = lmdb::txn::begin(*env);
+          auto txn = lmdb::txn::begin(*env, nullptr, MDB_RDONLY);
           auto dbi = lmdb::dbi::open(txn);
-          lmdb::val lmdb_key(key);
-          lmdb::val lmdb_val;
-          auto has_data = dbi.get(txn, lmdb_key, lmdb_val);
-          txn.commit();
+          std::string_view lmdb_val;
+          auto has_data = dbi.get(txn, key, lmdb_val);
+          txn.abort();
           if (!has_data) {
             std::lock_guard lk(dict.data_mutex);
             if (!dict.change_state(key, data_state::LOADING,
@@ -47,7 +48,6 @@ namespace cyy::cxx_lib::pytorch {
               continue;
             }
           }
-
           torch::Tensor value;
           torch::load(value, lmdb_val.data(), lmdb_val.size());
           bool need_flush = false;

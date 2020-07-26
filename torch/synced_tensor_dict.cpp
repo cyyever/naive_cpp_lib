@@ -1,3 +1,8 @@
+/*!
+ * \file synced_tensor_dict.cpp
+ *
+ * \brief
+ */
 
 #include <algorithm>
 #include <filesystem>
@@ -5,6 +10,7 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+#include <string>
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
@@ -19,20 +25,19 @@ namespace cyy::cxx_lib::pytorch {
       std::filesystem::create_directories(storage_dir);
     }
     auto env = std::make_shared<lmdb::env>(lmdb::env::create());
-    env->set_mapsize(1UL * 1024UL * 1024UL * 1024UL); /* 1 GiB */
-    env->open(storage_dir.c_str());
+    env->set_mapsize(100ULL * 1024ULL * 1024ULL * 1024ULL); /* 100 GiB */
+    env->open(storage_dir.c_str(), MDB_NOSYNC | MDB_NOMETASYNC);
     storage_handle = env;
     auto txn = lmdb::txn::begin(*env);
     auto dbi = lmdb::dbi::open(txn, nullptr, MDB_CREATE);
     auto cursor = lmdb::cursor::open(txn, dbi);
-    for (size_t i = 0;; i++) {
-      lmdb::val key;
-      if (!cursor.get(key, i == 0 ? MDB_FIRST : MDB_NEXT)) {
+    while (true) {
+      std::string_view key;
+      if (!cursor.get(key, MDB_NEXT)) {
         break;
       }
-      std::string key_str(key.data(), key.size());
-      data_info[key_str] = data_state::IN_DISK;
-      LOG_DEBUG("load key {}", key_str);
+      data_info[std::string(key)] = data_state::IN_DISK;
+      LOG_DEBUG("load key {}", key);
     }
     if (data_info.empty()) {
       LOG_WARN("no key to load");

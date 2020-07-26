@@ -1,10 +1,10 @@
 #pragma once
 #include <any>
 #include <filesystem>
+#include <list>
 #include <mutex>
 #include <optional>
 #include <tuple>
-#include <list>
 #include <unordered_map>
 #include <utility>
 
@@ -85,7 +85,7 @@ namespace cyy::cxx_lib::pytorch {
     using save_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
-    size_t saving_thread_num{2};
+    size_t saving_thread_num{10};
     std::list<save_thread> saving_threads;
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
