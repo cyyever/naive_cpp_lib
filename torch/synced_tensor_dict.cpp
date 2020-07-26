@@ -1,6 +1,8 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <lmdb++.h>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 
@@ -13,28 +15,37 @@ namespace cyy::cxx_lib::pytorch {
   synced_tensor_dict::synced_tensor_dict(const std::string &storage_dir_)
       : storage_dir(storage_dir_) {
 
-    if (!storage_dir.empty()) {
-      if (std::filesystem::exists(storage_dir)) {
-        if (!std::filesystem::is_directory(storage_dir)) {
-          throw std::invalid_argument(storage_dir.string() +
-                                      " is not a directory");
-        }
-        for (const auto &f : std::filesystem::directory_iterator(storage_dir)) {
-          if (f.is_regular_file()) {
-            auto key = f.path().filename().string();
-            data_info[key] = data_state::IN_DISK;
-            LOG_DEBUG("load key {}", key);
-          }
-        }
-        if (data_info.empty()) {
-          LOG_WARN("no key to load");
-        } else {
-          LOG_WARN("load {} keys", data_info.size());
-        }
-      } else {
-        std::filesystem::create_directories(storage_dir);
-      }
+    if (!std::filesystem::exists(storage_dir)) {
+      std::filesystem::create_directories(storage_dir);
     }
+    auto env = std::make_shared<lmdb::env>(lmdb::env::create());
+    storage_handle = env;
+    env->open(storage_dir);
+    auto txn = lmdb::txn::begin(env);
+    auto dbi = lmdb::dbi::open(txn, nullptr, MDB_CREATE);
+
+    /* if (!storage_dir.empty()) { */
+    /*   if (std::filesystem::exists(storage_dir)) { */
+    /*     if (!std::filesystem::is_directory(storage_dir)) { */
+    /*       throw std::invalid_argument(storage_dir.string() + */
+    /*                                   " is not a directory"); */
+    /*     } */
+    /*     for (const auto &f :
+     * std::filesystem::directory_iterator(storage_dir)) { */
+    /*       if (f.is_regular_file()) { */
+    /*         auto key = f.path().filename().string(); */
+    /*         data_info[key] = data_state::IN_DISK; */
+    /*         LOG_DEBUG("load key {}", key); */
+    /*       } */
+    /*     } */
+    /*     if (data_info.empty()) { */
+    /*       LOG_WARN("no key to load"); */
+    /*     } else { */
+    /*       LOG_WARN("load {} keys", data_info.size()); */
+    /*     } */
+    /*   } else { */
+    /*   } */
+    /* } */
     for (size_t i = 0; i < saving_thread_num; i++) {
       saving_threads.emplace_back(*this);
     }
@@ -266,7 +277,7 @@ namespace cyy::cxx_lib::pytorch {
       LOG_INFO("wait flush saving_data size is {} data is {} ",
                saving_data.size(), data.size());
       less_data_cv.wait(lk);
-      old_in_memory_number=in_memory_number;
+      old_in_memory_number = in_memory_number;
       in_memory_number = 0;
       flush();
       in_memory_number = old_in_memory_number;

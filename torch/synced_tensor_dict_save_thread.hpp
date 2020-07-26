@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <mutex>
 #include <stdexcept>
+#include <sstream>
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
@@ -30,9 +31,12 @@ namespace cyy::cxx_lib::pytorch {
           }
           auto value = dict.saving_data[key];
           lk.unlock();
-      if (std::filesystem::is_regular_file(path)) {
-      std::filesystem::remove_all(path);
-      }
+          if (std::filesystem::is_regular_file(path)) {
+            std::filesystem::remove_all(path);
+          }
+          std::ostringstream os;
+          torch::save(value, os);
+          
           torch::save(value, path.string());
           lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {

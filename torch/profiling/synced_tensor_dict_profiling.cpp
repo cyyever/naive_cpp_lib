@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
   auto begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   auto tensor = torch::randn({1, 200 * 1024});
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 1024; i++) {
     dict.emplace(std::to_string(i), tensor);
   }
   dict.flush_all(true);
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
   dict2.set_in_memory_number(1024);
   dict2.enable_permanent_storage();
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 1024; i++) {
     tensor = dict2.get(std::to_string(i));
   }
   end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();

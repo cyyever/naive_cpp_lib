@@ -1,4 +1,5 @@
 #pragma once
+#include <any>
 #include <filesystem>
 #include <mutex>
 #include <optional>
@@ -71,8 +72,11 @@ namespace cyy::cxx_lib::pytorch {
     std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);
 
-    mutable std::recursive_mutex data_mutex;
+  private:
     std::filesystem::path storage_dir;
+    std::any storage_handle;
+
+    mutable std::recursive_mutex data_mutex;
     cyy::cxx_lib::ordered_dict<std::string, torch::Tensor> data;
     std::unordered_map<std::string, torch::Tensor> saving_data;
     std::unordered_map<std::string, data_state> data_info;

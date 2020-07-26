@@ -20,8 +20,10 @@ if(Python3_FOUND)
 endif()
 
 find_package(Torch REQUIRED)
+find_package(PkgConfig)
+pkg_search_module(lmdb REQUIRED IMPORTED_TARGET lmdb)
 
-target_link_libraries(my_cxx_lib_torch PUBLIC ${TORCH_LIBRARIES})
+target_link_libraries(my_cxx_lib_torch PUBLIC ${TORCH_LIBRARIES} lmdb)
 
 add_subdirectory(test)
 if(BUILD_FUZZING)
