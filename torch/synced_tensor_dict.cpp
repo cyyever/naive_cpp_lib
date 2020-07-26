@@ -19,33 +19,28 @@ namespace cyy::cxx_lib::pytorch {
       std::filesystem::create_directories(storage_dir);
     }
     auto env = std::make_shared<lmdb::env>(lmdb::env::create());
+    env->set_mapsize(1UL * 1024UL * 1024UL * 1024UL); /* 1 GiB */
+    env->open(storage_dir.c_str());
     storage_handle = env;
-    env->open(storage_dir);
-    auto txn = lmdb::txn::begin(env);
+    auto txn = lmdb::txn::begin(*env);
     auto dbi = lmdb::dbi::open(txn, nullptr, MDB_CREATE);
+    auto cursor = lmdb::cursor::open(txn, dbi);
+    for (size_t i = 0;; i++) {
+      lmdb::val key;
+      if (!cursor.get(key, i == 0 ? MDB_FIRST : MDB_NEXT)) {
+        break;
+      }
+      std::string key_str(key.data(), key.size());
+      data_info[key_str] = data_state::IN_DISK;
+      LOG_DEBUG("load key {}", key_str);
+    }
+    if (data_info.empty()) {
+      LOG_WARN("no key to load");
+    } else {
+      LOG_WARN("load {} keys", data_info.size());
+    }
+    txn.commit();
 
-    /* if (!storage_dir.empty()) { */
-    /*   if (std::filesystem::exists(storage_dir)) { */
-    /*     if (!std::filesystem::is_directory(storage_dir)) { */
-    /*       throw std::invalid_argument(storage_dir.string() + */
-    /*                                   " is not a directory"); */
-    /*     } */
-    /*     for (const auto &f :
-     * std::filesystem::directory_iterator(storage_dir)) { */
-    /*       if (f.is_regular_file()) { */
-    /*         auto key = f.path().filename().string(); */
-    /*         data_info[key] = data_state::IN_DISK; */
-    /*         LOG_DEBUG("load key {}", key); */
-    /*       } */
-    /*     } */
-    /*     if (data_info.empty()) { */
-    /*       LOG_WARN("no key to load"); */
-    /*     } else { */
-    /*       LOG_WARN("load {} keys", data_info.size()); */
-    /*     } */
-    /*   } else { */
-    /*   } */
-    /* } */
     for (size_t i = 0; i < saving_thread_num; i++) {
       saving_threads.emplace_back(*this);
     }
@@ -227,6 +222,7 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   void synced_tensor_dict::set_storage_dir(std::string storage_dir_) {
+    throw std::logic_error("unsupported");
     if (storage_dir_.empty()) {
       throw std::invalid_argument(storage_dir_ + " is not a directory");
     }

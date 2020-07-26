@@ -1,7 +1,9 @@
 #include <filesystem>
+#include <lmdb++.h>
+#include <memory>
 #include <mutex>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
@@ -13,6 +15,7 @@ namespace cyy::cxx_lib::pytorch {
 
   private:
     void run() override {
+      auto env = std::any_cast<std::shared_ptr<lmdb::env>>(dict.storage_handle);
       while (true) {
         auto value_opt =
             dict.save_request_queue.pop_front(std::chrono::seconds(1));
@@ -36,8 +39,14 @@ namespace cyy::cxx_lib::pytorch {
           }
           std::ostringstream os;
           torch::save(value, os);
-          
-          torch::save(value, path.string());
+          lmdb::val lmdb_key(key);
+          lmdb::val lmdb_val(os.str());
+          auto txn = lmdb::txn::begin(*env);
+          auto dbi = lmdb::dbi::open(txn);
+          dbi.put(txn, lmdb_key, lmdb_val);
+          txn.commit();
+            LOG_ERROR("torch::save {} succ", path.string());
+
           lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
             dict.saving_data.erase(key);

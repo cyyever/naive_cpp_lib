@@ -1,3 +1,4 @@
+#include <lmdb++.h>
 #include <stdexcept>
 
 #include <torch/csrc/api/include/torch/serialize.h>
@@ -13,6 +14,7 @@ namespace cyy::cxx_lib::pytorch {
 
   private:
     void run() override {
+      auto env = std::any_cast<std::shared_ptr<lmdb::env>>(dict.storage_handle);
       while (true) {
         auto value_opt =
             dict.fetch_request_queue.pop_front(std::chrono::seconds(1));
@@ -31,8 +33,23 @@ namespace cyy::cxx_lib::pytorch {
               continue;
             }
           }
+
+          auto txn = lmdb::txn::begin(*env);
+          auto dbi = lmdb::dbi::open(txn);
+          lmdb::val lmdb_key(key);
+          lmdb::val lmdb_val;
+          auto has_data = dbi.get(txn, lmdb_key, lmdb_val);
+          txn.commit();
+          if (!has_data) {
+            std::lock_guard lk(dict.data_mutex);
+            if (!dict.change_state(key, data_state::LOADING,
+                                   data_state::LOAD_FAILED)) {
+              continue;
+            }
+          }
+
           torch::Tensor value;
-          torch::load(value, path.string());
+          torch::load(value, lmdb_val.data(), lmdb_val.size());
           bool need_flush = false;
           {
             std::lock_guard lk(dict.data_mutex);
