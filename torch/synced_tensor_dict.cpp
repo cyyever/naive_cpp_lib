@@ -16,6 +16,7 @@ namespace cyy::cxx_lib::pytorch {
     auto cpu_num = cyy::cxx_lib::hardware::cpu_num();
     saving_thread_num = cpu_num;
     fetch_thread_num = cpu_num;
+    LOG_WARN("saving_thread_num and fetch_thread_num {}", cpu_num);
     if (!storage_dir.empty()) {
       if (std::filesystem::exists(storage_dir)) {
         if (!std::filesystem::is_directory(storage_dir)) {
@@ -346,6 +347,7 @@ namespace cyy::cxx_lib::pytorch {
     if (saving_thread_num_ == 0) {
       throw std::runtime_error("saving_thread_num_ is 0");
     }
+
     std::unique_lock lk(data_mutex);
     if (saving_thread_num_ < saving_thread_num) {
       throw std::runtime_error("can't shrink threads");
@@ -355,6 +357,7 @@ namespace cyy::cxx_lib::pytorch {
       saving_threads.back().start();
     }
     saving_thread_num = saving_thread_num_;
+    LOG_WARN("new saving_thread_num {}", saving_thread_num);
   }
 
   void synced_tensor_dict::set_fetch_thread_number(size_t fetch_thread_num_) {
@@ -370,6 +373,7 @@ namespace cyy::cxx_lib::pytorch {
       fetch_threads.back().start();
     }
     fetch_thread_num = fetch_thread_num_;
+    LOG_WARN("new fetch_thread_num {}", fetch_thread_num);
   }
   void synced_tensor_dict::set_in_memory_number(size_t in_memory_number_) {
     LOG_WARN("set in_memory_number {}", in_memory_number_);
