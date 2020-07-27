@@ -37,21 +37,21 @@ namespace cyy::cxx_lib {
     operator=(thread_safe_container &&) noexcept = delete;
 
   public:
-    class reference final {
+    class const_reference final {
     public:
-      reference(const container_type &container_, mutex_type &mutex_)
+      const_reference(const container_type &container_, mutex_type &mutex_)
           : container{container_}, mutex{mutex_} {
         mutex.lock_shared();
       }
 
-      reference(const reference &) = delete;
-      reference &operator=(const reference &) = delete;
+      const_reference(const const_reference &) = delete;
+      const_reference &operator=(const const_reference &) = delete;
 
-      reference(reference &&) noexcept = delete;
-      reference &operator=(reference &&) noexcept = delete;
+      const_reference(const_reference &&) noexcept = delete;
+      const_reference &operator=(const_reference &&) noexcept = delete;
 
-      ~reference() { mutex.unlock(); }
-      operator const container_type &() const { return container; }
+      ~const_reference() { mutex.unlock(); }
+      explicit operator const container_type &() const { return container; }
       const container_type *operator->() const { return &container; }
 
     private:
@@ -59,7 +59,9 @@ namespace cyy::cxx_lib {
       mutex_type &mutex;
     };
 
-    reference const_ref() const { return {container, container_mutex}; }
+    const_reference const_ref() const { return {container, container_mutex}; }
+    bool empty() const { return const_ref()->empty(); }
+    size_t size() const { return const_ref()->size(); }
 
   protected:
     container_type container;
@@ -77,15 +79,16 @@ namespace cyy::cxx_lib {
     using thread_safe_container<ContainerType>::container;
     using thread_safe_container<ContainerType>::container_mutex;
 
-    thread_safe_linear_container(size_t max_size_ = 0) : max_size{max_size_} {}
-    ~thread_safe_linear_container() { wake_up_all_consumers(); }
+    explicit thread_safe_linear_container(size_t max_size_ = 0)
+        : max_size{max_size_} {}
+    ~thread_safe_linear_container() {}
 
     template <typename Rep, typename Period>
     std::optional<value_type>
     back(const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-      if (wait_for_condition(lock, rel_time,
-                             [this]() { return !container.empty(); })) {
+      if (wait_for_consumer_condition(
+              lock, rel_time, [this]() { return !container.empty(); })) {
         return {container.back()};
       }
       return {};
@@ -95,8 +98,8 @@ namespace cyy::cxx_lib {
     std::optional<value_type>
     front(const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-      if (wait_for_condition(lock, rel_time,
-                             [this]() { return !container.empty(); })) {
+      if (wait_for_consumer_condition(
+              lock, rel_time, [this]() { return !container.empty(); })) {
         return {container.front()};
       }
       return {};
@@ -112,9 +115,7 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      if (wake_up_on_new_elements) {
-        new_element_cv.notify_all();
-      }
+      new_element_cv.notify_one();
     }
 
     template <typename... Args> void emplace_back(Args &&... args) {
@@ -127,15 +128,15 @@ namespace cyy::cxx_lib {
           }
         }
       }
-      if (wake_up_on_new_elements) {
-        new_element_cv.notify_all();
-      }
+      new_element_cv.notify_one();
     }
 
     void pop_front() {
-      std::lock_guard lock(container_mutex);
+      std::unique_lock lock(container_mutex);
       if (!container.empty()) {
         pop_front_wrapper();
+        lock.unlock();
+        less_element_cv.notify_all();
       }
     }
 
@@ -143,53 +144,65 @@ namespace cyy::cxx_lib {
               typename Predicate = bool (*)(const container_type &)>
     std::optional<value_type> pop_front(
         const std::chrono::duration<Rep, Period> &rel_time,
-        Predicate pred = [](const auto &) { return true; }) {
+        Predicate pred = [](const auto & /*unused*/) { return true; }) {
       std::unique_lock<mutex_type> lock(container_mutex);
-      if (wait_for_condition(lock, rel_time, [this, &pred]() {
+      if (wait_for_consumer_condition(lock, rel_time, [this, &pred]() {
             return !container.empty() && pred(container);
           })) {
         std::optional<value_type> value{std::move(container.front())};
         pop_front_wrapper();
+        lock.unlock();
+        less_element_cv.notify_all();
         return value;
       }
       return {};
     }
 
     void clear() {
-      std::lock_guard lock(container_mutex);
-      container.clear();
+      {
+        std::lock_guard lock(container_mutex);
+        container.clear();
+      }
+      less_element_cv.notify_all();
     }
 
     template <typename Rep, typename Period>
-    bool
-    wait_for_size(typename container_type::size_type want_size,
-                  const std::chrono::duration<Rep, Period> &rel_time) const {
+    bool wait_for_more_size(
+        typename container_type::size_type want_size,
+        const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-      return wait_for_condition(lock, rel_time, [this, want_size]() {
+      return wait_for_consumer_condition(lock, rel_time, [this, want_size]() {
         return container.size() >= want_size;
       });
     }
-
-    void wake_up_all_consumers() {
-      {
-        std::lock_guard lock(container_mutex);
-        wake_up_flag = true;
-      }
-      new_element_cv.notify_all();
+    template <typename Rep, typename Period>
+    bool wait_for_less_size(
+        typename container_type::size_type want_size,
+        const std::chrono::duration<Rep, Period> &rel_time) const {
+      std::unique_lock<mutex_type> lock(container_mutex);
+      return wait_for_producer_condition(lock, rel_time, [this, want_size]() {
+        return container.size() <= want_size;
+      });
     }
 
   private:
     template <typename Rep, typename Period, typename Predicate>
-    bool wait_for_condition(std::unique_lock<mutex_type> &lock,
-                            const std::chrono::duration<Rep, Period> &rel_time,
-                            Predicate pred) const {
-      auto res = new_element_cv.wait_for(
-          lock, rel_time, [this, &pred]() { return wake_up_flag || pred(); });
-      if (wake_up_flag) {
-        wake_up_flag = false;
-        return pred();
-      }
+    bool wait_for_consumer_condition(
+        std::unique_lock<mutex_type> &lock,
+        const std::chrono::duration<Rep, Period> &rel_time,
+        Predicate pred) const {
+      auto res = new_element_cv.wait_for(lock, rel_time,
+                                         [this, &pred]() { return pred(); });
       return res;
+    }
+
+    template <typename Rep, typename Period, typename Predicate>
+    bool wait_for_producer_condition(
+        std::unique_lock<mutex_type> &lock,
+        const std::chrono::duration<Rep, Period> &rel_time,
+        Predicate pred) const {
+      return less_element_cv.wait_for(lock, rel_time,
+                                      [this, &pred]() { return pred(); });
     }
 
     void pop_front_wrapper() {
@@ -203,13 +216,10 @@ namespace cyy::cxx_lib {
       }
     }
 
-  public:
-    std::atomic<bool> wake_up_on_new_elements{true};
-
   private:
     size_t max_size{0};
-    mutable bool wake_up_flag{false};
     mutable std::condition_variable_any new_element_cv;
+    mutable std::condition_variable_any less_element_cv;
   };
 
   //! \brief thread_safe_linear_container 線程安全的map容器模板

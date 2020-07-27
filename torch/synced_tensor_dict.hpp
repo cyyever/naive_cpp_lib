@@ -93,7 +93,6 @@ namespace cyy::cxx_lib::pytorch {
     size_t in_memory_number{128};
     bool permanent{true};
     std::condition_variable_any new_data_cv;
-    std::condition_variable_any less_data_cv;
     float wait_flush_ratio{1.5};
   };
 } // namespace cyy::cxx_lib::pytorch

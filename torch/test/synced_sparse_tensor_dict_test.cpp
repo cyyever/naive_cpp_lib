@@ -19,8 +19,6 @@ TEST_CASE("synced_sparse_tensor_dict") {
   CHECK_EQ(dict.size(), 0);
 
   dict.set_in_memory_number(3);
-  dict.set_saving_thread_number(5);
-  dict.set_fetch_thread_number(5);
 
   // save sparse tensor
   dict.emplace("sparse_tensor", sparse_tensor);

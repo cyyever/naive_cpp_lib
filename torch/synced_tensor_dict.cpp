@@ -1,7 +1,7 @@
 
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
-#include <mutex>
 #include <stdexcept>
 
 #include "hardware/hardware.hpp"
@@ -63,11 +63,9 @@ namespace cyy::cxx_lib::pytorch {
     for (size_t i = 0; i < fetch_thread_num; i++) {
       fetch_request_queue.emplace_back();
     }
-    fetch_request_queue.wake_up_all_consumers();
     for (size_t i = 0; i < saving_thread_num; i++) {
       save_request_queue.emplace_back();
     }
-    save_request_queue.wake_up_all_consumers();
     for (auto &t : fetch_threads) {
       t.stop();
     }
@@ -109,23 +107,23 @@ namespace cyy::cxx_lib::pytorch {
   void synced_tensor_dict::emplace(const std::string &key,
                                    const torch::Tensor &value) {
     std::unique_lock lk(data_mutex);
+    if (data.size() > in_memory_number) {
+      auto wait_threshold =
+          static_cast<size_t>(in_memory_number * wait_flush_ratio);
+      lk.unlock();
+      flush();
+      auto remain_size = save_request_queue.size();
+      if (remain_size > wait_threshold) {
+        LOG_INFO("wait flush remain_size is {} wait threshold is {} ",
+                 remain_size, wait_threshold);
+        save_request_queue.wait_for_less_size(wait_threshold,
+                                              std::chrono::seconds(1));
+      }
+      lk.lock();
+    }
     data.emplace(key, value);
     data_info[key] = data_state::IN_MEMORY_NEW_DATA;
     saving_data.erase(key);
-    if (data.size() > in_memory_number) {
-      lk.unlock();
-      flush();
-      lk.lock();
-      if (data.size() + saving_data.size() >
-          static_cast<size_t>(in_memory_number * wait_flush_ratio)) {
-        LOG_WARN(
-            "wait flush saving_data size is {} ratio is {} data size is {} "
-            "in_memory_number is {}",
-            saving_data.size(), wait_flush_ratio, data.size(),
-            in_memory_number);
-        less_data_cv.wait(lk);
-      }
-    }
   }
   size_t synced_tensor_dict::size() const {
     std::lock_guard lk(data_mutex);
@@ -151,7 +149,6 @@ namespace cyy::cxx_lib::pytorch {
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove(get_tensor_file_path(key));
     }
-    less_data_cv.notify_all();
   }
 
   void synced_tensor_dict::clear() {
@@ -159,7 +156,6 @@ namespace cyy::cxx_lib::pytorch {
     data_info.clear();
     data.clear();
     saving_data.clear();
-    less_data_cv.notify_all();
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove_all(storage_dir);
     }
@@ -248,35 +244,22 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   void synced_tensor_dict::flush_all(bool wait) {
+    fetch_request_queue.clear();
     std::unique_lock lk(data_mutex);
     auto old_in_memory_number = in_memory_number;
     in_memory_number = 0;
-    flush();
+    auto tasks = pop_expired_data(SIZE_MAX);
     in_memory_number = old_in_memory_number;
+    lk.unlock();
+    if (tasks.empty()) {
+      return;
+    }
+    flush(tasks);
     if (!wait) {
       return;
     }
-    while (true) {
-      bool has_saving = false;
-      for (auto const &[_, state] : data_info) {
-        if (state == data_state::IN_MEMORY_NEW_DATA ||
-            state == data_state::SAVING || state == data_state::PRE_SAVING) {
-          has_saving = true;
-          break;
-        }
-      }
-      if (!has_saving) {
-        break;
-      }
 
-      LOG_INFO("wait flush saving_data size is {} data is {} ",
-               saving_data.size(), data.size());
-      less_data_cv.wait(lk);
-      old_in_memory_number = in_memory_number;
-      in_memory_number = 0;
-      flush();
-      in_memory_number = old_in_memory_number;
-    }
+    save_request_queue.wait_for_less_size(0, std::chrono::minutes(1));
   }
 
   std::filesystem::path
