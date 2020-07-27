@@ -15,11 +15,11 @@ int main(int argc, char **argv) {
   cyy::cxx_lib::log::set_level(spdlog::level::level_enum::err);
   cyy::cxx_lib::pytorch::synced_tensor_dict dict("tensor_dir_profiling");
 
-  dict.set_in_memory_number(1024);
+  dict.set_in_memory_number(100);
   dict.enable_permanent_storage();
 
-  auto begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   auto tensor = torch::randn({1, 200 * 1024});
+  auto begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   for (int i = 0; i < 1024; i++) {
     dict.emplace(std::to_string(i), tensor);
   }
@@ -33,11 +33,7 @@ int main(int argc, char **argv) {
   dict2.enable_permanent_storage();
 
   begin_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
-  std::vector<std::string> keys;
-  for (int i = 0; i < 1024; i++) {
-    keys.push_back(std::to_string(i));
-  }
-  dict2.prefetch(keys);
+  dict2.prefetch(dict2.keys());
   for (int i = 0; i < 1024; i++) {
     tensor = dict2.get(std::to_string(i));
   }

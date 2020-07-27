@@ -69,7 +69,7 @@ namespace cyy::cxx_lib::pytorch {
     prefetch(const std::string &key, bool with_lock = true);
     using save_task = std::tuple<std::string, std::filesystem::path>;
     std::list<save_task> pop_expired_data(size_t max_number);
-    void flush(const std::list<save_task> &tasks);
+    void flush(std::list<save_task> &tasks);
 
     mutable std::recursive_mutex data_mutex;
     std::filesystem::path storage_dir;
@@ -94,6 +94,6 @@ namespace cyy::cxx_lib::pytorch {
     bool permanent{true};
     std::condition_variable_any new_data_cv;
     std::condition_variable_any less_data_cv;
-    size_t wait_flush_ratio{1};
+    float wait_flush_ratio{1.5};
   };
 } // namespace cyy::cxx_lib::pytorch

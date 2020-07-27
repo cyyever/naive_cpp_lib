@@ -14,7 +14,7 @@ namespace cyy::cxx_lib::pytorch {
     void run() override {
       while (true) {
         auto value_opt =
-            dict.save_request_queue.pop_front(std::chrono::seconds(1));
+            dict.save_request_queue.pop_front(std::chrono::minutes(1));
         if (!value_opt.has_value()) {
           continue;
         }
@@ -30,9 +30,7 @@ namespace cyy::cxx_lib::pytorch {
           }
           auto value = dict.saving_data[key];
           lk.unlock();
-          if (std::filesystem::is_regular_file(path)) {
-            std::filesystem::remove_all(path);
-          }
+          std::filesystem::remove(path);
           torch::save(value, path.string());
           lk.lock();
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {

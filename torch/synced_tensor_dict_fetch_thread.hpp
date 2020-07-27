@@ -15,7 +15,7 @@ namespace cyy::cxx_lib::pytorch {
     void run() override {
       while (true) {
         auto value_opt =
-            dict.fetch_request_queue.pop_front(std::chrono::seconds(1));
+            dict.fetch_request_queue.pop_front(std::chrono::minutes(1));
         if (!value_opt.has_value()) {
           continue;
         }

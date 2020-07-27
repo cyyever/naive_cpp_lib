@@ -113,13 +113,16 @@ namespace cyy::cxx_lib::pytorch {
     data_info[key] = data_state::IN_MEMORY_NEW_DATA;
     saving_data.erase(key);
     if (data.size() > in_memory_number) {
+      lk.unlock();
       flush();
+      lk.lock();
       if (data.size() + saving_data.size() >
-          in_memory_number * wait_flush_ratio) {
-        LOG_INFO("wait flush saving_data size is {} ratio is {} data is {} "
-                 "in_memory_number is {}",
-                 saving_data.size(), wait_flush_ratio, data.size(),
-                 in_memory_number);
+          static_cast<size_t>(in_memory_number * wait_flush_ratio)) {
+        LOG_WARN(
+            "wait flush saving_data size is {} ratio is {} data size is {} "
+            "in_memory_number is {}",
+            saving_data.size(), wait_flush_ratio, data.size(),
+            in_memory_number);
         less_data_cv.wait(lk);
       }
     }
@@ -129,8 +132,8 @@ namespace cyy::cxx_lib::pytorch {
     return data_info.size();
   }
   std::vector<std::string> synced_tensor_dict::keys() const {
-    std::lock_guard lk(data_mutex);
     std::vector<std::string> res;
+    std::lock_guard lk(data_mutex);
     res.reserve(data_info.size());
     for (auto const &[key, __] : data_info) {
       res.emplace_back(key);
@@ -148,6 +151,7 @@ namespace cyy::cxx_lib::pytorch {
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove(get_tensor_file_path(key));
     }
+    less_data_cv.notify_all();
   }
 
   void synced_tensor_dict::clear() {
@@ -155,6 +159,7 @@ namespace cyy::cxx_lib::pytorch {
     data_info.clear();
     data.clear();
     saving_data.clear();
+    less_data_cv.notify_all();
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove_all(storage_dir);
     }
@@ -176,12 +181,9 @@ namespace cyy::cxx_lib::pytorch {
     auto tasks = pop_expired_data(SIZE_MAX);
     flush(tasks);
   }
-  void synced_tensor_dict::flush(const std::list<save_task> &tasks) {
+  void synced_tensor_dict::flush(std::list<save_task> &tasks) {
     for (auto &task : tasks) {
       save_request_queue.emplace_back(std::move(task));
-    }
-    if (!tasks.empty()) {
-      save_request_queue.wake_up_all_consumers();
     }
   }
 
@@ -319,7 +321,6 @@ namespace cyy::cxx_lib::pytorch {
     }
     auto file_path = get_tensor_file_path(key);
     fetch_request_queue.emplace_back(fetch_task{key, file_path});
-    fetch_request_queue.wake_up_all_consumers();
     return {true, {}};
   }
 
