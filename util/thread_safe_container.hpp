@@ -8,14 +8,19 @@
 
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <forward_list>
 #include <list>
+#include <memory>
 #include <optional>
+#include <set>
 #include <shared_mutex>
+#include <type_traits>
+#include <unordered_map>
 
 namespace cyy::cxx_lib {
 
@@ -135,35 +140,28 @@ namespace cyy::cxx_lib {
       std::unique_lock lock(container_mutex);
       if (!container.empty()) {
         pop_front_wrapper();
-        lock.unlock();
-        less_element_cv.notify_all();
+        notify_less_element();
       }
     }
 
-    template <typename Rep, typename Period,
-              typename Predicate = bool (*)(const container_type &)>
-    std::optional<value_type> pop_front(
-        const std::chrono::duration<Rep, Period> &rel_time,
-        Predicate pred = [](const auto & /*unused*/) { return true; }) {
+    template <typename Rep, typename Period>
+    std::optional<value_type>
+    pop_front(const std::chrono::duration<Rep, Period> &rel_time) {
       std::unique_lock<mutex_type> lock(container_mutex);
-      if (wait_for_consumer_condition(lock, rel_time, [this, &pred]() {
-            return !container.empty() && pred(container);
-          })) {
+      if (wait_for_consumer_condition(
+              lock, rel_time, [this]() { return !container.empty(); })) {
         std::optional<value_type> value{std::move(container.front())};
         pop_front_wrapper();
-        lock.unlock();
-        less_element_cv.notify_all();
+        notify_less_element();
         return value;
       }
       return {};
     }
 
     void clear() {
-      {
-        std::lock_guard lock(container_mutex);
-        container.clear();
-      }
-      less_element_cv.notify_all();
+      std::unique_lock lk(container_mutex);
+      container.clear();
+      notify_less_element();
     }
 
     template <typename Rep, typename Period>
@@ -171,9 +169,10 @@ namespace cyy::cxx_lib {
         typename container_type::size_type want_size,
         const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
-      return wait_for_producer_condition(lock, rel_time, [this, want_size]() {
-        return container.size() <= want_size;
-      });
+      auto &cv_ptr = get_less_element_cv(want_size);
+      return wait_for_producer_condition(
+          *cv_ptr, lock, rel_time,
+          [this, want_size]() { return container.size() <= want_size; });
     }
 
   private:
@@ -189,11 +188,10 @@ namespace cyy::cxx_lib {
 
     template <typename Rep, typename Period, typename Predicate>
     bool wait_for_producer_condition(
-        std::unique_lock<mutex_type> &lock,
+        std::condition_variable_any &cv, std::unique_lock<mutex_type> &lock,
         const std::chrono::duration<Rep, Period> &rel_time,
         Predicate pred) const {
-      return less_element_cv.wait_for(lock, rel_time,
-                                      [this, &pred]() { return pred(); });
+      return cv.wait_for(lock, rel_time, [this, &pred]() { return pred(); });
     }
 
     void pop_front_wrapper() {
@@ -207,10 +205,46 @@ namespace cyy::cxx_lib {
       }
     }
 
+    void recycle_cv(std::shared_ptr<std::condition_variable_any> &ptr) const {
+      cv_pool.emplace_back(std::move(ptr));
+    }
+    std::shared_ptr<std::condition_variable_any> get_cv() const {
+      if (!cv_pool.empty()) {
+        auto cv_ptr = std::move(cv_pool.back());
+        cv_pool.pop_back();
+        return cv_ptr;
+      }
+      return std::make_shared<std::condition_variable_any>();
+    }
+
+    std::shared_ptr<std::condition_variable_any> &
+    get_less_element_cv(size_t want_size) const {
+      auto it = less_element_cv_map.find(want_size);
+      if (it == less_element_cv_map.end()) {
+        it = less_element_cv_map.emplace(want_size, get_cv()).first;
+      }
+      return it->second;
+    }
+
+    void notify_less_element() const {
+      auto cur_size = container.size();
+      auto first_it = less_element_cv_map.lower_bound(cur_size);
+      auto it = first_it;
+      while (it != less_element_cv_map.end()) {
+        auto &cv_ptr = it->second;
+        cv_ptr->notify_all();
+        recycle_cv(cv_ptr);
+        it++;
+      }
+      less_element_cv_map.erase(first_it, less_element_cv_map.end());
+    }
+
   private:
     size_t max_size{0};
+    mutable std::vector<std::shared_ptr<std::condition_variable_any>> cv_pool;
+    mutable std::map<size_t, std::shared_ptr<std::condition_variable_any>>
+        less_element_cv_map;
     mutable std::condition_variable_any new_element_cv;
-    mutable std::condition_variable_any less_element_cv;
   };
 
   //! \brief thread_safe_linear_container 線程安全的map容器模板
