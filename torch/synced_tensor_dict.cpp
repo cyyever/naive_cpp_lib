@@ -13,6 +13,7 @@ namespace cyy::cxx_lib::pytorch {
 
   synced_tensor_dict::synced_tensor_dict(const std::string &storage_dir_)
       : storage_dir(storage_dir_) {
+      cyy::cxx_lib::log::set_level(spdlog::level::level_enum::warn);
     auto cpu_num = cyy::cxx_lib::hardware::cpu_num();
     saving_thread_num = cpu_num;
     fetch_thread_num = cpu_num;
@@ -112,11 +113,12 @@ namespace cyy::cxx_lib::pytorch {
           static_cast<size_t>(in_memory_number * wait_flush_ratio);
       lk.unlock();
       flush();
+      auto old_in_memory_number=in_memory_number;
       auto remain_size = save_request_queue.size();
       if (remain_size > wait_threshold) {
         LOG_INFO("wait flush remain_size is {} wait threshold is {} ",
                  remain_size, wait_threshold);
-        save_request_queue.wait_for_less_size(wait_threshold,
+        save_request_queue.wait_for_less_size(old_in_memory_number,
                                               std::chrono::seconds(1));
       }
       lk.lock();

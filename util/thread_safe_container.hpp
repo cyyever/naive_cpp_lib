@@ -167,15 +167,6 @@ namespace cyy::cxx_lib {
     }
 
     template <typename Rep, typename Period>
-    bool wait_for_more_size(
-        typename container_type::size_type want_size,
-        const std::chrono::duration<Rep, Period> &rel_time) const {
-      std::unique_lock<mutex_type> lock(container_mutex);
-      return wait_for_consumer_condition(lock, rel_time, [this, want_size]() {
-        return container.size() >= want_size;
-      });
-    }
-    template <typename Rep, typename Period>
     bool wait_for_less_size(
         typename container_type::size_type want_size,
         const std::chrono::duration<Rep, Period> &rel_time) const {

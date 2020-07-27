@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
   auto end_ms = cyy::cxx_lib::time::now_ms<std::chrono::steady_clock>();
   dict.flush_all(true);
   std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
+  dict.release();
 
   cyy::cxx_lib::pytorch::synced_tensor_dict dict2("tensor_dir_profiling");
 
