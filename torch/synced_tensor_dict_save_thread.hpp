@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "log/log.hpp"
+#include "util/time.hpp"
 #include "synced_tensor_dict.hpp"
 namespace cyy::cxx_lib::pytorch {
 
@@ -16,6 +17,17 @@ namespace cyy::cxx_lib::pytorch {
         auto value_opt =
             dict.save_request_queue.pop_front(std::chrono::minutes(1));
         if (!value_opt.has_value()) {
+          if(!flush_mutex.try_lock()) {
+            continue;
+          }
+          std::unique_lock lk(flush_mutex,std::adopt_lock);
+          auto cur_ms=cyy::cxx_lib::time::now_ms();
+          if(cur_ms-last_flush_ms<1000*3) {
+            continue;
+          }
+          last_flush_ms=cur_ms;
+          LOG_ERROR("flush by save thread");
+          dict.flush();
           continue;
         }
         if (!(*value_opt).has_value()) {
@@ -51,5 +63,7 @@ namespace cyy::cxx_lib::pytorch {
 
   private:
     synced_tensor_dict &dict;
+    static inline std::mutex flush_mutex;
+    static inline uint64_t last_flush_ms{0};
   };
 } // namespace cyy::cxx_lib::pytorch
