@@ -66,7 +66,7 @@ namespace cyy::cxx_lib::pytorch {
     bool need_flush() const;
 
     std::pair<bool, std::optional<torch::Tensor>>
-    prefetch(const std::string &key);
+    prefetch(const std::string &key, bool with_lock = true);
     using save_task = std::tuple<std::string, std::filesystem::path>;
     std::list<save_task> pop_expired_data(size_t max_number);
     void flush(const std::list<save_task> &tasks);

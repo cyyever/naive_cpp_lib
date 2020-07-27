@@ -9,18 +9,18 @@
 #include <filesystem>
 #include <torch/torch.h>
 
- uint64_t now_ms() {
-    return static_cast<uint64_t>(
-        std::chrono::time_point_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now())
-            .time_since_epoch()
-            .count());
-  }
+uint64_t now_ms() {
+  return static_cast<uint64_t>(
+      std::chrono::time_point_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now())
+          .time_since_epoch()
+          .count());
+}
 
 int main(int argc, char **argv) {
 
   auto tensor = torch::randn({1, 200 * 1024});
-  auto begin_ms =now_ms();
+  auto begin_ms = now_ms();
   for (int i = 0; i < 100; i++) {
     torch::save(tensor, "tmp_file");
   }

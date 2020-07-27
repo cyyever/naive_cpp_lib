@@ -90,7 +90,7 @@ namespace cyy::cxx_lib::pytorch {
     bool flag = true;
     while (true) {
       std::unique_lock lk(data_mutex);
-      auto [result, value_opt] = prefetch(key);
+      auto [result, value_opt] = prefetch(key, false);
       if (!result) {
         throw std::out_of_range(key);
       }
@@ -287,9 +287,12 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   std::pair<bool, std::optional<torch::Tensor>>
-  synced_tensor_dict::prefetch(const std::string &key) {
+  synced_tensor_dict::prefetch(const std::string &key, bool with_lock) {
     {
-      std::lock_guard lk(data_mutex);
+      std::unique_lock lk(data_mutex, std::defer_lock);
+      if (with_lock) {
+        lk.lock();
+      }
       auto it = data_info.find(key);
       if (it == data_info.end()) {
         return {false, {}};
