@@ -321,8 +321,8 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   void synced_tensor_dict::prefetch(const std::vector<std::string> &keys) {
-    for (auto it = keys.rbegin(); it != keys.rend(); it++) {
-      prefetch(*it);
+    for (auto const &key : keys) {
+      prefetch(key);
     }
   }
 
