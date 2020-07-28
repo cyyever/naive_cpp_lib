@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <fstream>
 #include <stdexcept>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -117,6 +118,37 @@ namespace cyy::cxx_lib::io {
       }
     }
     return {data};
+  }
+
+  read_only_mmaped_file::read_only_mmaped_file(
+      const std::filesystem::path &file_path) {
+    auto fd = open(file_path.c_str(), O_RDONLY);
+    if (fd < 0) {
+      throw std::runtime_error(std::string("open failed: ") +
+                               ::cyy::cxx_lib::util::errno_to_str(errno));
+    }
+    /* Obtain the size of the file and use it to specify the size of       the
+     * mapping and the size of the buffer to be written */
+    struct stat sb;
+    if (fstat(fd, &sb) != 0) {
+      close(fd);
+      auto saved_errno = errno;
+      throw std::runtime_error(std::string("fstat failed: ") +
+                               ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+    }
+    file_size = sb.st_size;
+    addr = mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+    if (addr == MAP_FAILED) {
+      auto saved_errno = errno;
+      throw std::runtime_error(std::string("mmap failed: ") +
+                               ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+    }
+  }
+  read_only_mmaped_file::~read_only_mmaped_file() {
+    if (munmap(addr, file_size) != 0) {
+      LOG_ERROR("munmap failed:{}", ::cyy::cxx_lib::util::errno_to_str(errno));
+    }
   }
 
 } // namespace cyy::cxx_lib::io

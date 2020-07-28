@@ -8,9 +8,9 @@
 
 #include <torch/torch.h>
 
-#include "util/runnable.hpp"
 #include "data_structure/ordered_dict.hpp"
 #include "data_structure/thread_safe_container.hpp"
+#include "util/runnable.hpp"
 
 namespace cyy::cxx_lib::pytorch {
   class synced_tensor_dict {
@@ -30,7 +30,7 @@ namespace cyy::cxx_lib::pytorch {
     size_t size() const;
     void erase(const std::string &key);
     bool contains(const std::string &key) const;
-    void synced_tensor_dict::set_logging(bool enable_debug) const;
+    void set_logging(bool enable_debug) const;
     std::vector<std::string> keys() const;
     void flush_all(bool wait = false);
     void flush(size_t flush_num = SIZE_MAX);

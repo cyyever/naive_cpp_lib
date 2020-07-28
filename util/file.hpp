@@ -30,4 +30,22 @@ namespace cyy::cxx_lib::io {
   std::optional<std::vector<std::byte>> read(int fd,
                                              size_t max_read_size = SIZE_MAX);
 
+  class read_only_mmaped_file final {
+  public:
+    read_only_mmaped_file(const std::filesystem::path &file_path);
+    ~read_only_mmaped_file();
+    read_only_mmaped_file(const read_only_mmaped_file &) = delete;
+    read_only_mmaped_file &operator=(const read_only_mmaped_file &) = delete;
+
+    read_only_mmaped_file(read_only_mmaped_file &&) noexcept = delete;
+    read_only_mmaped_file &
+    operator=(read_only_mmaped_file &&) noexcept = delete;
+
+    const void *data() const { return addr; }
+    size_t size() const { return file_size; }
+
+  private:
+    void *addr{nullptr};
+    size_t file_size{0};
+  };
 } // namespace cyy::cxx_lib::io
