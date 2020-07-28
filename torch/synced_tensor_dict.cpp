@@ -41,7 +41,7 @@ namespace cyy::cxx_lib::pytorch {
       }
     }
     for (size_t i = 0; i < saving_thread_num; i++) {
-      saving_threads.emplace_back(*this);
+      saving_threads.emplace_back(*this, i);
     }
     for (auto &t : saving_threads) {
       t.start();
@@ -102,6 +102,9 @@ namespace cyy::cxx_lib::pytorch {
   void synced_tensor_dict::emplace(const std::string &key,
                                    const torch::Tensor &value) {
     std::unique_lock lk(data_mutex);
+    data.emplace(key, value);
+    data_info[key] = data_state::IN_MEMORY_NEW_DATA;
+    saving_data.erase(key);
     if (data.size() > in_memory_number) {
       auto wait_threshold =
           static_cast<size_t>(in_memory_number * wait_flush_ratio);
@@ -117,9 +120,6 @@ namespace cyy::cxx_lib::pytorch {
       }
       lk.lock();
     }
-    data.emplace(key, value);
-    data_info[key] = data_state::IN_MEMORY_NEW_DATA;
-    saving_data.erase(key);
   }
   size_t synced_tensor_dict::size() const {
     std::lock_guard lk(data_mutex);
@@ -172,6 +172,7 @@ namespace cyy::cxx_lib::pytorch {
   void synced_tensor_dict::flush(size_t flush_num) {
     auto tasks = pop_expired_data(flush_num);
     flush(tasks);
+    return;
   }
   void synced_tensor_dict::flush(std::list<save_task> &tasks) {
     for (auto &task : tasks) {
@@ -336,8 +337,8 @@ namespace cyy::cxx_lib::pytorch {
     if (saving_thread_num_ < saving_thread_num) {
       throw std::runtime_error("can't shrink threads");
     }
-    for (size_t i = 0; i < saving_thread_num_ - saving_thread_num; i++) {
-      saving_threads.emplace_back(*this);
+    for (size_t i = saving_thread_num; i < saving_thread_num_; i++) {
+      saving_threads.emplace_back(*this, i);
       saving_threads.back().start();
     }
     saving_thread_num = saving_thread_num_;
