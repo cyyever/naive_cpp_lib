@@ -18,12 +18,6 @@ TEST_CASE("split") {
   CHECK(tmp[1] == "b");
 }
 
-TEST_CASE("has_suffix") {
-  CHECK(!cyy::cxx_lib::strings::has_suffix("abc", "e"));
-  CHECK(!cyy::cxx_lib::strings::has_suffix("abc", "ab"));
-  CHECK(cyy::cxx_lib::strings::has_suffix("abc", "bc"));
-}
-
 #ifdef _WIN32
 TEST_CASE("UTF8_and_GBK_conv") {
   std::string test_str = "a123";
