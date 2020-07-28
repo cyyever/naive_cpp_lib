@@ -90,7 +90,7 @@ namespace cyy::cxx_lib {
     template <typename Rep, typename Period>
     std::optional<value_type>
     back(const std::chrono::duration<Rep, Period> &rel_time) const {
-      std::unique_lock<mutex_type> lock(container_mutex);
+      std::unique_lock lock(container_mutex);
       if (wait_for_consumer_condition(
               lock, rel_time, [this]() { return !container.empty(); })) {
         return {container.back()};
@@ -101,7 +101,7 @@ namespace cyy::cxx_lib {
     template <typename Rep, typename Period>
     std::optional<value_type>
     front(const std::chrono::duration<Rep, Period> &rel_time) const {
-      std::unique_lock<mutex_type> lock(container_mutex);
+      std::unique_lock lock(container_mutex);
       if (wait_for_consumer_condition(
               lock, rel_time, [this]() { return !container.empty(); })) {
         return {container.front()};
@@ -114,7 +114,7 @@ namespace cyy::cxx_lib {
         std::lock_guard lock(container_mutex);
         container.push_back(std::forward<T>(value));
       }
-      new_element_cv.notify_one();
+      new_element_cv.notify_all();
     }
 
     template <typename... Args> void emplace_back(Args &&... args) {
@@ -122,7 +122,7 @@ namespace cyy::cxx_lib {
         std::lock_guard lock(container_mutex);
         container.emplace_back(std::forward<Args>(args)...);
       }
-      new_element_cv.notify_one();
+      new_element_cv.notify_all();
     }
 
     template <typename... Args> void emplace_front(Args &&... args) {
@@ -130,7 +130,7 @@ namespace cyy::cxx_lib {
         std::lock_guard lock(container_mutex);
         container.emplace_front(std::forward<Args>(args)...);
       }
-      new_element_cv.notify_one();
+      new_element_cv.notify_all();
     }
 
     void pop_front() {
