@@ -6,6 +6,7 @@ add_library(MyCXXLib::torch ALIAS my_cxx_lib_torch)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::log)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::hardware)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::util)
+target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::data_structure)
 
 find_package(Python3 REQUIRED)
 if(Python3_FOUND)

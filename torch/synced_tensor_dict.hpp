@@ -8,9 +8,9 @@
 
 #include <torch/torch.h>
 
-#include "util/ordered_dict.hpp"
 #include "util/runnable.hpp"
-#include "util/thread_safe_container.hpp"
+#include "data_structure/ordered_dict.hpp"
+#include "data_structure/thread_safe_container.hpp"
 
 namespace cyy::cxx_lib::pytorch {
   class synced_tensor_dict {
