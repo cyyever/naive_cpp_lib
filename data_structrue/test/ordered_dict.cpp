@@ -6,7 +6,7 @@
  */
 #include <doctest/doctest.h>
 
-#include "util/ordered_dict.hpp"
+#include "data_structure/ordered_dict.hpp"
 
 TEST_CASE("ordered_dict") {
   cyy::cxx_lib::ordered_dict<int, std::string> container;
