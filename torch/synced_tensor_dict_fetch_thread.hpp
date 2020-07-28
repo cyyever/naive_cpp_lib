@@ -33,7 +33,6 @@ namespace cyy::cxx_lib::pytorch {
           }
           torch::Tensor value;
           torch::load(value, path.string());
-          bool need_flush = false;
           {
             std::lock_guard lk(dict.data_mutex);
             if (!dict.change_state(key, data_state::LOADING,
@@ -41,10 +40,6 @@ namespace cyy::cxx_lib::pytorch {
               continue;
             }
             dict.data.emplace(key, std::move(value));
-            need_flush = dict.need_flush();
-          }
-          if (need_flush) {
-            dict.flush();
           }
         } catch (const std::exception &e) {
           LOG_ERROR("torch::load {} failed:{}", path.string(), e.what());

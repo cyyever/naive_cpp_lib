@@ -33,7 +33,7 @@ namespace cyy::cxx_lib::pytorch {
     void enable_debug_logging(bool enable) const;
     std::vector<std::string> keys() const;
     void flush_all(bool wait = false);
-    void flush();
+    void flush(size_t flush_num = SIZE_MAX);
     void clear();
     void prefetch(const std::vector<std::string> &keys);
     void set_in_memory_number(size_t in_memory_number_);

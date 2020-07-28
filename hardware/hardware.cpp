@@ -16,14 +16,7 @@
 #include <mutex>
 
 #ifdef HAVE_CUDA
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wdocumentation"
-#pragma GCC diagnostic ignored "-Wreserved-id-macro"
-#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
-#pragma GCC diagnostic ignored "-Wundef"
 #include <cuda_runtime.h>
-#pragma GCC diagnostic pop
 #endif
 
 #include "hardware.hpp"

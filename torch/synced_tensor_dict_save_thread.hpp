@@ -1,21 +1,35 @@
+#include <chrono>
 #include <filesystem>
 #include <mutex>
 #include <stdexcept>
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
+#include "util/time.hpp"
 namespace cyy::cxx_lib::pytorch {
 
   class synced_tensor_dict::save_thread final : public cyy::cxx_lib::runnable {
   public:
-    explicit save_thread(synced_tensor_dict &dict_) : dict(dict_) {}
+    explicit save_thread(synced_tensor_dict &dict_, size_t id_)
+        : dict(dict_), id(id_) {}
 
   private:
     void run() override {
+      LOG_DEBUG("run save_thread id {}", id);
+      std::optional<std::optional<synced_tensor_dict::save_task>> value_opt;
       while (true) {
-        auto value_opt =
-            dict.save_request_queue.pop_front(std::chrono::minutes(1));
+        if (id == 0) {
+          value_opt =
+              dict.save_request_queue.pop_front(std::chrono::milliseconds(500));
+        } else {
+          value_opt =
+              dict.save_request_queue.pop_front(std::chrono::minutes(1));
+        }
         if (!value_opt.has_value()) {
+          if (id == 0) {
+            dict.flush();
+            LOG_DEBUG("flush by save thread");
+          }
           continue;
         }
         if (!(*value_opt).has_value()) {
@@ -51,5 +65,6 @@ namespace cyy::cxx_lib::pytorch {
 
   private:
     synced_tensor_dict &dict;
+    size_t id;
   };
 } // namespace cyy::cxx_lib::pytorch
