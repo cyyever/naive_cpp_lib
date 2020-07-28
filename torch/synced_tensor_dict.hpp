@@ -30,7 +30,7 @@ namespace cyy::cxx_lib::pytorch {
     size_t size() const;
     void erase(const std::string &key);
     bool contains(const std::string &key) const;
-    void enable_debug_logging(bool enable) const;
+    void synced_tensor_dict::set_logging(bool enable_debug) const;
     std::vector<std::string> keys() const;
     void flush_all(bool wait = false);
     void flush(size_t flush_num = SIZE_MAX);
@@ -75,6 +75,8 @@ namespace cyy::cxx_lib::pytorch {
     cyy::cxx_lib::ordered_dict<std::string, torch::Tensor> data;
     std::unordered_map<std::string, torch::Tensor> saving_data;
     std::unordered_map<std::string, data_state> data_info;
+    size_t in_memory_number{128};
+    bool permanent{true};
 
     using save_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
         std::list<std::optional<save_task>>>;
@@ -89,8 +91,6 @@ namespace cyy::cxx_lib::pytorch {
     size_t fetch_thread_num{8};
     std::list<fetch_thread> fetch_threads;
 
-    size_t in_memory_number{128};
-    bool permanent{true};
     std::condition_variable_any new_data_cv;
     float wait_flush_ratio{1.5};
   };
