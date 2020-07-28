@@ -32,6 +32,7 @@ namespace cyy::cxx_lib::pytorch {
     bool contains(const std::string &key) const;
     void set_logging(bool enable_debug) const;
     std::vector<std::string> keys() const;
+    std::vector<std::string> in_memory_keys() const;
     void flush_all(bool wait = false);
     void flush(size_t flush_num = SIZE_MAX);
     void clear();

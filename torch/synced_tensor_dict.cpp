@@ -134,6 +134,18 @@ namespace cyy::cxx_lib::pytorch {
     }
     return res;
   }
+  std::vector<std::string> synced_tensor_dict::in_memory_keys() const {
+    std::vector<std::string> res;
+    std::lock_guard lk(data_mutex);
+    res.reserve(data_info.size());
+    for (auto const &[key, state] : data_info) {
+      if (state == data_state::IN_MEMORY ||
+          state == data_state::IN_MEMORY_NEW_DATA) {
+        res.emplace_back(key);
+      }
+    }
+    return res;
+  }
 
   void synced_tensor_dict::erase(const std::string &key) {
     std::lock_guard lk(data_mutex);
