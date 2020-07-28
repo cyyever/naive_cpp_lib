@@ -161,8 +161,8 @@ namespace cyy::cxx_lib::pytorch {
     std::lock_guard lk(data_mutex);
     return data_info.find(key) != data_info.end();
   }
-  void synced_tensor_dict::enable_debug_logging(bool enable) const {
-    if (enable) {
+  void synced_tensor_dict::set_logging(bool enable_debug) const {
+    if (enable_debug) {
       cyy::cxx_lib::log::set_level(spdlog::level::level_enum::debug);
     } else {
       cyy::cxx_lib::log::set_level(spdlog::level::level_enum::warn);
