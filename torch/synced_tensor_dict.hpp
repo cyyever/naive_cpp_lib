@@ -63,7 +63,6 @@ namespace cyy::cxx_lib::pytorch {
     bool change_state(const std::string &key, data_state old_state,
                       data_state new_state);
     std::filesystem::path get_tensor_file_path(const std::string &key) const;
-    bool need_flush() const;
 
     std::pair<bool, std::optional<torch::Tensor>>
     prefetch(const std::string &key, bool with_lock = true);

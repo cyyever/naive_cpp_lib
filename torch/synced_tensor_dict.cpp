@@ -256,7 +256,10 @@ namespace cyy::cxx_lib::pytorch {
       return;
     }
 
-    save_request_queue.wait_for_less_size(0, std::chrono::minutes(1));
+    while (!save_request_queue.wait_for_less_size(0, std::chrono::minutes(1))) {
+      LOG_WARN("wait more than 1 minute, cur size is {}",
+               save_request_queue.size());
+    }
   }
 
   std::filesystem::path
@@ -300,18 +303,15 @@ namespace cyy::cxx_lib::pytorch {
       it->second = data_state::PRE_LOAD;
     }
     auto file_path = get_tensor_file_path(key);
-    fetch_request_queue.emplace_back(fetch_task{key, file_path});
+    // jump to queue front
+    fetch_request_queue.emplace_front(fetch_task{key, file_path});
     return {true, {}};
   }
 
   void synced_tensor_dict::prefetch(const std::vector<std::string> &keys) {
-    flush(keys.size());
-    for (const auto &key : keys) {
-      prefetch(key);
+    for (auto it=keys.rbegin();it!=keys.rend();it++) {
+      prefetch(*it);
     }
-  }
-  bool synced_tensor_dict::need_flush() const {
-    return data.size() > in_memory_number;
   }
 
   bool synced_tensor_dict::change_state(const std::string &key,

@@ -84,8 +84,7 @@ namespace cyy::cxx_lib {
     using thread_safe_container<ContainerType>::container;
     using thread_safe_container<ContainerType>::container_mutex;
 
-    explicit thread_safe_linear_container(size_t max_size_ = 0)
-        : max_size{max_size_} {}
+    thread_safe_linear_container() {}
     ~thread_safe_linear_container() {}
 
     template <typename Rep, typename Period>
@@ -114,11 +113,6 @@ namespace cyy::cxx_lib {
       {
         std::lock_guard lock(container_mutex);
         container.push_back(std::forward<T>(value));
-        if (max_size != 0) {
-          while (container.size() > max_size) {
-            pop_front_wrapper();
-          }
-        }
       }
       new_element_cv.notify_one();
     }
@@ -127,11 +121,14 @@ namespace cyy::cxx_lib {
       {
         std::lock_guard lock(container_mutex);
         container.emplace_back(std::forward<Args>(args)...);
-        if (max_size != 0) {
-          while (container.size() > max_size) {
-            pop_front_wrapper();
-          }
-        }
+      }
+      new_element_cv.notify_one();
+    }
+
+    template <typename... Args> void emplace_front(Args &&... args) {
+      {
+        std::lock_guard lock(container_mutex);
+        container.emplace_front(std::forward<Args>(args)...);
       }
       new_element_cv.notify_one();
     }
@@ -169,10 +166,11 @@ namespace cyy::cxx_lib {
         typename container_type::size_type want_size,
         const std::chrono::duration<Rep, Period> &rel_time) const {
       std::unique_lock<mutex_type> lock(container_mutex);
+      if (container.size() <= want_size) {
+        return true;
+      }
       auto &cv_ptr = get_less_element_cv(want_size);
-      return wait_for_producer_condition(
-          *cv_ptr, lock, rel_time,
-          [this, want_size]() { return container.size() <= want_size; });
+      return cv_ptr->wait_for(lock, rel_time) == std::cv_status::no_timeout;
     }
 
   private:
@@ -184,14 +182,6 @@ namespace cyy::cxx_lib {
       auto res = new_element_cv.wait_for(lock, rel_time,
                                          [this, &pred]() { return pred(); });
       return res;
-    }
-
-    template <typename Rep, typename Period, typename Predicate>
-    bool wait_for_producer_condition(
-        std::condition_variable_any &cv, std::unique_lock<mutex_type> &lock,
-        const std::chrono::duration<Rep, Period> &rel_time,
-        Predicate pred) const {
-      return cv.wait_for(lock, rel_time, [this, &pred]() { return pred(); });
     }
 
     void pop_front_wrapper() {
@@ -240,7 +230,6 @@ namespace cyy::cxx_lib {
     }
 
   private:
-    size_t max_size{0};
     mutable std::vector<std::shared_ptr<std::condition_variable_any>> cv_pool;
     mutable std::map<size_t, std::shared_ptr<std::condition_variable_any>>
         less_element_cv_map;
