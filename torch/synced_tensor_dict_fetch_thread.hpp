@@ -41,6 +41,7 @@ namespace cyy::cxx_lib::pytorch {
             }
             dict.data.emplace(key, std::move(value));
           }
+          LOG_DEBUG("torch::load {} succ", key);
         } catch (const std::exception &e) {
           LOG_ERROR("torch::load {} failed:{}", path.string(), e.what());
           {
