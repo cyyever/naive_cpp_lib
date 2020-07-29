@@ -93,6 +93,7 @@ namespace cyy::cxx_lib::pytorch {
     std::list<fetch_thread> fetch_threads;
 
     std::condition_variable_any new_data_cv;
+    std::condition_variable_any flush_finished_cv;
     float wait_flush_ratio{1.5};
   };
 } // namespace cyy::cxx_lib::pytorch

@@ -50,6 +50,10 @@ namespace cyy::cxx_lib::pytorch {
           if (dict.change_state(key, data_state::SAVING, data_state::IN_DISK)) {
             dict.saving_data.erase(key);
             LOG_DEBUG("torch::save {} succ", path.string());
+            if (dict.saving_data.empty()) {
+              lk.unlock();
+              dict.flush_finished_cv.notify_all();
+            }
             continue;
           }
           if (!dict.data_info.count(key)) {

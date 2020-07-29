@@ -253,7 +253,6 @@ namespace cyy::cxx_lib::pytorch {
   }
 
   void synced_tensor_dict::flush_all(bool wait) {
-    fetch_request_queue.clear();
     std::unique_lock lk(data_mutex);
     auto old_in_memory_number = in_memory_number;
     in_memory_number = 0;
@@ -268,10 +267,12 @@ namespace cyy::cxx_lib::pytorch {
       return;
     }
 
-    while (!save_request_queue.wait_for_less_size(0, std::chrono::minutes(1))) {
-      LOG_WARN("wait more than 1 minute, cur size is {}",
-               save_request_queue.size());
+    save_request_queue.wait_for_less_size(0, std::chrono::minutes(1));
+    lk.lock();
+    if (saving_data.empty()) {
+      return;
     }
+    flush_finished_cv.wait(lk);
   }
 
   std::filesystem::path

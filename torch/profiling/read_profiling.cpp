@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
     std::vector<std::byte> buf;
-    cyy::cxx_lib::io::get_file_content(std::to_string(i) + ".tensor",buf);
+    cyy::cxx_lib::io::get_file_content(std::to_string(i) + ".tensor", buf);
     torch::load(value, reinterpret_cast<const char *>(buf.data()), buf.size());
   }
   end_ms = now_ms();
