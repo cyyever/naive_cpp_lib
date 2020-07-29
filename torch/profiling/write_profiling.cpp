@@ -18,22 +18,24 @@ uint64_t now_ms() {
 }
 
 int main(int argc, char **argv) {
+  std::filesystem::path tensor_dir("pytorch_tensor_profiling_dir");
+  std::filesystem::create_directory(tensor_dir);
 
   auto tensor = torch::randn({1, 200 * 1024});
   auto begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
-    torch::save(tensor, std::to_string(i) + ".tensor");
+    torch::save(tensor, tensor_dir / (std::to_string(i) + ".tensor"));
   }
   auto end_ms = now_ms();
   std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
 
   begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
-    std::filesystem::remove(std::to_string(i) + ".tensor");
-    torch::save(tensor, std::to_string(i) + ".tensor");
+    std::filesystem::remove(tensor_dir / (std::to_string(i) + ".tensor"));
+    torch::save(tensor, tensor_dir / (std::to_string(i) + ".tensor"));
   }
   end_ms = now_ms();
   std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
-
+  std::filesystem::remove_all(tensor_dir);
   return 0;
 }
