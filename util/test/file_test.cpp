@@ -27,13 +27,13 @@ TEST_CASE("write_and_read") {
 
   CHECK_EQ(write_cnt_opt.value(), 2);
 
-  auto data_opt = ::cyy::cxx_lib::io::read(pipefd[0], 1);
-  CHECK(data_opt);
-  CHECK_EQ(data_opt.value().size(), 1);
-  CHECK_EQ((char)(data_opt.value()[0]), 'a');
+  auto [res, data] = ::cyy::cxx_lib::io::read(pipefd[0], 1);
+  CHECK(res);
+  CHECK_EQ(data.size(), 1);
+  CHECK_EQ((char)(data[0]), 'a');
 
-  data_opt = ::cyy::cxx_lib::io::read(pipefd[0], 1);
-  CHECK(data_opt);
-  CHECK_EQ(data_opt.value().size(), 1);
-  CHECK_EQ((char)(data_opt.value()[0]), 'b');
+  std::tie(res, data) = ::cyy::cxx_lib::io::read(pipefd[0], 1);
+  CHECK(res);
+  CHECK_EQ(data.size(), 1);
+  CHECK_EQ((char)(data[0]), 'b');
 }

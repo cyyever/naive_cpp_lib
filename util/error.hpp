@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <cerrno>
 #include <string>
 
 #ifdef _WIN32
@@ -20,6 +21,7 @@ namespace cyy::cxx_lib::util {
   //! \brief 获取errno的字符串描述
   //! \note 本函数线程安全
   std::string errno_to_str(int errno_);
+  inline std::string errno_to_str() { return errno_to_str(errno); }
 
 #ifdef _WIN32
   //! \brief 获取Windows API errno的字符串描述

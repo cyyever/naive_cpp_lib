@@ -5,6 +5,7 @@
  * \author cyy
  */
 
+#include "util/file.hpp"
 #include <chrono>
 #include <filesystem>
 #include <torch/torch.h>
@@ -20,20 +21,25 @@ uint64_t now_ms() {
 int main(int argc, char **argv) {
 
   auto tensor = torch::randn({1, 200 * 1024});
-  auto begin_ms = now_ms();
-  for (int i = 0; i < 1024; i++) {
-    torch::save(tensor, std::to_string(i) + ".tensor");
-  }
-  auto end_ms = now_ms();
-  std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
-
-  begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
     std::filesystem::remove(std::to_string(i) + ".tensor");
     torch::save(tensor, std::to_string(i) + ".tensor");
   }
-  end_ms = now_ms();
-  std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
 
+  torch::Tensor value;
+  auto begin_ms = now_ms();
+  for (int i = 0; i < 1024; i++) {
+    torch::load(value, std::to_string(i) + ".tensor");
+  }
+  auto end_ms = now_ms();
+  std::cout << "read used " << end_ms - begin_ms << " ms" << std::endl;
+
+  begin_ms = now_ms();
+  for (int i = 0; i < 1024; i++) {
+    cyy::cxx_lib::io::read_only_mmaped_file f(std::to_string(i) + ".tensor");
+    torch::load(value, reinterpret_cast<const char *>(f.data()), f.size());
+  }
+  end_ms = now_ms();
+  std::cout << "mmap read used " << end_ms - begin_ms << " ms" << std::endl;
   return 0;
 }

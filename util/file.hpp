@@ -20,19 +20,28 @@ namespace cyy::cxx_lib::io {
   std::optional<std::vector<std::byte>>
   get_file_content(const std::filesystem::path &file_path);
 
+  //! \brief 读取文件内容
+  bool get_file_content(const std::filesystem::path &file_path,
+                        std::vector<std::byte> &content);
+
   //! \brief 寫入指定數據到文件
   //! \return
   //! 如果fd是阻塞的，直到所有數據寫入成功才返回，否則返回實際寫入的數據量。如果系統調用失敗，直接返回失敗，不返回之前部分寫入的數據量
   std::optional<size_t> write(int fd, const void *data, size_t data_len);
 
   //! \brief 读取文件，最多讀取max_read_size個字節
+  //! \return 是否失败
+  bool read(int fd, std::vector<std::byte> &buf,
+            std::optional<size_t> max_read_size_opt = {});
+
+  //! \brief 读取文件，最多讀取max_read_size個字節
   //! \return 實際讀取到的數據
-  std::optional<std::vector<std::byte>> read(int fd,
-                                             size_t max_read_size = SIZE_MAX);
+  std::pair<bool, std::vector<std::byte>>
+  read(int fd, std::optional<size_t> max_read_size_opt = {});
 
   class read_only_mmaped_file final {
   public:
-    read_only_mmaped_file(const std::filesystem::path &file_path);
+    explicit read_only_mmaped_file(const std::filesystem::path &file_path);
     ~read_only_mmaped_file();
     read_only_mmaped_file(const read_only_mmaped_file &) = delete;
     read_only_mmaped_file &operator=(const read_only_mmaped_file &) = delete;

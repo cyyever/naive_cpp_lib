@@ -26,6 +26,8 @@
 #include "file.hpp"
 #include "log/log.hpp"
 #include "util/error.hpp"
+#include <cassert>
+#include <gsl/gsl>
 
 namespace cyy::cxx_lib::io {
 
@@ -52,6 +54,22 @@ namespace cyy::cxx_lib::io {
       return {};
     }
     return {file_content};
+  }
+  bool get_file_content(const std::filesystem::path &file_path,
+                        std::vector<std::byte> &content) {
+    auto fd = open(file_path.c_str(), O_RDONLY);
+    if (fd < 0) {
+      LOG_ERROR("open file {} failed:{}", file_path.string(),
+                ::cyy::cxx_lib::util::errno_to_str());
+      return false;
+    }
+    auto cleanup = gsl::finally([fd]() { close(fd); });
+    if (!read(fd, content)) {
+
+      LOG_ERROR("read file {} failed", file_path.string());
+      return false;
+    }
+    return true;
   }
 
   std::optional<size_t> write(int fd, const void *data, size_t data_len) {
@@ -84,22 +102,33 @@ namespace cyy::cxx_lib::io {
     return {write_cnt};
   }
 
-  std::optional<std::vector<std::byte>> read(int fd, size_t max_read_size) {
-    std::vector<std::byte> data;
-
-    std::byte buf[1024];
-    while (max_read_size) {
-      auto read_size = std::min(max_read_size, sizeof(buf));
+  bool read(int fd, std::vector<std::byte> &buf,
+            std::optional<size_t> max_read_size_opt) {
+    size_t max_read_size = SIZE_MAX;
+    if (max_read_size_opt.has_value()) {
+      max_read_size = max_read_size_opt.value();
+    } else {
+      struct stat sb;
+      if (fstat(fd, &sb) != 0) {
+        LOG_ERROR("fstat failed:{}", ::cyy::cxx_lib::util::errno_to_str());
+        return false;
+      }
+      max_read_size = sb.st_size;
+    }
+    buf.resize(max_read_size);
+    size_t total_cnt = 0;
+    while (total_cnt < max_read_size) {
+      auto read_size = max_read_size - total_cnt;
 #ifdef WIN32
-      auto cnt = ::_read(fd, buf, read_size);
+      auto cnt = ::_read(fd, buf.data() + total_cnt, read_size);
 #else
-      auto cnt = ::read(fd, buf, read_size);
+      auto cnt = ::read(fd, buf.data() + total_cnt, read_size);
 #endif
       if (cnt == 0) { // EOF
+        buf.resize(total_cnt);
         break;
       } else if (cnt > 0) {
-        max_read_size -= static_cast<size_t>(cnt);
-        data.insert(data.end(), buf, buf + cnt);
+        total_cnt += cnt;
         if (static_cast<size_t>(cnt) < read_size) { //這意味着下次讀會阻塞
           break;
         }
@@ -114,12 +143,19 @@ namespace cyy::cxx_lib::io {
       } else {
         LOG_ERROR("read failed:{}",
                   ::cyy::cxx_lib::util::errno_to_str(saved_errno));
-        return {};
+        buf.resize(total_cnt);
+        return false;
       }
     }
-    return {data};
+    return true;
   }
 
+  std::pair<bool, std::vector<std::byte>>
+  read(int fd, std::optional<size_t> max_read_size_opt) {
+    std::vector<std::byte> buf;
+    auto res = read(fd, buf, max_read_size_opt);
+    return {res, std::move(buf)};
+  }
   read_only_mmaped_file::read_only_mmaped_file(
       const std::filesystem::path &file_path) {
     auto fd = open(file_path.c_str(), O_RDONLY);
