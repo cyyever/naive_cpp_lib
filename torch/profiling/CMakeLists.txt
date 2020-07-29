@@ -8,5 +8,5 @@ foreach(profiling_source IN LISTS profiling_sources)
                  ${CMAKE_CURRENT_LIST_DIR}/${profiling_prog}.cpp)
   target_link_libraries(${profiling_prog} PRIVATE MyCXXLib::torch MyCXXLib::log
                                                   MyCXXLib::util)
-  add_profiling(TARGET ${profiling_prog} WITH_GPU_profiling OFF)
+  add_profiling(TARGET ${profiling_prog} WITH_GPU_profiling OFF LTRACE OFF)
 endforeach()

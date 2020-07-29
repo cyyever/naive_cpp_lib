@@ -19,7 +19,6 @@ uint64_t now_ms() {
 }
 
 int main(int argc, char **argv) {
-
   auto tensor = torch::randn({1, 200 * 1024});
   for (int i = 0; i < 1024; i++) {
     std::filesystem::remove(std::to_string(i) + ".tensor");
@@ -41,5 +40,14 @@ int main(int argc, char **argv) {
   }
   end_ms = now_ms();
   std::cout << "mmap read used " << end_ms - begin_ms << " ms" << std::endl;
+
+  begin_ms = now_ms();
+  for (int i = 0; i < 1024; i++) {
+    std::vector<std::byte> buf;
+    cyy::cxx_lib::io::get_file_content(std::to_string(i) + ".tensor",buf);
+    torch::load(value, reinterpret_cast<const char *>(buf.data()), buf.size());
+  }
+  end_ms = now_ms();
+  std::cout << "improved read used " << end_ms - begin_ms << " ms" << std::endl;
   return 0;
 }
