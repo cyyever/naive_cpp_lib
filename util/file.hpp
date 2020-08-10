@@ -27,6 +27,12 @@ namespace cyy::cxx_lib::io {
   //! \brief 寫入指定數據到文件
   //! \return
   //! 如果fd是阻塞的，直到所有數據寫入成功才返回，否則返回實際寫入的數據量。如果系統調用失敗，直接返回失敗，不返回之前部分寫入的數據量
+  std::optional<size_t> write(const std::filesystem::path &file_path,
+                              const void *data, size_t data_len);
+
+  //! \brief 寫入指定數據到文件
+  //! \return
+  //! 如果fd是阻塞的，直到所有數據寫入成功才返回，否則返回實際寫入的數據量。如果系統調用失敗，直接返回失敗，不返回之前部分寫入的數據量
   std::optional<size_t> write(int fd, const void *data, size_t data_len);
 
   //! \brief 读取文件，最多讀取max_read_size個字節
