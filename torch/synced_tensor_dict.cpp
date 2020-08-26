@@ -380,4 +380,8 @@ namespace cyy::cxx_lib::pytorch {
     std::lock_guard lk(data_mutex);
     in_memory_number = in_memory_number_;
   }
+  size_t synced_tensor_dict::get_in_memory_number() const {
+    std::lock_guard lk(data_mutex);
+    return in_memory_number;
+  }
 } // namespace cyy::cxx_lib::pytorch

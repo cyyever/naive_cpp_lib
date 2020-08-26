@@ -38,6 +38,7 @@ namespace cyy::cxx_lib::pytorch {
     void clear();
     void prefetch(const std::vector<std::string> &keys);
     void set_in_memory_number(size_t in_memory_number_);
+    size_t get_in_memory_number() const;
     void set_storage_dir(std::string storage_dir_);
     std::string get_storage_dir() const;
     void set_wait_flush_ratio(size_t wait_flush_ratio_);
