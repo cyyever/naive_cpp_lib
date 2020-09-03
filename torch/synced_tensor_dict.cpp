@@ -95,7 +95,7 @@ namespace cyy::cxx_lib::pytorch {
       if (value_opt.has_value()) {
         return value_opt.value();
       }
-      LOG_WARN("wait data {}, fetch_request_queue size is {}", key,
+      LOG_DEBUG("wait data {}, fetch_request_queue size is {}", key,
                 fetch_request_queue.size());
       new_data_cv.wait(lk);
     }
@@ -115,7 +115,7 @@ namespace cyy::cxx_lib::pytorch {
       auto old_in_memory_number = in_memory_number;
       auto remain_size = save_request_queue.size();
       if (remain_size > wait_threshold) {
-        LOG_WARN("wait flush remain_size is {} wait threshold is {} ",
+        LOG_DEBUG("wait flush remain_size is {} wait threshold is {} ",
                  remain_size, wait_threshold);
         save_request_queue.wait_for_less_size(old_in_memory_number,
                                               std::chrono::seconds(1));
