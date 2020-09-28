@@ -15,12 +15,11 @@
 #include <deque>
 #include <forward_list>
 #include <list>
+#include <map>
 #include <memory>
 #include <optional>
-#include <set>
 #include <shared_mutex>
 #include <type_traits>
-#include <unordered_map>
 
 namespace cyy::cxx_lib {
 
@@ -84,8 +83,8 @@ namespace cyy::cxx_lib {
     using thread_safe_container<ContainerType>::container;
     using thread_safe_container<ContainerType>::container_mutex;
 
-    thread_safe_linear_container() {}
-    ~thread_safe_linear_container() {}
+    thread_safe_linear_container() = default;
+    ~thread_safe_linear_container() = default;
 
     template <typename Rep, typename Period>
     std::optional<value_type>
@@ -117,7 +116,7 @@ namespace cyy::cxx_lib {
       new_element_cv.notify_all();
     }
 
-    template <typename... Args> void emplace_back(Args &&... args) {
+    template <typename... Args> void emplace_back(Args &&...args) {
       {
         std::lock_guard lock(container_mutex);
         container.emplace_back(std::forward<Args>(args)...);
@@ -125,7 +124,7 @@ namespace cyy::cxx_lib {
       new_element_cv.notify_all();
     }
 
-    template <typename... Args> void emplace_front(Args &&... args) {
+    template <typename... Args> void emplace_front(Args &&...args) {
       {
         std::lock_guard lock(container_mutex);
         container.emplace_front(std::forward<Args>(args)...);
@@ -179,8 +178,8 @@ namespace cyy::cxx_lib {
         std::unique_lock<mutex_type> &lock,
         const std::chrono::duration<Rep, Period> &rel_time,
         Predicate pred) const {
-      auto res = new_element_cv.wait_for(lock, rel_time,
-                                         [this, &pred]() { return pred(); });
+      auto res =
+          new_element_cv.wait_for(lock, rel_time, [&pred]() { return pred(); });
       return res;
     }
 
