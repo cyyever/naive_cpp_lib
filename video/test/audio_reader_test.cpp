@@ -16,7 +16,7 @@
 #define STR_HELPER(x) STR_H(x)
 
 TEST_CASE("ffmpeg_reader") {
-  deepir::audio::ffmpeg::reader reader;
+  cyy::cxx_lib::audio::ffmpeg::reader reader;
   REQUIRE(reader.open(STR_HELPER(IN_AUDIO)));
 
   auto duration_opt = reader.get_duration();

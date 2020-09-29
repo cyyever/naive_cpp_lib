@@ -16,7 +16,7 @@
 #define STR_HELPER(x) STR_H(x)
 
 TEST_CASE("ffmpeg_reader") {
-  deepir::video::ffmpeg::package_reader reader;
+  cyy::cxx_lib::video::ffmpeg::package_reader reader;
   CHECK(reader.open(STR_HELPER(IN_URL)));
   CHECK(reader.get_frame_rate());
   auto [res, _] = reader.next_packet();
