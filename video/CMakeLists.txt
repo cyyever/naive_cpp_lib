@@ -26,6 +26,12 @@ target_link_libraries(
   my_cxx_lib_audio PRIVATE PkgConfig::libavcodec PkgConfig::libavutil
                            PkgConfig::libavformat PkgConfig::libavdevice)
 
+find_package(OpenCV REQUIRED COMPONENTS core)
+
+target_include_directories(my_cxx_lib_video PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(my_cxx_lib_video PRIVATE ${OpenCV_LIBRARIES})
+target_link_libraries(my_cxx_lib_video PUBLIC opencv_core)
+
 add_subdirectory(test)
 if(BUILD_FUZZING)
   add_subdirectory(fuzz_test)

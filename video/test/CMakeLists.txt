@@ -12,6 +12,8 @@ foreach(test_prog ${test_progs})
   # TARGET_LINK_LIBRARIES(${test_prog} PRIVATE DeepirImage)
   target_link_libraries(${test_prog} PRIVATE doctest::doctest)
   target_compile_definitions(${test_prog}
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+  target_compile_definitions(${test_prog}
                              PRIVATE IN_URL=${TEST_IMAGE_DIR}/1.jpg)
   target_compile_definitions(${test_prog}
                              PRIVATE IN_IMAGE=${TEST_IMAGE_DIR}/1.jpg)
