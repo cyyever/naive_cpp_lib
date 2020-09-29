@@ -11,6 +11,7 @@ add_library(MyCXXLib::audio ALIAS my_cxx_lib_audio)
 # dependency
 target_link_libraries(my_cxx_lib_video PRIVATE MyCXXLib::log)
 target_link_libraries(my_cxx_lib_audio PRIVATE MyCXXLib::util)
+target_link_libraries(my_cxx_lib_audio PRIVATE MyCXXLib::data_structure)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(libavcodec REQUIRED IMPORTED_TARGET libavcodec)

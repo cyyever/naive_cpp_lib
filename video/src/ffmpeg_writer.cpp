@@ -8,19 +8,19 @@
 
 #include "ffmpeg_writer_impl.hpp"
 
-namespace deepir::video::ffmpeg {
+namespace cyy::cxx_lib::video::ffmpeg {
 
-writer::writer() : pimpl{std::make_unique<impl>()} {}
-writer::~writer() = default;
+  writer::writer() : pimpl{std::make_unique<impl>()} {}
+  writer::~writer() = default;
 
-bool writer::open(const std::string &url, const std::string &format_name,
-                  int video_width, int video_height) {
-  return pimpl->open(url, format_name, video_width, video_height);
-}
+  bool writer::open(const std::string &url, const std::string &format_name,
+                    int video_width, int video_height) {
+    return pimpl->open(url, format_name, video_width, video_height);
+  }
 
-bool writer::write_frame(const cv::Mat &frame_mat) {
-  return pimpl->write_frame(frame_mat);
-}
+  bool writer::write_frame(const cv::Mat &frame_mat) {
+    return pimpl->write_frame(frame_mat);
+  }
 
-void writer::close() { pimpl->close(); }
-} // namespace deepir::video::ffmpeg
+  void writer::close() { pimpl->close(); }
+} // namespace cyy::cxx_lib::video::ffmpeg

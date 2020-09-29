@@ -21,7 +21,7 @@ extern "C" {
 #include "ffmpeg_base.hpp"
 #include "log/log.hpp"
 
-namespace deepir::audio::ffmpeg {
+namespace cyy::cxx_lib::audio::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   class reader_impl final {
@@ -34,7 +34,7 @@ namespace deepir::audio::ffmpeg {
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url) {
-      ::deepir::video::ffmpeg::init_library();
+      ::cyy::cxx_lib::video::ffmpeg::init_library();
       int ret = 0;
       this->close();
 
@@ -55,7 +55,7 @@ namespace deepir::audio::ffmpeg {
           ret = av_dict_set(&opts, "ar", "8000", 0);
           if (ret != 0) {
             LOG_ERROR("av_dict_set failed:{}",
-                       ::deepir::video::ffmpeg::errno_to_str(ret));
+                      ::cyy::cxx_lib::video::ffmpeg::errno_to_str(ret));
             return false;
           }
         }
@@ -64,14 +64,14 @@ namespace deepir::audio::ffmpeg {
       ret = avformat_open_input(&input_ctx, url.c_str(), iformat, &opts);
       if (ret != 0) {
         LOG_ERROR("avformat_open_input failed:{}",
-                   ::deepir::video::ffmpeg::errno_to_str(ret));
+                  ::cyy::cxx_lib::video::ffmpeg::errno_to_str(ret));
         return false;
       }
 
       ret = avformat_find_stream_info(input_ctx, &opts);
       if (ret < 0) {
         LOG_ERROR("avformat_find_stream_info failed:{}",
-                   ::deepir::video::ffmpeg::errno_to_str(ret));
+                  ::cyy::cxx_lib::video::ffmpeg::errno_to_str(ret));
         return false;
       }
 
@@ -133,4 +133,4 @@ namespace deepir::audio::ffmpeg {
     AVFormatContext *input_ctx{nullptr};
     AVDictionary *opts{nullptr};
   };
-} // namespace deepir::audio::ffmpeg
+} // namespace cyy::cxx_lib::audio::ffmpeg

@@ -8,7 +8,7 @@
 #include "ffmpeg_audio_reader.hpp"
 #include "ffmpeg_audio_reader_impl.hpp"
 
-namespace deepir::audio::ffmpeg {
+namespace cyy::cxx_lib::audio::ffmpeg {
 
   reader::reader() : pimpl{std::make_unique<reader_impl>()} {}
   reader::~reader() = default;
@@ -19,4 +19,4 @@ namespace deepir::audio::ffmpeg {
   std::optional<std::chrono::milliseconds> reader::get_duration() {
     return pimpl->get_duration();
   }
-} // namespace deepir::audio::ffmpeg
+} // namespace cyy::cxx_lib::audio::ffmpeg
