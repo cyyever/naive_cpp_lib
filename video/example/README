@@ -1,0 +1,38 @@
+
+
+# --- samples:
+
+---
+ Usage: 
+       ./ffmpeg_example in-url out-url
+
+Sample: 
+       ./ffmpeg_example /dev/video0 /tmp/saved.flv
+       vlc /tmp/saved.flv  # display output .flv
+
+
+---
+ Usage: 
+       ./ffmpeg_example in-url out-url
+
+Sample: 
+       ./ffmpeg_example /dev/video0 /tmp/saved.flv
+       vlc /tmp/saved.flv  # display output .flv
+
+---
+ Usage: 
+       ./ffmpeg_writer_example /path/to/input.jpg /path/to/saved.flv
+
+Sample: 
+       ./ffmpeg_writer_example /tmp/1.jpg /tmp/saved.flv
+       vlc /tmp/saved.flv  # display output .flv
+
+
+---
+ Usage: 
+       ./probe_camera_example
+
+# --- ffmpeg cmd samples:
+
+$ffmpeg -f v4l2 -i /dev/video0 ~/tmp/%03d.jpg
+
