@@ -8,7 +8,7 @@
 
 #include <doctest/doctest.h>
 
-#include <deepir/image/image.hpp>
+#include <cv/mat.hpp>
 #include <iostream>
 
 #include "../src/ffmpeg_writer.hpp"
@@ -18,10 +18,10 @@
 
 TEST_CASE("ffmpeg_writer") {
 
-  auto mat_opt = deepir::image::load(STR_HELPER(IN_IMAGE));
+  auto mat_opt = cyy::cxx_lib::math::mat::image::load(STR_HELPER(IN_IMAGE));
   CHECK(mat_opt);
 
-  deepir::video::ffmpeg::writer writer;
+  cyy::cxx_lib::video::ffmpeg::writer writer;
   CHECK(writer.open("a.flv", "flv", 320, 240));
   CHECK(writer.write_frame(mat_opt.value()));
 }
