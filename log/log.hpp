@@ -62,7 +62,7 @@ namespace cyy::cxx_lib::log {
   template <typename... Args>
   void log_message(spdlog::level::level_enum level,
                    const std::source_location &location, std::string fmt,
-                   Args &&... args) {
+                   Args &&...args) {
     auto real_fmt = std::string(" [ ") + location.file_name() + ":" +
                     std::to_string(location.line()) + " ] " + std::move(fmt);
 

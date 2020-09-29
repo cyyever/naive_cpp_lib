@@ -72,17 +72,17 @@ namespace cyy::cxx_lib::io {
     return true;
   }
 
-  std::optional<size_t> write(const std::filesystem::path &file_path, const void *data, size_t data_len) {
-    auto fd = open(file_path.c_str(), O_CREAT| O_EXCL|O_WRONLY,S_IRWXU);
+  std::optional<size_t> write(const std::filesystem::path &file_path,
+                              const void *data, size_t data_len) {
+    auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY, S_IRWXU);
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
                 ::cyy::cxx_lib::util::errno_to_str());
       return {};
     }
     auto cleanup = gsl::finally([fd]() { close(fd); });
-    return write(fd,data,data_len);
+    return write(fd, data, data_len);
   }
-
 
   std::optional<size_t> write(int fd, const void *data, size_t data_len) {
     size_t write_cnt = 0;
