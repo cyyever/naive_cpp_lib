@@ -10,13 +10,13 @@
 
 namespace deepir::audio::ffmpeg {
 
-reader::reader() : pimpl{std::make_unique<reader_impl>()} {}
-reader::~reader() = default;
-bool reader::open(const std::string &url) { return pimpl->open(url); }
+  reader::reader() : pimpl{std::make_unique<reader_impl>()} {}
+  reader::~reader() = default;
+  bool reader::open(const std::string &url) { return pimpl->open(url); }
 
-void reader::close() { pimpl->close(); }
+  void reader::close() { pimpl->close(); }
 
-std::optional<std::chrono::milliseconds> reader::get_duration() {
-  return pimpl->get_duration();
-}
+  std::optional<std::chrono::milliseconds> reader::get_duration() {
+    return pimpl->get_duration();
+  }
 } // namespace deepir::audio::ffmpeg

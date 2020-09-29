@@ -5,7 +5,6 @@
  * \author Yue Wu,cyy
  */
 
-#include <deepir/log/log.hpp>
 #include <mutex>
 
 extern "C" {
@@ -13,6 +12,7 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 }
 
+#include "log/log.hpp"
 #include "ffmpeg_base.hpp"
 
 namespace deepir::video::ffmpeg {
@@ -41,7 +41,7 @@ private:
   //! \brief ffmpeg库要求我们提供该函数来实现线程安全
   static int lock_manager(void **mutex, enum AVLockOp op) {
 #ifdef _WIN32
-    DLOG_error("windows not support thread safty");
+    LOG_error("windows not support thread safty");
     return 1;
 #endif
     switch (op) {

@@ -9,23 +9,23 @@
 #include "converter.hpp"
 #include <memory>
 
-namespace deepir::video::ffmpeg {
+namespace cyy::cxx_lib::video::ffmpeg {
 
-//! \brief 封装ffmpeg对视频流的讀操作
-class converter final : public ::deepir::video::converter {
-public:
-  converter(const std::string &in_url, const std::string &out_url);
+  //! \brief 封装ffmpeg对视频流的讀操作
+  class converter final : public ::cyy::cxx_lib::video::converter {
+  public:
+    converter(const std::string &in_url, const std::string &out_url);
 
-  ~converter() override;
+    ~converter() override;
 
-  //! \brief 轉換視頻
-  //! \return >0 成功
-  //	      =0 EOF
-  //	      <0 失敗
-  int convert() override;
+    //! \brief 轉換視頻
+    //! \return >0 成功
+    //	      =0 EOF
+    //	      <0 失敗
+    int convert() override;
 
-private:
-  class impl;
-  std::unique_ptr<impl> pimpl;
-};
-} // namespace deepir::video::ffmpeg
+  private:
+    class impl;
+    std::unique_ptr<impl> pimpl;
+  };
+} // namespace cyy::cxx_lib::video::ffmpeg
