@@ -129,7 +129,7 @@ namespace {
 } // namespace
 #endif
 
-namespace cyy::cxx_lib::math {
+namespace cyy::cxx_lib::opencv{
   //! \brief cv::Mat的cpu/gpu操作
   class mat::mat_impl final {
   private:
@@ -660,4 +660,4 @@ namespace cyy::cxx_lib::math {
     }
     return {};
   }
-} // namespace cyy::cxx_lib::math
+} // namespace cyy::cxx_lib

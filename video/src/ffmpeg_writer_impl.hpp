@@ -201,7 +201,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
                                      frame_mat.data, src_linesize);
       } else {
         resized_mat =
-            ::cyy::cxx_lib::math::mat(frame_mat).convert_to(CV_8UC3).get_cv_mat();
+            ::cyy::cxx_lib::opencv::mat(frame_mat).convert_to(CV_8UC3).get_cv_mat();
         src_linesize[0] = resized_mat.step;
         ret = av_image_fill_pointers(src_data, pix_fmt, resized_mat.rows,
                                      resized_mat.data, src_linesize);

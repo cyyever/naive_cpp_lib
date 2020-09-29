@@ -18,9 +18,9 @@
 TEST_CASE("mat") {
   {
 
-    auto tmp_mat = cyy::cxx_lib::math::mat::load(STR_HELPER(IN_IMAGE));
+    auto tmp_mat = cyy::cxx_lib::opencv::mat::load(STR_HELPER(IN_IMAGE));
     CHECK(tmp_mat);
-    cyy::cxx_lib::math::mat image_mat = tmp_mat.value();
+    auto image_mat = tmp_mat.value();
 
     image_mat.use_gpu(true);
 
