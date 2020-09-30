@@ -9,9 +9,9 @@
 #include "cv/mat.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
-  try{
-   cyy::cxx_lib::math::mat::load(Data,Size);
-  }catch(...){
+  try {
+    cyy::cxx_lib::opencv::mat::load(Data, Size);
+  } catch (...) {
   }
   return 0; // Non-zero return values are reserved for future use.
 }

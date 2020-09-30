@@ -21,11 +21,11 @@ pkg_search_module(libavutil REQUIRED IMPORTED_TARGET libavutil)
 pkg_search_module(libavdevice REQUIRED IMPORTED_TARGET libavdevice)
 target_link_libraries(
   my_cxx_lib_video
-  PRIVATE PkgConfig::libavcodec PkgConfig::libavutil PkgConfig::libavformat
-          PkgConfig::libswscale PkgConfig::libavdevice)
+  PUBLIC PkgConfig::libavcodec PkgConfig::libavutil PkgConfig::libavformat
+         PkgConfig::libswscale PkgConfig::libavdevice)
 target_link_libraries(
-  my_cxx_lib_audio PRIVATE PkgConfig::libavcodec PkgConfig::libavutil
-                           PkgConfig::libavformat PkgConfig::libavdevice)
+  my_cxx_lib_audio PUBLIC PkgConfig::libavcodec PkgConfig::libavutil
+                          PkgConfig::libavformat PkgConfig::libavdevice)
 
 find_package(OpenCV REQUIRED COMPONENTS core)
 

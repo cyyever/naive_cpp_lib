@@ -18,7 +18,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
     impl(const std::string &in_url_, const std::string &out_url_)
         : in_url(in_url_), out_url(out_url_) {}
 
-    ~impl() = default;
+    ~impl() override = default;
 
     //! \brief 轉換視頻
     //! \return >0 成功

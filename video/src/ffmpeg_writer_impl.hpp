@@ -19,10 +19,10 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#include "cv/mat.hpp"
 #include "ffmpeg_base.hpp"
 #include "ffmpeg_writer.hpp"
 #include "log/log.hpp"
-#include "cv/mat.hpp"
 
 namespace cyy::cxx_lib::video::ffmpeg {
 
@@ -46,7 +46,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
                                            format_name.c_str(), url.c_str());
       if (ret < 0) {
         LOG_ERROR("avformat_alloc_output_context2 failed:{}",
-                   errno_to_str(ret));
+                  errno_to_str(ret));
         return false;
       }
       output_ctx->oformat->video_codec = AV_CODEC_ID_H264;
@@ -145,7 +145,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
           avcodec_parameters_from_context(output_stream->codecpar, encode_ctx);
       if (ret < 0) {
         LOG_ERROR("avcodec_parameters_from_context failed:{}",
-                   errno_to_str(ret));
+                  errno_to_str(ret));
         return false;
       }
 
@@ -200,8 +200,9 @@ namespace cyy::cxx_lib::video::ffmpeg {
         ret = av_image_fill_pointers(src_data, pix_fmt, frame_mat.rows,
                                      frame_mat.data, src_linesize);
       } else {
-        resized_mat =
-            ::cyy::cxx_lib::opencv::mat(frame_mat).convert_to(CV_8UC3).get_cv_mat();
+        resized_mat = ::cyy::cxx_lib::opencv::mat(frame_mat)
+                          .convert_to(CV_8UC3)
+                          .get_cv_mat();
         src_linesize[0] = resized_mat.step;
         ret = av_image_fill_pointers(src_data, pix_fmt, resized_mat.rows,
                                      resized_mat.data, src_linesize);

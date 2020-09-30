@@ -105,4 +105,4 @@ namespace cyy::cxx_lib::opencv {
     std::unique_ptr<mat_impl> pimpl;
   };
 
-} // namespace cyy::cxx_lib
+} // namespace cyy::cxx_lib::opencv

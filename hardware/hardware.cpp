@@ -28,31 +28,34 @@ namespace cyy::cxx_lib::hardware {
 
 #ifdef HAVE_CUDA
   size_t gpu_num() {
-    static std::atomic<int> _gpu_num = 0;
     if (getenv("TEST_NO_CUDA")) {
       return 0;
     }
-    if (_gpu_num == 0) {
-      int device_count = 0;
-      auto const error = cudaGetDeviceCount(&device_count);
-      if (error != cudaSuccess) {
-        if (error == cudaErrorInsufficientDriver) {
-          return 0;
-        }
-
-        LOG_ERROR("cudaGetDeviceCount failed {} {},so we treat as no GPU:",
-                  error, cudaGetErrorString(error));
-        return 0;
-      }
-
-      if (device_count < 0) {
-        LOG_ERROR("invalid device_count {},so we treat as no GPU:",
-                  device_count, cudaGetErrorString(error));
-
-        return 0;
-      }
-      _gpu_num = device_count;
+    static int _gpu_num = -1;
+    static std::mutex gpu_mutex;
+    if (_gpu_num >= 0) {
+      return static_cast<size_t>(_gpu_num);
     }
+    std::lock_guard lk(gpu_mutex);
+    int device_count = 0;
+    auto const error = cudaGetDeviceCount(&device_count);
+    if (error != cudaSuccess) {
+      if (error == cudaErrorInsufficientDriver) {
+        return 0;
+      }
+
+      LOG_ERROR("cudaGetDeviceCount failed {} {},so we treat as no GPU:", error,
+                cudaGetErrorString(error));
+      return 0;
+    }
+
+    if (device_count < 0) {
+      LOG_ERROR("invalid device_count {},so we treat as no GPU:", device_count,
+                cudaGetErrorString(error));
+
+      return 0;
+    }
+    _gpu_num = device_count;
     return static_cast<size_t>(_gpu_num);
   }
   int gpu_no() noexcept(false) {
