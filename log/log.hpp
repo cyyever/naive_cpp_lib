@@ -26,27 +26,27 @@ namespace std {
     // 14.1.2, source_location creation
     static constexpr source_location current(
 #ifdef __GNUG__
-        const char *__file = __builtin_FILE(), int __line = __builtin_LINE()
+        const char *_file = __builtin_FILE(), int _line = __builtin_LINE()
 #else
         const char *__file = "unknown", int __line = 0
 #endif
             ) noexcept {
-      source_location __loc;
-      __loc._M_file = __file;
-      __loc._M_line = __line;
-      return __loc;
+      source_location _loc;
+      _loc._M_file = _file;
+      _loc._M_line = _line;
+      return _loc;
     }
 
-    constexpr source_location() noexcept : _M_file("unknown"), _M_line(0) {}
+    constexpr source_location() noexcept {}
 
     // 14.1.3, source_location field access
     constexpr uint_least32_t line() const noexcept { return _M_line; }
     constexpr const char *file_name() const noexcept { return _M_file; }
 
   private:
-    const char *_M_file;
-    uint_least32_t _M_line;
-  };
+    const char *_M_file{"unknown"};
+    uint_least32_t _M_line{0};
+  } __attribute__((aligned(16)));
 } // namespace std
 #endif
 

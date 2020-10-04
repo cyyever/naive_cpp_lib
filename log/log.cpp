@@ -5,11 +5,9 @@
  * \date 2016-04-18
  */
 
-/* #ifndef SPDLOG_COMPILED_LIB */
-/* #define SPDLOG_COMPILED_LIB 1 */
-/* #endif */
-
+#ifdef _WIN32
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
