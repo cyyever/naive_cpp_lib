@@ -40,20 +40,6 @@ namespace cyy::cxx_lib {
       }
       status = sync_status::no_thread;
     }
-
-    bool set_name(const std::string &name_) {
-      std::lock_guard lock(sync_mutex);
-      if (status == sync_status::no_thread) {
-        name = name_;
-        // glibc 限制名字長度
-        name.resize(15);
-        return true;
-      }
-      return false;
-    }
-
-  protected:
-    bool needs_stop() const { return status == sync_status::wait_stop; }
     template <typename Rep, typename Period>
     bool wait_stop(const std::chrono::duration<Rep, Period> &rel_time) {
       std::unique_lock lock(stop_mutex);
@@ -70,6 +56,20 @@ namespace cyy::cxx_lib {
       }
       stop_cv.wait(lock);
     }
+
+    bool set_name(const std::string &name_) {
+      std::lock_guard lock(sync_mutex);
+      if (status == sync_status::no_thread) {
+        name = name_;
+        // glibc 限制名字長度
+        name.resize(15);
+        return true;
+      }
+      return false;
+    }
+
+  protected:
+    bool needs_stop() const { return status == sync_status::wait_stop; }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;

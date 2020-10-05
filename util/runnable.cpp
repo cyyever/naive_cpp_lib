@@ -36,9 +36,11 @@ namespace cyy::cxx_lib {
           LOG_ERROR("catch thread exception:{}", e.what());
         }
         status = sync_status::wait_join;
+        stop_cv.notify_all();
       });
     } catch (const std::exception &e) {
       status = sync_status::no_thread;
+      stop_cv.notify_all();
       if (exception_callback) {
         exception_callback(e);
       }
