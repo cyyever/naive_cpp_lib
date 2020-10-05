@@ -17,6 +17,11 @@ public:
 
   ~test_class() override { stop(); }
 
+  void test_wait_stop() {
+    start();
+    CHECK(!wait_stop(std::chrono::seconds(1)));
+    stop() CHECK(wait_stop());
+  }
   void test_stop() {
     stop();
     stop();

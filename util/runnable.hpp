@@ -57,7 +57,18 @@ namespace cyy::cxx_lib {
     template <typename Rep, typename Period>
     bool wait_stop(const std::chrono::duration<Rep, Period> &rel_time) {
       std::unique_lock lock(stop_mutex);
+      if (status != sync_status::running) {
+        return true;
+      }
       return stop_cv.wait_for(lock, rel_time) == std::cv_status::no_timeout;
+    }
+
+    void wait_stop() {
+      std::unique_lock lock(stop_mutex);
+      if (status != sync_status::running) {
+        return;
+      }
+      stop_cv.wait();
     }
 
   protected:
