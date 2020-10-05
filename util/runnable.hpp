@@ -68,7 +68,7 @@ namespace cyy::cxx_lib {
       if (status != sync_status::running) {
         return;
       }
-      stop_cv.wait();
+      stop_cv.wait(lock);
     }
 
   protected:

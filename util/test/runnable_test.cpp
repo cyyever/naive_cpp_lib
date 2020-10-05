@@ -20,7 +20,8 @@ public:
   void test_wait_stop() {
     start();
     CHECK(!wait_stop(std::chrono::seconds(1)));
-    stop() CHECK(wait_stop());
+    stop();
+    wait_stop();
   }
   void test_stop() {
     stop();
