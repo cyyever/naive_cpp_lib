@@ -48,8 +48,9 @@ namespace std {
     uint_least32_t _M_line{0};
   } 
 #ifdef __GNUG__
-  __attribute__((aligned(16)));
+  __attribute__((aligned(16)))
 #endif
+    ;
 } // namespace std
 #endif
 
