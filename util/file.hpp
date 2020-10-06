@@ -45,6 +45,7 @@ namespace cyy::cxx_lib::io {
   std::pair<bool, std::vector<std::byte>>
   read(int fd, std::optional<size_t> max_read_size_opt = {});
 
+#ifndef WIN32
   class read_only_mmaped_file final {
   public:
     explicit read_only_mmaped_file(const std::filesystem::path &file_path);
@@ -63,4 +64,5 @@ namespace cyy::cxx_lib::io {
     void *addr{nullptr};
     size_t file_size{0};
   };
+#endif
 } // namespace cyy::cxx_lib::io

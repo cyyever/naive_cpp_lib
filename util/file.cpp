@@ -9,12 +9,16 @@
 #define NOMINMAX
 #endif
 
+#include <cassert>
+#include <gsl/gsl>
 #include <algorithm>
 #include <fstream>
 #include <stdexcept>
+#ifndef WIN32
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
 
 #include <fcntl.h>
 #ifdef WIN32
@@ -26,8 +30,6 @@
 #include "file.hpp"
 #include "log/log.hpp"
 #include "util/error.hpp"
-#include <cassert>
-#include <gsl/gsl>
 
 namespace cyy::cxx_lib::io {
 
@@ -168,6 +170,7 @@ namespace cyy::cxx_lib::io {
     auto res = read(fd, buf, max_read_size_opt);
     return {res, std::move(buf)};
   }
+#ifndef WIN32
   read_only_mmaped_file::read_only_mmaped_file(
       const std::filesystem::path &file_path) {
     auto fd = open(file_path.c_str(), O_RDONLY);
@@ -198,5 +201,6 @@ namespace cyy::cxx_lib::io {
       LOG_ERROR("munmap failed:{}", ::cyy::cxx_lib::util::errno_to_str(errno));
     }
   }
+#endif
 
 } // namespace cyy::cxx_lib::io
