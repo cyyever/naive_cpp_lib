@@ -59,13 +59,21 @@ namespace cyy::cxx_lib::io {
   }
   bool get_file_content(const std::filesystem::path &file_path,
                         std::vector<std::byte> &content) {
+#ifdef WIN32
+    auto fd = _open(file_path.c_str(), O_RDONLY);
+#else
     auto fd = open(file_path.c_str(), O_RDONLY);
+#endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
                 ::cyy::cxx_lib::util::errno_to_str());
       return false;
     }
+#ifdef WIN32
+    auto cleanup = gsl::finally([fd]() { _close(fd); });
+#else
     auto cleanup = gsl::finally([fd]() { close(fd); });
+#endif
     if (!read(fd, content)) {
 
       LOG_ERROR("read file {} failed", file_path.string());
