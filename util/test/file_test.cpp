@@ -6,8 +6,9 @@
  * \date 2017-01-17
  */
 
-#include "../file.hpp"
 #include <doctest/doctest.h>
+
+#include "../file.hpp"
 
 TEST_CASE("get_file_content") {
   CHECK(::cyy::cxx_lib::io::get_file_content(__FILE__));

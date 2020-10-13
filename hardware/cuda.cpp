@@ -6,6 +6,7 @@
  */
 
 #include "cuda.hpp"
+
 #include "log/log.hpp"
 
 #ifdef HAVE_CUDA

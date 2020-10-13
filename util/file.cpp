@@ -10,24 +10,26 @@
 #endif
 
 #include <algorithm>
+#include <fcntl.h>
 #include <fstream>
 #include <stdexcept>
+
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#include <fcntl.h>
 #ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
 #endif
 
+#include <cassert>
+
+#include <gsl/gsl>
+
 #include "file.hpp"
 #include "log/log.hpp"
 #include "util/error.hpp"
-#include <cassert>
-#include <gsl/gsl>
 
 namespace cyy::cxx_lib::io {
 

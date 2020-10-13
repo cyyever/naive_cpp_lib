@@ -13,8 +13,9 @@
 #include <spdlog/spdlog.h>
 
 #if __has_include(<unistd.h>)
-#include <sys/types.h>
 #include <unistd.h>
+
+#include <sys/types.h>
 #endif
 #include <ctime>
 

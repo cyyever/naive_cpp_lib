@@ -4,9 +4,10 @@
  * \brief 测试runnable相关函数
  * \author cyy
  */
-#include <doctest/doctest.h>
 #include <functional>
 #include <iostream>
+
+#include <doctest/doctest.h>
 
 #include "log/log.hpp"
 #include "util/runnable.hpp"

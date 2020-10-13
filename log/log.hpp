@@ -11,8 +11,9 @@
 /* #define SPDLOG_COMPILED_LIB 1 */
 /* #endif */
 
-#include <spdlog/spdlog.h>
 #include <string>
+
+#include <spdlog/spdlog.h>
 
 #if __has_include(<source_location>)
 #include <source_location>
@@ -25,15 +26,17 @@ namespace std {
 
     // 14.1.2, source_location creation
     static constexpr source_location current(
-#ifdef __GNUG__
-        const char *_file = __builtin_FILE(), int _line = __builtin_LINE()
+#if defined(__clang__)
+        const char *__file = "unknown", int __line = 0
+#elif defined(__GNUC__) || defined(__GNUG__)
+        const char *__file = __builtin_FILE(), int __line = __builtin_LINE()
 #else
         const char *__file = "unknown", int __line = 0
 #endif
-            ) noexcept {
+        ) noexcept {
       source_location _loc;
-      _loc._M_file = _file;
-      _loc._M_line = _line;
+      _loc._M_file = __file;
+      _loc._M_line = static_cast<uint_least32_t>(__line);
       return _loc;
     }
 

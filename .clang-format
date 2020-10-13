@@ -4,4 +4,14 @@ TabWidth: 4
 Language:        Cpp
 IndentCaseLabels: true
 NamespaceIndentation: All
+SortIncludes: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        0
+  - Regex:           '<[[:alnum:].]+\/.*>'
+    Priority:        2
+  - Regex:           '.*'
+    Priority:        3
+    SortPriority:    4
 ...

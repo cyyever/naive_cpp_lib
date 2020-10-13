@@ -8,10 +8,11 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <functional>
 #include <mutex>
 #include <thread>
+
+#include <condition_variable>
 
 namespace cyy::cxx_lib {
   //! \brief runnable 封裝線程啓動和關閉的同步控制
@@ -29,15 +30,17 @@ namespace cyy::cxx_lib {
     virtual ~runnable() = default;
     void start();
 
-    void stop() {
+    template <typename WakeUpType = std::function<void()>>
+    void stop(WakeUpType wakeup = []() {}) {
       std::lock_guard lock(sync_mutex);
       if (status == sync_status::running) {
         status = sync_status::wait_stop;
-        stop_cv.notify_all();
+        wakeup();
       }
       if (thd.joinable()) {
         thd.join();
       }
+      stop_cv.notify_all();
       status = sync_status::no_thread;
     }
     template <typename Rep, typename Period>

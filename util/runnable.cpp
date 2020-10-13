@@ -4,10 +4,10 @@
  * \brief 封裝線程操作
  * \author cyy
  */
-#include "log/log.hpp"
+#include "runnable.hpp"
 
 #include "error.hpp"
-#include "runnable.hpp"
+#include "log/log.hpp"
 
 namespace cyy::cxx_lib {
   void runnable::start() {

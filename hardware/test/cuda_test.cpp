@@ -5,8 +5,9 @@
  * \author cyy
  */
 
-#include <doctest/doctest.h>
 #include <vector>
+
+#include <doctest/doctest.h>
 
 #include "hardware/cuda.hpp"
 #include "hardware/hardware.hpp"

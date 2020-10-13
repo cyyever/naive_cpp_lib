@@ -4,9 +4,9 @@
  * \brief 测试container相关函数
  * \author cyy
  */
-#include <doctest/doctest.h>
-
 #include "data_structure/ordered_dict.hpp"
+
+#include <doctest/doctest.h>
 
 TEST_CASE("ordered_dict") {
   cyy::cxx_lib::ordered_dict<int, std::string> container;

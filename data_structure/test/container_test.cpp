@@ -5,12 +5,13 @@
  * \author cyy
  */
 #include <chrono>
-#include <doctest/doctest.h>
 #include <functional>
 #include <thread>
-#include <type_traits>
+
+#include <doctest/doctest.h>
 
 #include "data_structure/thread_safe_container.hpp"
+#include <type_traits>
 
 TEST_CASE("thread_safe_linear_container") {
   cyy::cxx_lib::thread_safe_linear_container<std::vector<int>> container;
