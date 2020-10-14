@@ -8,13 +8,8 @@
 
 #pragma once
 
-#include <atomic>
 #include <chrono>
-#include <cstring>
-#include <iostream>
 #include <mutex>
-#include <thread>
-#include <vector>
 
 #include <condition_variable>
 
@@ -39,18 +34,19 @@ namespace cyy::cxx_lib::task {
     //! \param callback call after change status
     virtual void process(const std::chrono::milliseconds &timeout,
                          std::function<void()> callback) {
+      std::unique_lock<std::mutex> lk(task_mutex);
+      if (status != task_status::unprocessed &&
+          status != task_status::timed_out) {
+        return;
+      }
       try {
-        std::unique_lock<std::mutex> lk(task_mutex);
-        if (status == task_status::unprocessed) {
-          status = task_status::processing;
-          callback();
-          if (task_cv.wait_for(lk, timeout) == std::cv_status::timeout) {
-            status = task_status::timed_out;
-            return;
-          }
+        status = task_status::processing;
+        callback();
+        if (task_cv.wait_for(lk, timeout) == std::cv_status::timeout) {
+          status = task_status::timed_out;
+          return;
         }
       } catch (...) { //视为超时
-        std::unique_lock<std::mutex> lk(task_mutex);
         status = task_status::timed_out;
       }
     }

@@ -13,7 +13,6 @@
 #include <mutex>
 #include <optional>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "base_task.hpp"
@@ -21,7 +20,7 @@
 
 namespace cyy::cxx_lib::task {
 
-  //! \brief 深图内部服务的任务处理器
+  //! \brief 任務處理器
   class base_processor : public cyy::cxx_lib::runnable {
   public:
     base_processor() {}

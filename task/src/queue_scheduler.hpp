@@ -62,7 +62,6 @@ namespace cyy::cxx_lib::task {
     //! \param timeout 任務處理超时时间
     void schedule(const std::shared_ptr<base_task> &task,
                   const std::chrono::milliseconds &timeout) override {
-
       task->process(timeout, [this, &task]() { queue.push_back(task); });
     }
 
@@ -73,11 +72,11 @@ namespace cyy::cxx_lib::task {
     }
 
   private:
-    using processor_list = std::vector<std::unique_ptr<base_processor>>;
+    using processor_list_type = std::vector<std::unique_ptr<base_processor>>;
 
-    processor_list
+    processor_list_type
     make_processors(const std::vector<processor_factory> &makers) {
-      processor_list new_processors;
+      processor_list_type new_processors;
       //先构造新的processor
       for (auto maker : makers) {
         auto tmp = maker();
@@ -99,7 +98,7 @@ namespace cyy::cxx_lib::task {
   private:
     thread_safe_linear_container<std::vector<std::shared_ptr<base_task>>> queue;
 
-    processor_list processors;
+    processor_list_type processors;
     std::mutex processor_mutex;
   }; // class queue_scheduler
 } // namespace cyy::cxx_lib::task

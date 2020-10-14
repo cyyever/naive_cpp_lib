@@ -9,7 +9,6 @@
 
 #include <chrono>
 #include <memory>
-#include <thread>
 
 #include "base_task.hpp"
 
@@ -31,4 +30,4 @@ public:
                         const std::chrono::milliseconds &timeout) = 0;
 
 }; // class base_scheduler
-} // namespace cyy::cxx_lib::internal_task
+} // namespace cyy::cxx_lib::task
