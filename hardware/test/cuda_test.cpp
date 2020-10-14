@@ -15,15 +15,15 @@
 #ifdef HAVE_CUDA
 #ifdef TEST_GPU
 TEST_CASE("gpu_num") {
-  CHECK(deepir::hardware::gpu_num() > 0);
+  CHECK(cyy::cxx_lib::hardware::gpu_num() > 0);
 
-  auto gpu_no = deepir::hardware::round_robin_allocator::next_gpu_no();
-  CHECK(gpu_no < deepir::hardware::gpu_num());
-  CHECK(deepir::hardware::gpu_no() >= 0);
+  auto gpu_no = cyy::cxx_lib::hardware::round_robin_allocator::next_gpu_no();
+  CHECK(gpu_no < cyy::cxx_lib::hardware::gpu_num());
+  CHECK(cyy::cxx_lib::hardware::gpu_no() >= 0);
 }
 TEST_CASE("cuda stream") {
-  deepir::hardware::cuda::get_copy_to_device_stream();
-  deepir::hardware::cuda::get_copy_to_host_stream();
+  cyy::cxx_lib::hardware::cuda::get_copy_to_device_stream();
+  cyy::cxx_lib::hardware::cuda::get_copy_to_host_stream();
 }
 #endif
 #endif

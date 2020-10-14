@@ -15,7 +15,7 @@
 
 namespace cyy::cxx_lib::task {
 
-  //! \brief 深图内部服务的任务
+  //! \brief 綫程任务
   class base_task {
   public:
     base_task() = default;
