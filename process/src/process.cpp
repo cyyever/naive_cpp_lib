@@ -73,11 +73,7 @@ namespace cyy::cxx_lib::process {
       if (config.need_channel) {
         close(socketfd[0]);
       }
-      if (envp.empty()) {
-        execvp(config.binary_path.c_str(), argv.data());
-      } else {
-        execvpe(config.binary_path.c_str(), argv.data(), envp.data());
-      }
+      execvpe(config.binary_path.c_str(), argv.data(), envp.data());
       auto saved_errno = errno;
 
       //通知父進程失敗了

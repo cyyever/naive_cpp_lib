@@ -36,7 +36,7 @@ namespace cyy::cxx_lib::this_thread {
           throw std::runtime_error("signal_fd failed");
         }
       }
-      int get_fd() { return fd; }
+      int const get_fd() { return fd; }
 
       ~signal_fd() { close(fd); }
 

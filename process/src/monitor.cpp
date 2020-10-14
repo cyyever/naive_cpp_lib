@@ -174,7 +174,7 @@ namespace cyy::cxx_lib::process::monitor {
 
     private:
       struct child_setting {
-        prog_id id;
+        prog_id id{};
         bool check_exist{true};
         spawn_config config{};
         spawn_result result{};
