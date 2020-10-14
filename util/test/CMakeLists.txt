@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.9)
-
 include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
 
 find_package(doctest REQUIRED)

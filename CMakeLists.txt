@@ -6,7 +6,7 @@ include(cmake/all.cmake)
 
 option(BUILD_ML "Build machine learning modules" OFF)
 
-set(submodule_names log util hardware data_structure process)
+set(submodule_names log util hardware data_structure process task)
 if(BUILD_ML)
   list(APPEND submodule_names torch cv)
 endif()
