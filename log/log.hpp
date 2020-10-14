@@ -31,7 +31,7 @@ namespace std {
 #elif defined(__GNUC__) || defined(__GNUG__)
         const char *__file = __builtin_FILE(), int __line = __builtin_LINE()
 #else
-        const char *_file = "unknown", int _line = 0
+        const char *__file = "unknown", int __line = 0
 #endif
         ) noexcept {
       source_location _loc;
@@ -49,11 +49,11 @@ namespace std {
   private:
     const char *_M_file{"unknown"};
     uint_least32_t _M_line{0};
-  } 
+  }
 #ifdef __GNUG__
   __attribute__((aligned(16)))
 #endif
-    ;
+  ;
 } // namespace std
 #endif
 
