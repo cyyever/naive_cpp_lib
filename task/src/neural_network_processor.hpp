@@ -9,19 +9,19 @@
 
 #include "base_processor.hpp"
 
-namespace cyy::cxx_lib::internal_task {
+namespace cyy::cxx_lib::task {
 
-//! \brief 神经网络任务处理器
-class neural_network_processor : public base_processor {
-public:
-  neural_network_processor() = default;
-  ~neural_network_processor() override = default;
+  //! \brief 神经网络任务处理器
+  class neural_network_processor : public base_processor {
+  public:
+    neural_network_processor() = default;
+    ~neural_network_processor() override = default;
 
-  void set_model_version(const std::string &version) {
-    model_version = version;
-  }
+    void set_model_version(const std::string &version) {
+      model_version = version;
+    }
 
-protected:
-  std::string model_version;
-};
-} // namespace cyy::cxx_lib::internal_task
+  protected:
+    std::string model_version;
+  };
+} // namespace cyy::cxx_lib::task

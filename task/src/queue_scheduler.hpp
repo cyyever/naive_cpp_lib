@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
-#include <deepir/util/thread_safe_container.hpp>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -18,86 +17,89 @@
 
 #include "base_processor.hpp"
 #include "base_scheduler.hpp"
+#include "data_structure/thread_safe_container.hpp"
 
-namespace cyy::cxx_lib::internal_task {
+namespace cyy::cxx_lib::task {
 
-//! \brief 基于队列的任务调度器
-class queue_scheduler : public base_scheduler {
-public:
-  using processor_factory = std::function<base_processor *()>;
+  //! \brief 基于队列的任务调度器
+  class queue_scheduler : public base_scheduler {
+  public:
+    using processor_factory = std::function<base_processor *()>;
 
-public:
-  queue_scheduler() = default;
-  queue_scheduler(const queue_scheduler &) = delete;
-  queue_scheduler &operator=(const queue_scheduler &) = delete;
+  public:
+    queue_scheduler() = default;
+    queue_scheduler(const queue_scheduler &) = delete;
+    queue_scheduler &operator=(const queue_scheduler &) = delete;
 
-  explicit queue_scheduler(const std::vector<processor_factory> &makers) {
-    this->replace_processor(makers);
-  }
-
-  void replace_processor(const std::vector<processor_factory> &makers) {
-    std::unique_lock<std::mutex> lk(processor_mutex);
-    processors = make_processors(makers);
-  }
-
-  void add_processor(const std::vector<processor_factory> &makers) {
-    std::unique_lock<std::mutex> lk(processor_mutex);
-
-    for (auto &processor : make_processors(makers)) {
-      processors.emplace_back(std::move(processor));
+    explicit queue_scheduler(const std::vector<processor_factory> &makers) {
+      this->replace_processor(makers);
     }
-    return;
-  }
 
-  void foreach_processor(
-      const std::function<bool(const base_processor *)> &call_back) {
-    std::unique_lock<std::mutex> lk(processor_mutex);
-    for (const auto &processor : processors) {
-      if (call_back(processor.get()))
-        break;
+    void replace_processor(const std::vector<processor_factory> &makers) {
+      std::unique_lock<std::mutex> lk(processor_mutex);
+      processors = make_processors(makers);
     }
-  }
 
-  //! \brief 調度任务
-  //! \param timeout 任務處理超时时间
-  void schedule(const std::shared_ptr<base_task> &task,
-                const std::chrono::milliseconds &timeout) override {
+    void add_processor(const std::vector<processor_factory> &makers) {
+      std::unique_lock<std::mutex> lk(processor_mutex);
 
-    task->process(timeout, [this, &task]() { queue.push_back(task); });
-  }
+      for (auto &processor : make_processors(makers)) {
+        processors.emplace_back(std::move(processor));
+      }
+      return;
+    }
 
-  ~queue_scheduler() override {
-    //我们必须在这边明确地把processors清理掉，这样做是为了处理完任务队列内积压的任务，避免内存泄露
-    //在这边不能依赖processors的析构函数，因为这样的话queue和processors的析构函数的顺序依赖于成员声明的位置，很容易在重构时跪掉
-    processors.clear();
-  }
+    void foreach_processor(
+        const std::function<bool(const base_processor *)> &call_back) {
+      std::unique_lock<std::mutex> lk(processor_mutex);
+      for (const auto &processor : processors) {
+        if (call_back(processor.get()))
+          break;
+      }
+    }
 
-private:
-  using processor_list = std::vector<std::unique_ptr<base_processor>>;
+    //! \brief 調度任务
+    //! \param timeout 任務處理超时时间
+    void schedule(const std::shared_ptr<base_task> &task,
+                  const std::chrono::milliseconds &timeout) override {
 
-  processor_list make_processors(const std::vector<processor_factory> &makers) {
-    processor_list new_processors;
-    //先构造新的processor
-    for (auto maker : makers) {
-      auto tmp = maker();
-      tmp->set_get_task_func([this](const std::chrono::milliseconds &timeout) {
-        return queue.pop_front(timeout);
+      task->process(timeout, [this, &task]() { queue.push_back(task); });
+    }
+
+    ~queue_scheduler() override {
+      //我们必须在这边明确地把processors清理掉，这样做是为了处理完任务队列内积压的任务，避免内存泄露
+      //在这边不能依赖processors的析构函数，因为这样的话queue和processors的析构函数的顺序依赖于成员声明的位置，很容易在重构时跪掉
+      processors.clear();
+    }
+
+  private:
+    using processor_list = std::vector<std::unique_ptr<base_processor>>;
+
+    processor_list
+    make_processors(const std::vector<processor_factory> &makers) {
+      processor_list new_processors;
+      //先构造新的processor
+      for (auto maker : makers) {
+        auto tmp = maker();
+        tmp->set_get_task_func(
+            [this](const std::chrono::milliseconds &timeout) {
+              return queue.pop_front(timeout);
+            }
+
+        );
+        new_processors.emplace_back(tmp);
       }
 
-      );
-      new_processors.emplace_back(tmp);
+      for (auto &processor : new_processors) {
+        processor->start();
+      }
+      return new_processors;
     }
 
-    for (auto &processor : new_processors) {
-      processor->start();
-    }
-    return new_processors;
-  }
+  private:
+    thread_safe_linear_container<std::vector<std::shared_ptr<base_task>>> queue;
 
-private:
-  thread_safe_linear_container<std::vector<std::shared_ptr<base_task>>> queue;
-
-  processor_list processors;
-  std::mutex processor_mutex;
-}; // class queue_scheduler
-} // namespace cyy::cxx_lib::internal_task
+    processor_list processors;
+    std::mutex processor_mutex;
+  }; // class queue_scheduler
+} // namespace cyy::cxx_lib::task

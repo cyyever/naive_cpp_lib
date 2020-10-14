@@ -13,7 +13,7 @@
 
 #include "base_task.hpp"
 
-namespace cyy::cxx_lib::internal_task {
+namespace cyy::cxx_lib::task{
 
 class base_scheduler {
 public:
