@@ -9,14 +9,19 @@
 #define NOMINMAX
 #endif
 
+#include <cassert>
+#include <gsl/gsl>
 #include <algorithm>
 #include <fcntl.h>
 #include <fstream>
 #include <stdexcept>
-
+#ifndef WIN32
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
+
+#include <fcntl.h>
 #ifdef WIN32
 #include <io.h>
 #else
@@ -59,13 +64,21 @@ namespace cyy::cxx_lib::io {
   }
   bool get_file_content(const std::filesystem::path &file_path,
                         std::vector<std::byte> &content) {
+#ifdef WIN32
+    auto fd =_wopen(file_path.c_str(), O_RDONLY);
+#else
     auto fd = open(file_path.c_str(), O_RDONLY);
+#endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
                 ::cyy::cxx_lib::util::errno_to_str());
       return false;
     }
+#ifdef WIN32
+    auto cleanup = gsl::finally([fd]() { _close(fd); });
+#else
     auto cleanup = gsl::finally([fd]() { close(fd); });
+#endif
     if (!read(fd, content)) {
 
       LOG_ERROR("read file {} failed", file_path.string());
@@ -76,13 +89,21 @@ namespace cyy::cxx_lib::io {
 
   std::optional<size_t> write(const std::filesystem::path &file_path,
                               const void *data, size_t data_len) {
+#ifdef WIN32
+    auto fd =_wopen(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY);
+#else
     auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY, S_IRWXU);
+#endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
                 ::cyy::cxx_lib::util::errno_to_str());
       return {};
     }
+#ifdef WIN32
+    auto cleanup = gsl::finally([fd]() { _close(fd); });
+#else
     auto cleanup = gsl::finally([fd]() { close(fd); });
+#endif
     return write(fd, data, data_len);
   }
 
@@ -170,6 +191,7 @@ namespace cyy::cxx_lib::io {
     auto res = read(fd, buf, max_read_size_opt);
     return {res, std::move(buf)};
   }
+#ifndef WIN32
   read_only_mmaped_file::read_only_mmaped_file(
       const std::filesystem::path &file_path) {
     auto fd = open(file_path.c_str(), O_RDONLY);
@@ -200,5 +222,6 @@ namespace cyy::cxx_lib::io {
       LOG_ERROR("munmap failed:{}", ::cyy::cxx_lib::util::errno_to_str(errno));
     }
   }
+#endif
 
 } // namespace cyy::cxx_lib::io
