@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.18)
 
 project(MyCXXLib LANGUAGES CXX)
 
@@ -6,7 +6,10 @@ include(cmake/all.cmake)
 
 option(BUILD_ML "Build machine learning modules" OFF)
 
-set(submodule_names log util hardware data_structure process task)
+set(submodule_names log util hardware data_structure task)
+if(NOT WIN32)
+  list(APPEND submodule_names process)
+endif()
 if(BUILD_ML)
   list(APPEND submodule_names torch cv)
 endif()

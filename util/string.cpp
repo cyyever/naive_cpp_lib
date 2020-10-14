@@ -7,8 +7,8 @@
  */
 
 #ifdef _WIN32
-#include <Stringapiset.h>
 #include <windows.h>
+#include <Stringapiset.h>
 #endif
 
 #include <iostream>
