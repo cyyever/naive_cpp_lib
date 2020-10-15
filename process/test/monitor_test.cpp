@@ -30,13 +30,14 @@ TEST_CASE("monitor") {
         child_id_opt.value()));
     return child_id_opt.value();
   };
-
   SUBCASE("child fail") {
     using namespace std::chrono_literals;
     auto child_id_opt = cyy::cxx_lib::process::monitor::start_process(
         {"sh", {"sh", "-c", "exit 3"}}, 1s, 2);
     CHECK(child_id_opt);
-    std::this_thread::sleep_for(3s);
+    std::this_thread::sleep_for(5s);
+    CHECK(!cyy::cxx_lib::process::monitor::monitored_process_exist(
+        child_id_opt.value()));
   }
 
   SUBCASE("kill child") {

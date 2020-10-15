@@ -1,6 +1,6 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-add_library(my_cxx_lib_process SHARED ${SOURCE})
+add_library(my_cxx_lib_process ${SOURCE})
 add_library(MyCXXLib::process ALIAS my_cxx_lib_process)
 
 target_link_libraries(my_cxx_lib_process PRIVATE MyCXXLib::log)

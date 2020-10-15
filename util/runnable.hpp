@@ -10,6 +10,7 @@
 #include <chrono>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <thread>
 
 #include <condition_variable>
@@ -27,52 +28,50 @@ namespace cyy::cxx_lib {
     runnable &operator=(runnable &&) noexcept = delete;
 
     //! \note 子類Destructor必須明確調用stop
-    virtual ~runnable() = default;
-    void start();
+    virtual ~runnable() =default;
+    void start(std::string name = "");
 
     template <typename WakeUpType = std::function<void()>>
     void stop(WakeUpType wakeup = []() {}) {
-      std::lock_guard lock(sync_mutex);
-      if (status == sync_status::running) {
-        status = sync_status::wait_stop;
-        wakeup();
+      std::unique_lock lock(sync_mutex);
+      if (!thd.joinable()) {
+        return;
       }
-      if (thd.joinable()) {
-        thd.join();
-      }
+      std::stop_callback cb(thd.get_stop_token(), wakeup);
+      thd.request_stop();
+      lock.unlock();
+      thd.join();
       stop_cv.notify_all();
-      status = sync_status::no_thread;
     }
     template <typename Rep, typename Period>
     bool wait_stop(const std::chrono::duration<Rep, Period> &rel_time) {
-      std::unique_lock lock(stop_mutex);
-      if (status != sync_status::running) {
+      std::unique_lock lock(sync_mutex);
+      if (!thd.joinable()) {
         return true;
       }
       return stop_cv.wait_for(lock, rel_time) == std::cv_status::no_timeout;
     }
 
     void wait_stop() {
-      std::unique_lock lock(stop_mutex);
-      if (status != sync_status::running) {
+      std::unique_lock lock(sync_mutex);
+      if (!thd.joinable()) {
         return;
       }
       stop_cv.wait(lock);
     }
 
-    bool set_name(const std::string &name_) {
-      std::lock_guard lock(sync_mutex);
-      if (status == sync_status::no_thread) {
-        name = name_;
-        // glibc 限制名字長度
-        name.resize(15);
-        return true;
-      }
-      return false;
-    }
 
   protected:
-    bool needs_stop() const { return status == sync_status::wait_stop; }
+    bool needs_stop() {
+      std::unique_lock lock(sync_mutex);
+      if(!thd.joinable()) {
+        return true;
+      }
+      if(thd.get_stop_token().stop_requested()) {
+        puts("after request_stop");
+      }
+      return thd.get_stop_token().stop_requested();
+    }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;
@@ -81,14 +80,10 @@ namespace cyy::cxx_lib {
     virtual void run() = 0;
 
   private:
-    enum class sync_status { no_thread = 0, running, wait_stop, wait_join };
-    std::atomic<sync_status> status{sync_status::no_thread};
-    std::thread thd;
-    std::string name;
+    std::jthread thd;
 
   protected:
-    std::mutex sync_mutex;
-    std::mutex stop_mutex;
-    std::condition_variable stop_cv;
+    std::recursive_mutex  sync_mutex;
+    std::condition_variable_any stop_cv;
   };
 } // namespace cyy::cxx_lib

@@ -10,41 +10,43 @@
 #include "log/log.hpp"
 
 namespace cyy::cxx_lib {
-  void runnable::start() {
+  void runnable::start(std::string name) {
     std::lock_guard lock(sync_mutex);
-    if (status != sync_status::no_thread) {
+    if (thd.joinable()) {
       throw std::runtime_error("thread is running");
     }
-    status = sync_status::running;
     try {
-      thd = std::thread([this]() {
-        try {
+      thd = std::jthread(
+          [this](std::string name_) {
+            try {
 #if defined(__linux__)
-          if (!name.empty()) {
-            auto err = pthread_setname_np(pthread_self(), name.c_str());
-            if (err != 0) {
-              LOG_ERROR("pthread_setname_np failed:{}",
-                        cyy::cxx_lib::util::errno_to_str(err));
-            }
-          }
+              if (!name_.empty()) {
+        // glibc 限制名字長度
+        name_.resize(15);
+                auto err = pthread_setname_np(pthread_self(), name_.c_str());
+                if (err != 0) {
+                  LOG_ERROR("pthread_setname_np failed:{}",
+                            cyy::cxx_lib::util::errno_to_str(err));
+                }
+              }
 #endif
-          run();
-        } catch (const std::exception &e) {
-          if (exception_callback) {
-            exception_callback(e);
-          }
-          LOG_ERROR("catch thread exception:{}", e.what());
-        }
-        status = sync_status::wait_join;
-        stop_cv.notify_all();
-      });
+              run();
+            } catch (const std::exception &e) {
+              if (exception_callback) {
+                exception_callback(e);
+              }
+              LOG_ERROR("catch thread exception:{}", e.what());
+            }
+            stop_cv.notify_all();
+          },
+          std::move(name));
     } catch (const std::exception &e) {
-      status = sync_status::no_thread;
       stop_cv.notify_all();
       if (exception_callback) {
         exception_callback(e);
       }
       LOG_ERROR("create thread failed:{}", e.what());
+      throw;
     }
   }
 

@@ -1,4 +1,3 @@
-int main(int argc, char **argv) { return 0; }
 /*!
  * \file monitor.cpp
  *
@@ -354,6 +353,7 @@ namespace cyy::cxx_lib::process::monitor {
       }
 
       void deal_zombie(int wstatus, child_setting setting) {
+        LOG_INFO("deal zombie {}", setting.config.binary_path);
         if (setting.result.channel_fd) {
           close(setting.result.channel_fd.value());
           setting.result.channel_fd.reset();
