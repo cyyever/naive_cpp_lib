@@ -37,9 +37,7 @@ public:
 
 #if defined(__linux__)
   void test_name() {
-    thread_name = "my-thread";
-    set_name(thread_name);
-    start();
+    start(thread_name);
     stop();
     thread_name.clear();
   }
