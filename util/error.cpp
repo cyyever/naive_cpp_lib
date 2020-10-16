@@ -6,9 +6,10 @@
  * \date 2017-01-17
  */
 
+#include "error.hpp"
+
 #include <mutex>
 
-#include "error.hpp"
 #include <system_error>
 
 namespace cyy::cxx_lib::util {

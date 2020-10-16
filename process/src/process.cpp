@@ -112,7 +112,7 @@ namespace cyy::cxx_lib::process {
     if (succ) {
       if (config.need_channel) {
         close(socketfd[1]);
-        socketfd_RAII.release();
+        [[maybe_unused]] auto tmp=socketfd_RAII.release();
         return {{pid, socketfd[0]}};
       } else {
         return {{pid}};

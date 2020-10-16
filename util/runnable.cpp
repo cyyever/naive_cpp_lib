@@ -21,8 +21,8 @@ namespace cyy::cxx_lib {
             try {
 #if defined(__linux__)
               if (!name_.empty()) {
-        // glibc 限制名字長度
-        name_.resize(15);
+                // glibc 限制名字長度
+                name_.resize(15);
                 auto err = pthread_setname_np(pthread_self(), name_.c_str());
                 if (err != 0) {
                   LOG_ERROR("pthread_setname_np failed:{}",

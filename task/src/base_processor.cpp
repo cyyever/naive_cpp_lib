@@ -6,9 +6,10 @@
  * \date 2016-11-09
  */
 
+#include "base_processor.hpp"
+
 #include <chrono>
 
-#include "base_processor.hpp"
 #include "base_task.hpp"
 #include "hardware/hardware.hpp"
 
@@ -53,9 +54,9 @@ namespace cyy::cxx_lib::task {
       }
 
       for (size_t i = 0; i < tasks.size();) {
-        tasks[i]->lock();
+        /* tasks[i]->lock(); */
         if (tasks[i]->has_expired()) {
-          tasks[i]->unlock();
+          /* tasks[i]->unlock(); */
           std::swap(tasks[i], tasks.back());
           tasks.pop_back();
         } else {

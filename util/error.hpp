@@ -12,8 +12,9 @@
 #include <string>
 
 #ifdef _WIN32
-#include <strsafe.h>
 #include <windows.h>
+
+#include <strsafe.h>
 #endif
 
 namespace cyy::cxx_lib::util {

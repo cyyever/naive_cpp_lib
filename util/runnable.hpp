@@ -28,7 +28,7 @@ namespace cyy::cxx_lib {
     runnable &operator=(runnable &&) noexcept = delete;
 
     //! \note 子類Destructor必須明確調用stop
-    virtual ~runnable() =default;
+    virtual ~runnable() = default;
     void start(std::string name = "");
 
     template <typename WakeUpType = std::function<void()>>
@@ -60,14 +60,13 @@ namespace cyy::cxx_lib {
       stop_cv.wait(lock);
     }
 
-
   protected:
     bool needs_stop() {
       std::unique_lock lock(sync_mutex);
-      if(!thd.joinable()) {
+      if (!thd.joinable()) {
         return true;
       }
-      if(thd.get_stop_token().stop_requested()) {
+      if (thd.get_stop_token().stop_requested()) {
         puts("after request_stop");
       }
       return thd.get_stop_token().stop_requested();
@@ -83,7 +82,7 @@ namespace cyy::cxx_lib {
     std::jthread thd;
 
   protected:
-    std::recursive_mutex  sync_mutex;
+    std::recursive_mutex sync_mutex;
     std::condition_variable_any stop_cv;
   };
 } // namespace cyy::cxx_lib
