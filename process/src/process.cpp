@@ -4,6 +4,8 @@
  * \brief 封裝進程處理代碼
  * \author cyy
  */
+#include "process.hpp"
+
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
@@ -15,7 +17,6 @@
 #include <sys/wait.h>
 
 #include "log/log.hpp"
-#include "process.hpp"
 #include "util/error.hpp"
 #include "util/file.hpp"
 
@@ -112,7 +113,7 @@ namespace cyy::cxx_lib::process {
     if (succ) {
       if (config.need_channel) {
         close(socketfd[1]);
-        [[maybe_unused]] auto tmp=socketfd_RAII.release();
+        [[maybe_unused]] auto tmp = socketfd_RAII.release();
         return {{pid, socketfd[0]}};
       } else {
         return {{pid}};

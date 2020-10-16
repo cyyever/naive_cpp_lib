@@ -5,6 +5,8 @@
  * \author cyy
  */
 
+#include "thread.hpp"
+
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
@@ -16,7 +18,6 @@
 #include <sys/types.h>
 
 #include "log/log.hpp"
-#include "thread.hpp"
 #include "util/error.hpp"
 
 namespace cyy::cxx_lib::this_thread {
