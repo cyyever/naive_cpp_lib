@@ -30,7 +30,7 @@ namespace cyy::cxx_lib::task {
     }
 
     {
-      std::lock_guard<std::mutex> lock(thd_mutex);
+      std::lock_guard lock(thd_mutex);
       init_thread_context();
     }
 
@@ -54,9 +54,9 @@ namespace cyy::cxx_lib::task {
       }
 
       for (size_t i = 0; i < tasks.size();) {
-        /* tasks[i]->lock(); */
+        tasks[i]->lock();
         if (tasks[i]->has_expired()) {
-          /* tasks[i]->unlock(); */
+          tasks[i]->unlock();
           std::swap(tasks[i], tasks.back());
           tasks.pop_back();
         } else {
@@ -72,7 +72,7 @@ namespace cyy::cxx_lib::task {
     }
 
     {
-      std::lock_guard<std::mutex> lock(thd_mutex);
+      std::lock_guard lock(thd_mutex);
       deinit_thread_context();
     }
   }
