@@ -7,19 +7,20 @@
  */
 
 #if defined(__linux__)
-#include <arpa/inet.h>
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <ifaddrs.h>
-#include <net/if.h>
-#include <netinet/in.h>
 #include <pthread.h>
 #include <regex>
-#include <sys/ioctl.h>
 #include <unistd.h>
+
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
 
 #include "hardware.hpp"
 #include "util/error.hpp"
