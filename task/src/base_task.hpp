@@ -9,6 +9,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <future>
 
 namespace cyy::cxx_lib::task {
