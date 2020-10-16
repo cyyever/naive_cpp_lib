@@ -84,7 +84,7 @@ namespace cyy::cxx_lib::task {
     int gpu_no{-1};
 
   private:
-    static std::mutex thd_mutex;
+    static inline std::mutex thd_mutex;
 
   }; // class base_processor
 } // namespace cyy::cxx_lib::task

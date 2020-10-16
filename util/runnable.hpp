@@ -66,9 +66,6 @@ namespace cyy::cxx_lib {
       if (!thd.joinable()) {
         return true;
       }
-      if (thd.get_stop_token().stop_requested()) {
-        puts("after request_stop");
-      }
       return thd.get_stop_token().stop_requested();
     }
 

@@ -60,9 +60,10 @@ namespace cyy::cxx_lib::task {
 
     //! \brief 調度任务
     //! \param timeout 任務處理超时时间
-    void schedule(const std::shared_ptr<base_task> &task,
+    bool schedule(const std::shared_ptr<base_task> &task,
                   const std::chrono::milliseconds &timeout) override {
-      task->process(timeout, [this, &task]() { queue.push_back(task); });
+      queue.push_back(task);
+      return task->wait_done(timeout);
     }
 
     ~queue_scheduler() override {

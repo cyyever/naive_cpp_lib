@@ -12,6 +12,7 @@
 
 #include "base_task.hpp"
 #include "hardware/hardware.hpp"
+#include "log/log.hpp"
 
 namespace cyy::cxx_lib::task {
 
@@ -53,22 +54,12 @@ namespace cyy::cxx_lib::task {
         }
       }
 
-      for (size_t i = 0; i < tasks.size();) {
-        tasks[i]->lock();
-        if (tasks[i]->has_expired()) {
-          tasks[i]->unlock();
-          std::swap(tasks[i], tasks.back());
-          tasks.pop_back();
-        } else {
-          i++;
-        }
+      auto num =
+          std::erase_if(tasks, [](auto const &p) { return p->has_expired(); });
+      if (num != 0) {
+        LOG_WARN("skip {} expired tasks", num);
       }
-
       process_tasks(tasks);
-
-      for (auto &task : tasks) {
-        task->unlock();
-      }
     }
 
     {
@@ -77,5 +68,4 @@ namespace cyy::cxx_lib::task {
     }
   }
 
-  std::mutex base_processor::thd_mutex;
 } // namespace cyy::cxx_lib::task

@@ -26,7 +26,7 @@ public:
 
   //! \brief 調度任务
   //! \param timeout 任務處理超时时间
-  virtual void schedule(const std::shared_ptr<base_task> &task,
+  virtual bool schedule(const std::shared_ptr<base_task> &task,
                         const std::chrono::milliseconds &timeout) = 0;
 
 }; // class base_scheduler

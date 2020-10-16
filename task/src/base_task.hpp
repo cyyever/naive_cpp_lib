@@ -9,9 +9,7 @@
 #pragma once
 
 #include <chrono>
-#include <mutex>
-
-#include <condition_variable>
+#include <future>
 
 namespace cyy::cxx_lib::task {
 
@@ -20,79 +18,84 @@ namespace cyy::cxx_lib::task {
   public:
     base_task() = default;
 
-    base_task(const base_task &) = delete;
-    base_task &operator=(const base_task &) = delete;
-
     virtual ~base_task() = default;
-
-    void lock() { task_mutex.lock(); }
-    bool try_lock() { return task_mutex.try_lock(); }
-    void unlock() { task_mutex.unlock(); }
 
     //! \brief 处理任务
     //! \param timeout 该线程等待超时时间
-    //! \param callback call after change status
-    virtual void process(const std::chrono::milliseconds &timeout,
-                         std::function<void()> callback) {
-      std::unique_lock<std::mutex> lk(task_mutex);
-      if (status != task_status::unprocessed &&
-          status != task_status::timed_out) {
-        return;
+    bool wait_done(const std::chrono::milliseconds &timeout) {
+      if (status != task_status::unprocessed) {
+        return status == task_status::processed;
       }
-      try {
-        status = task_status::processing;
-        callback();
-        if (task_cv.wait_for(lk, timeout) == std::cv_status::timeout) {
-          status = task_status::timed_out;
-          return;
-        }
-      } catch (...) { //视为超时
-        status = task_status::timed_out;
+      auto res = _wait_done(timeout);
+      if (res) {
+        status = task_status::processed;
+        return true;
       }
-    }
-
-    //! \brief 重置任务状态，重新开始处理任务
-    void restart_process() {
-      std::unique_lock<std::mutex> lk(task_mutex);
-      status = task_status::unprocessed;
+      status = task_status::timed_out;
+      return false;
     }
 
     bool has_expired() const { return status == task_status::timed_out; }
-
     bool has_finished() const { return status == task_status::processed; }
 
-    bool has_failed() const { return status == task_status::process_failed; }
+  private:
+    virtual bool _wait_done(const std::chrono::milliseconds &timeout) = 0;
 
-    //! \brief 标识任务处理完毕
-    //! \param succ 任务处理是否成功
-    void finish_process(bool succ) {
-      if (status == task_status::timed_out) {
-        return;
-      }
-      auto pre_status = status;
+  private:
+    //! \brief 任务状态
+    enum class task_status : uint8_t { unprocessed, timed_out, processed };
 
-      if (succ)
-        status = task_status::processed;
-      else
-        status = task_status::process_failed;
-      if (pre_status == task_status::processing)
-        task_cv.notify_one();
-      return;
+  private:
+    std::atomic<task_status> status{task_status::unprocessed};
+  };
+
+  template <typename ResultType = void>
+  class task_with_result : public base_task {
+  public:
+    ~task_with_result() override = default;
+
+    auto const &get_result(const std::chrono::milliseconds &timeout =
+                               std::chrono::milliseconds(1)) {
+      _wait_done(timeout);
+      return result_opt;
     }
 
   private:
-    //! \brief 任务状态，用于做processor和task的信息交换
-    enum class task_status : uint8_t {
-      unprocessed,
-      processing,
-      timed_out,
-      process_failed,
-      processed
-    };
+    bool _wait_done(const std::chrono::milliseconds &timeout) override {
+      if (result_opt.has_value()) {
+        return true;
+      }
+      auto future = result_promise.get_future();
+      if (!future.valid()) {
+        return false;
+      }
+      if (has_expired()) {
+        return false;
+      }
+      if (future.wait_for(timeout) == std::future_status::ready) {
+        result_opt = future.get();
+        return true;
+      }
+      return false;
+    }
+
+  public:
+    std::promise<ResultType> result_promise;
 
   private:
-    task_status status{task_status::unprocessed};
-    std::mutex task_mutex;
-    std::condition_variable task_cv;
+    std::optional<ResultType> result_opt;
   };
+
+  template <typename ArgumentType, typename ResultType = void>
+  class task_with_argument_and_result : public task_with_result<ResultType> {
+  public:
+    explicit task_with_argument_and_result(ArgumentType argument_)
+        : argument{std::move(argument_)} {}
+    ~task_with_argument_and_result() override = default;
+    auto const &get_argument() const { return argument; }
+
+  private:
+    ArgumentType argument;
+  };
+
 } // namespace cyy::cxx_lib::task
