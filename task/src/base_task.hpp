@@ -9,8 +9,8 @@
 #pragma once
 
 #include <chrono>
-#include <optional>
 #include <future>
+#include <optional>
 
 namespace cyy::cxx_lib::task {
 
@@ -30,24 +30,21 @@ namespace cyy::cxx_lib::task {
       auto res = _wait_done(timeout);
       if (res) {
         status = task_status::processed;
-        return true;
       }
-      status = task_status::timed_out;
-      return false;
+      return res;
     }
 
-    bool has_expired() const { return status == task_status::timed_out; }
-    bool has_finished() const { return status == task_status::processed; }
+    void mark_invalid() { status = task_status::invalid; }
+    bool is_invalid() const { return status == task_status::invalid; }
+    bool can_process() const { return status == task_status::unprocessed; }
 
   private:
     virtual bool _wait_done(const std::chrono::milliseconds &timeout) = 0;
 
   private:
     //! \brief 任务状态
-    enum class task_status : uint8_t { unprocessed, timed_out, processed };
-
-  private:
-    std::atomic<task_status> status{task_status::unprocessed};
+    enum class task_status : uint8_t { unprocessed, invalid, processed };
+    task_status status{task_status::unprocessed};
   };
 
   template <typename ResultType = void>
@@ -66,11 +63,13 @@ namespace cyy::cxx_lib::task {
       if (result_opt.has_value()) {
         return true;
       }
-      auto future = result_promise.get_future();
-      if (!future.valid()) {
+
+      if (is_invalid()) {
         return false;
       }
-      if (has_expired()) {
+
+      auto future = result_promise.get_future();
+      if (!future.valid()) {
         return false;
       }
       if (future.wait_for(timeout) == std::future_status::ready) {

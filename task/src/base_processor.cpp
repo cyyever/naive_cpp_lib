@@ -55,7 +55,7 @@ namespace cyy::cxx_lib::task {
       }
 
       auto num =
-          std::erase_if(tasks, [](auto const &p) { return p->has_expired(); });
+          std::erase_if(tasks, [](auto const &p) { return !p->can_process(); });
       if (num != 0) {
         LOG_WARN("skip {} expired tasks", num);
       }

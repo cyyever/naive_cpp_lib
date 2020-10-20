@@ -47,9 +47,9 @@ TEST_CASE("queue scheduler") {
 
     auto task_ptr =
         std::make_shared<cyy::cxx_lib::task::neural_network_task<int, int>>(1);
-    scheduler.schedule(task_ptr, 100ms);
-    CHECK(task_ptr->has_finished());
-    CHECK_EQ(task_ptr->get_result().value(),1);
+    auto res = scheduler.schedule(task_ptr, 100ms);
+    CHECK(res);
+    CHECK_EQ(task_ptr->get_result().value(), 1);
   }
 
   SUBCASE("process timeout") {
@@ -59,7 +59,7 @@ TEST_CASE("queue scheduler") {
 
     auto task_ptr =
         std::make_shared<cyy::cxx_lib::task::neural_network_task<int, int>>(1);
-    scheduler.schedule(task_ptr, 10ms);
-    CHECK(task_ptr->has_expired());
+    auto res = scheduler.schedule(task_ptr, 10ms);
+    CHECK(!res);
   }
 }
