@@ -24,7 +24,7 @@ namespace cyy::cxx_lib::task {
   //! \brief 基于队列的任务调度器
   class queue_scheduler : public base_scheduler {
   public:
-    using processor_factory = std::function<base_processor *()>;
+    using processor_factory = std::function<std::unique_ptr<base_processor >()>;
 
   public:
     queue_scheduler() = default;
@@ -87,7 +87,7 @@ namespace cyy::cxx_lib::task {
             }
 
         );
-        new_processors.emplace_back(tmp);
+        new_processors.emplace_back(std::move(tmp));
       }
 
       for (auto &processor : new_processors) {

@@ -43,7 +43,7 @@ TEST_CASE("queue scheduler") {
   SUBCASE("finish task processing") {
     using namespace std::chrono_literals;
     cyy::cxx_lib::task::queue_scheduler scheduler(
-        {[]() { return new succ_processor(); }});
+        {[]() { return std::make_unique<succ_processor>(); }});
 
     auto task_ptr =
         std::make_shared<cyy::cxx_lib::task::neural_network_task<int, int>>(1);
@@ -55,7 +55,7 @@ TEST_CASE("queue scheduler") {
   SUBCASE("process timeout") {
     using namespace std::chrono_literals;
     cyy::cxx_lib::task::queue_scheduler scheduler(
-        {[]() { return new timeout_processor(); }});
+        {[]() { return std::make_unique<timeout_processor>(); }});
 
     auto task_ptr =
         std::make_shared<cyy::cxx_lib::task::neural_network_task<int, int>>(1);

@@ -42,6 +42,7 @@ namespace cyy::cxx_lib::task {
     bool is_invalid() const { return status == task_status::invalid; }
     bool can_process() const { return status == task_status::unprocessed; }
 
+
   private:
     virtual bool _wait_done(const std::chrono::milliseconds &timeout) = 0;
 
@@ -59,7 +60,7 @@ namespace cyy::cxx_lib::task {
 
     auto const &get_result(const std::chrono::milliseconds &timeout =
                                std::chrono::milliseconds(1)) {
-      _wait_done(timeout);
+      wait_done(timeout);
       return result_opt;
     }
 
@@ -68,7 +69,6 @@ namespace cyy::cxx_lib::task {
       if (result_opt.has_value()) {
         return true;
       }
-
       if (is_invalid()) {
         return false;
       }
