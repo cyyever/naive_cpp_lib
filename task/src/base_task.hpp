@@ -24,6 +24,7 @@ namespace cyy::cxx_lib::task {
     //! \brief 处理任务
     //! \param timeout 该线程等待超时时间
     bool wait_done(const std::chrono::milliseconds &timeout) {
+      std::lock_guard lk(sync_mu);
       if (status != task_status::unprocessed) {
         return status == task_status::processed;
       }
@@ -34,7 +35,10 @@ namespace cyy::cxx_lib::task {
       return res;
     }
 
-    void mark_invalid() { status = task_status::invalid; }
+    void mark_invalid() {
+      std::lock_guard lk(sync_mu);
+      status = task_status::invalid;
+    }
     bool is_invalid() const { return status == task_status::invalid; }
     bool can_process() const { return status == task_status::unprocessed; }
 
@@ -44,7 +48,8 @@ namespace cyy::cxx_lib::task {
   private:
     //! \brief 任务状态
     enum class task_status : uint8_t { unprocessed, invalid, processed };
-    task_status status{task_status::unprocessed};
+    std::atomic<task_status> status{task_status::unprocessed};
+    std::mutex sync_mu;
   };
 
   template <typename ResultType = void>
