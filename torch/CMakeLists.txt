@@ -1,7 +1,7 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(my_cxx_lib_torch ${SOURCE})
-set_target_properties(my_cxx_lib_torch PROPERTIES CXX_STANDARD 17)
+# set_target_properties(my_cxx_lib_torch PROPERTIES CXX_STANDARD 17)
 add_library(MyCXXLib::torch ALIAS my_cxx_lib_torch)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::log)
 target_link_libraries(my_cxx_lib_torch PRIVATE MyCXXLib::hardware)
@@ -18,7 +18,7 @@ if(Python3_FOUND)
     message(FATAL_ERROR "failed to found pytorch path")
   endif()
   string(STRIP ${_path} _path)
-  list(PREPEND CMAKE_PREFIX_PATH ${_path})
+  list(PREPEND CMAKE_PREFIX_PATH ${_path}/share/cmake)
 endif()
 
 find_package(Torch REQUIRED)
