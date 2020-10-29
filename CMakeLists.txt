@@ -7,7 +7,7 @@ include(cmake/all.cmake)
 option(BUILD_ML "Build machine learning modules" OFF)
 
 set(submodule_names log util hardware data_structure task)
-if(NOT WIN32)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   list(APPEND submodule_names process)
 endif()
 if(BUILD_ML)
