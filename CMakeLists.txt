@@ -26,7 +26,6 @@ option(BUILD_FUZZING "Build fuzzing" OFF)
 include_directories(${CMAKE_SOURCE_DIR})
 set(submodule_libs)
 
-
 if(MSVC)
   find_package(MicrosoftSTL REQUIRED)
 endif()
@@ -34,17 +33,18 @@ foreach(submodule_name IN LISTS submodule_names)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${submodule_name})
   if(WITH_ASAN)
     find_package(GoogleSanitizer)
-    target_link_libraries(my_cxx_lib_${submodule_name} PUBLIC GoogleSanitizer::address)
+    target_link_libraries(cyy_naive_lib_${submodule_name}
+                          PUBLIC GoogleSanitizer::address)
   endif()
-if(MSVC)
-  target_link_libraries(my_cxx_lib_${submodule_name} INTERFACE Microsoft::STL)
-endif()
+  if(MSVC)
+    target_link_libraries(cyy_naive_lib_${submodule_name} INTERFACE Microsoft::STL)
+  endif()
 
-  list(APPEND submodule_libs my_cxx_lib_${submodule_name})
+  list(APPEND submodule_libs cyy_naive_lib_${submodule_name})
 
   install(
     DIRECTORY ${submodule_name}/
-    DESTINATION include/cyy/cpp_lib/${submodule_name}
+    DESTINATION include/cyy/naive_lib/${submodule_name}
     FILES_MATCHING
     PATTERN "*.hpp")
 endforeach()

@@ -1,11 +1,11 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_library(my_cxx_lib_torch ${SOURCE})
-add_library(CyyNaiveLib::torch ALIAS my_cxx_lib_torch)
-target_link_libraries(my_cxx_lib_torch PRIVATE CyyNaiveLib::log)
-target_link_libraries(my_cxx_lib_torch PRIVATE CyyNaiveLib::hardware)
-target_link_libraries(my_cxx_lib_torch PRIVATE CyyNaiveLib::util)
-target_link_libraries(my_cxx_lib_torch PRIVATE CyyNaiveLib::data_structure)
+add_library(cyy_naive_lib_torch ${SOURCE})
+add_library(CyyNaiveLib::torch ALIAS cyy_naive_lib_torch)
+target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::log)
+target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::hardware)
+target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::util)
+target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::data_structure)
 
 find_package(Python3 REQUIRED)
 if(Python3_FOUND)
@@ -22,7 +22,7 @@ endif()
 
 find_package(Torch REQUIRED)
 
-target_link_libraries(my_cxx_lib_torch PUBLIC ${TORCH_LIBRARIES})
+target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES})
 
 add_subdirectory(test)
 if(BUILD_FUZZING)
