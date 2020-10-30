@@ -1,0 +1,2 @@
+/usr/bin/g++-10  -Wall -Wextra -fmax-errors=1 -fanalyzer -Wshadow -Wnon-virtual-dtor -Wpedantic -g  -Wl,--no-as-needed -fsanitize=thread -fno-omit-frame-pointer CMakeFiles/TSAN_string_test.dir/string_test.cpp.o -o TSAN_string_test  ../libmy_cxx_lib_util.a ../../log/libmy_cxx_lib_log.a -lpthread 
+/home/cyy/opt/bin/cmake -E __run_co_compile --lwyu=TSAN_string_test

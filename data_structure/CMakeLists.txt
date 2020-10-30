@@ -9,5 +9,5 @@ target_include_directories(my_cxx_lib_data_structure INTERFACE
 
 target_link_libraries(my_cxx_lib_data_structure INTERFACE Threads::Threads)
 
-add_library(MyCXXLib::data_structure ALIAS my_cxx_lib_data_structure)
+add_library(CyyNaiveLib::data_structure ALIAS my_cxx_lib_data_structure)
 add_subdirectory(test)

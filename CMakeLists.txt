@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(MyCXXLib LANGUAGES CXX)
+project(CyyNaiveLib LANGUAGES CXX)
 
 include(cmake/all.cmake)
 
@@ -51,7 +51,7 @@ endforeach()
 
 install(
   TARGETS ${submodule_libs}
-  EXPORT MyCXXLibConfig
+  EXPORT CyyNaiveLibConfig
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib COMPONENT library
@@ -59,6 +59,6 @@ install(
   DESTINATION include)
 
 install(
-  EXPORT MyCXXLibConfig
+  EXPORT CyyNaiveLibConfig
   DESTINATION lib/cmake/${PROJECT_NAME}
-  NAMESPACE MyCXXLib)
+  NAMESPACE CyyNaiveLib)

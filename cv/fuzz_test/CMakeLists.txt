@@ -8,6 +8,6 @@ foreach(fuzzing_source IN LISTS fuzzing_sources)
   get_filename_component(fuzzing_prog ${fuzzing_source} NAME_WE)
   add_executable(fuzz_${fuzzing_prog}
                  ${CMAKE_CURRENT_LIST_DIR}/${fuzzing_prog}.cpp)
-  target_link_libraries(fuzz_${fuzzing_prog} PRIVATE MyCXXLib::cv)
+  target_link_libraries(fuzz_${fuzzing_prog} PRIVATE CyyNaiveLib::cv)
   add_fuzzing(TARGET fuzz_${fuzzing_prog})
 endforeach()

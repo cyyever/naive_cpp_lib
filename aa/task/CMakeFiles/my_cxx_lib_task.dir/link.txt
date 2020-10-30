@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmy_cxx_lib_task.a CMakeFiles/my_cxx_lib_task.dir/src/base_processor.cpp.o
+/usr/bin/ranlib libmy_cxx_lib_task.a

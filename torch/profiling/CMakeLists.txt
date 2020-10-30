@@ -6,7 +6,7 @@ foreach(profiling_source IN LISTS profiling_sources)
   get_filename_component(profiling_prog ${profiling_source} NAME_WE)
   add_executable(${profiling_prog}
                  ${CMAKE_CURRENT_LIST_DIR}/${profiling_prog}.cpp)
-  target_link_libraries(${profiling_prog} PRIVATE MyCXXLib::torch MyCXXLib::log
-                                                  MyCXXLib::util)
+  target_link_libraries(${profiling_prog} PRIVATE CyyNaiveLib::torch CyyNaiveLib::log
+                                                  CyyNaiveLib::util)
   add_profiling(TARGET ${profiling_prog} WITH_GPU_profiling OFF LTRACE OFF)
 endforeach()

@@ -4,14 +4,14 @@ list(REMOVE_ITEM SOURCE ${IMPL_SOURCE} ${AUDIO_SOURCE})
 list(APPEND AUDIO_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/ffmpeg_base.cpp)
 
 add_library(my_cxx_lib_video ${SOURCE})
-add_library(MyCXXLib::video ALIAS my_cxx_lib_video)
+add_library(CyyNaiveLib::video ALIAS my_cxx_lib_video)
 add_library(my_cxx_lib_audio ${AUDIO_SOURCE})
-add_library(MyCXXLib::audio ALIAS my_cxx_lib_audio)
+add_library(CyyNaiveLib::audio ALIAS my_cxx_lib_audio)
 
 # dependency
-target_link_libraries(my_cxx_lib_video PRIVATE MyCXXLib::log)
-target_link_libraries(my_cxx_lib_audio PRIVATE MyCXXLib::util)
-target_link_libraries(my_cxx_lib_audio PRIVATE MyCXXLib::data_structure)
+target_link_libraries(my_cxx_lib_video PRIVATE CyyNaiveLib::log)
+target_link_libraries(my_cxx_lib_audio PRIVATE CyyNaiveLib::util)
+target_link_libraries(my_cxx_lib_audio PRIVATE CyyNaiveLib::data_structure)
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(libavcodec REQUIRED IMPORTED_TARGET libavcodec)

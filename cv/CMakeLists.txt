@@ -1,10 +1,10 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(my_cxx_lib_cv ${SOURCE})
-add_library(MyCXXLib::cv ALIAS my_cxx_lib_cv)
-target_link_libraries(my_cxx_lib_cv PRIVATE MyCXXLib::log)
-target_link_libraries(my_cxx_lib_cv PRIVATE MyCXXLib::util)
-target_link_libraries(my_cxx_lib_cv PRIVATE MyCXXLib::hardware)
+add_library(CyyNaiveLib::cv ALIAS my_cxx_lib_cv)
+target_link_libraries(my_cxx_lib_cv PRIVATE CyyNaiveLib::log)
+target_link_libraries(my_cxx_lib_cv PRIVATE CyyNaiveLib::util)
+target_link_libraries(my_cxx_lib_cv PRIVATE CyyNaiveLib::hardware)
 
 find_package(
   OpenCV REQUIRED
