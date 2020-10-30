@@ -37,8 +37,11 @@ foreach(submodule_name IN LISTS submodule_names)
                           PUBLIC GoogleSanitizer::address)
   endif()
   if(MSVC)
-    target_link_libraries(cyy_naive_lib_${submodule_name} INTERFACE Microsoft::STL)
+    target_link_libraries(cyy_naive_lib_${submodule_name}
+                          INTERFACE Microsoft::STL)
   endif()
+  set_target_properties(cyy_naive_lib_${submodule_name}
+                        PROPERTIES EXPORT_NAME ${submodule_name})
 
   list(APPEND submodule_libs cyy_naive_lib_${submodule_name})
 
@@ -61,4 +64,4 @@ install(
 install(
   EXPORT CyyNaiveLibConfig
   DESTINATION lib/cmake/${PROJECT_NAME}
-  NAMESPACE CyyNaiveLib)
+  NAMESPACE CyyNaiveLib::)
