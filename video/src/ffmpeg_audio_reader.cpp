@@ -6,6 +6,7 @@
  */
 
 #include "ffmpeg_audio_reader.hpp"
+
 #include "ffmpeg_audio_reader_impl.hpp"
 
 namespace cyy::cxx_lib::audio::ffmpeg {

@@ -6,10 +6,10 @@
  * \date 2017-01-17
  */
 
-#include <doctest/doctest.h>
+#include <iostream>
 
 #include <cv/mat.hpp>
-#include <iostream>
+#include <doctest/doctest.h>
 
 #include "../src/ffmpeg_writer.hpp"
 

@@ -32,7 +32,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
   template <bool decode_frame>
   class reader_impl : private cyy::cxx_lib::runnable {
   public:
-    reader_impl() { set_name("ffmpeg_reader_impl"); }
+    reader_impl() {}
 
     ~reader_impl() override { close(); }
 
@@ -176,7 +176,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
         packet_buffer =
             std::make_unique<cyy::cxx_lib::thread_safe_linear_container<
                 std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>();
-        start();
+        start("ffmpeg_reader_impl");
       }
 
       return true;

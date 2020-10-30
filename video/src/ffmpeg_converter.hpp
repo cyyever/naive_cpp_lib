@@ -6,8 +6,9 @@
  */
 #pragma once
 
-#include "converter.hpp"
 #include <memory>
+
+#include "converter.hpp"
 
 namespace cyy::cxx_lib::video::ffmpeg {
 

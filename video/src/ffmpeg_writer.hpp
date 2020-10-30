@@ -6,9 +6,10 @@
  */
 #pragma once
 
+#include <memory>
+
 #include "frame.hpp"
 #include "writer.hpp"
-#include <memory>
 
 namespace cyy::cxx_lib::video::ffmpeg {
 

@@ -6,6 +6,7 @@
  */
 
 #include "ffmpeg_reader.hpp"
+
 #include "ffmpeg_reader_impl.hpp"
 
 namespace cyy::cxx_lib::video::ffmpeg {
