@@ -1,2 +1,0 @@
-/usr/bin/g++-10  -Wall -Wextra -fmax-errors=1 -fanalyzer -Wshadow -Wnon-virtual-dtor -Wpedantic -g  -Wl,--no-as-needed -fsanitize=undefined -fno-omit-frame-pointer -lubsan CMakeFiles/UBSAN_ordered_dict.dir/ordered_dict.cpp.o -o UBSAN_ordered_dict  -lpthread 
-/home/cyy/opt/bin/cmake -E __run_co_compile --lwyu=UBSAN_ordered_dict

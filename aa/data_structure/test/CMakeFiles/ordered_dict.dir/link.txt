@@ -1,2 +1,0 @@
-/usr/bin/g++-10  -Wall -Wextra -fmax-errors=1 -fanalyzer -Wshadow -Wnon-virtual-dtor -Wpedantic -g  -Wl,--no-as-needed CMakeFiles/ordered_dict.dir/ordered_dict.cpp.o -o ordered_dict  -lpthread 
-/home/cyy/opt/bin/cmake -E __run_co_compile --lwyu=ordered_dict

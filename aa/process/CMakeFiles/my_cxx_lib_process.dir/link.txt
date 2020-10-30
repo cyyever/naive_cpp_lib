@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmy_cxx_lib_process.a CMakeFiles/my_cxx_lib_process.dir/src/monitor.cpp.o CMakeFiles/my_cxx_lib_process.dir/src/process.cpp.o CMakeFiles/my_cxx_lib_process.dir/src/thread.cpp.o
-/usr/bin/ranlib libmy_cxx_lib_process.a

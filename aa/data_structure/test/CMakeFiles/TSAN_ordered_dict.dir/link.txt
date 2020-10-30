@@ -1,2 +1,0 @@
-/usr/bin/g++-10  -Wall -Wextra -fmax-errors=1 -fanalyzer -Wshadow -Wnon-virtual-dtor -Wpedantic -g  -Wl,--no-as-needed -fsanitize=thread -fno-omit-frame-pointer CMakeFiles/TSAN_ordered_dict.dir/ordered_dict.cpp.o -o TSAN_ordered_dict  -lpthread 
-/home/cyy/opt/bin/cmake -E __run_co_compile --lwyu=TSAN_ordered_dict

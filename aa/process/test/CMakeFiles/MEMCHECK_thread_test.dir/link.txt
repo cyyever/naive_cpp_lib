@@ -1,2 +1,0 @@
-/usr/bin/g++-10  -Wall -Wextra -fmax-errors=1 -fanalyzer -Wshadow -Wnon-virtual-dtor -Wpedantic -g  -Wl,--no-as-needed CMakeFiles/MEMCHECK_thread_test.dir/thread_test.cpp.o -o MEMCHECK_thread_test  ../libmy_cxx_lib_process.a ../../log/libmy_cxx_lib_log.a ../../util/libmy_cxx_lib_util.a ../../log/libmy_cxx_lib_log.a -lpthread 
-/home/cyy/opt/bin/cmake -E __run_co_compile --lwyu=MEMCHECK_thread_test
