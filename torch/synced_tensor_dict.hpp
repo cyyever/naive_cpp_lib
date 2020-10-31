@@ -12,7 +12,7 @@
 #include "data_structure/thread_safe_container.hpp"
 #include "util/runnable.hpp"
 
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
   class synced_tensor_dict {
   public:
     explicit synced_tensor_dict(const std::string &storage_dir_);
@@ -74,20 +74,20 @@ namespace cyy::cxx_lib::pytorch {
 
     mutable std::recursive_mutex data_mutex;
     std::filesystem::path storage_dir;
-    cyy::cxx_lib::ordered_dict<std::string, torch::Tensor> data;
+    cyy::naive_lib::ordered_dict<std::string, torch::Tensor> data;
     std::unordered_map<std::string, torch::Tensor> saving_data;
     std::unordered_map<std::string, data_state> data_info;
     size_t in_memory_number{128};
     bool permanent{true};
 
-    using save_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
+    using save_request_queue_type = cyy::naive_lib::thread_safe_linear_container<
         std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
     size_t saving_thread_num{8};
     std::list<save_thread> saving_threads;
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
-    using fetch_request_queue_type = cyy::cxx_lib::thread_safe_linear_container<
+    using fetch_request_queue_type = cyy::naive_lib::thread_safe_linear_container<
         std::list<std::optional<fetch_task>>>;
     fetch_request_queue_type fetch_request_queue;
     size_t fetch_thread_num{8};
@@ -97,4 +97,4 @@ namespace cyy::cxx_lib::pytorch {
     std::condition_variable_any flush_finished_cv;
     float wait_flush_ratio{1.5};
   };
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

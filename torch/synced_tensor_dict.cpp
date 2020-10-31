@@ -9,12 +9,12 @@
 #include "synced_tensor_dict.hpp"
 #include "synced_tensor_dict_fetch_thread.hpp"
 #include "synced_tensor_dict_save_thread.hpp"
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
 
   synced_tensor_dict::synced_tensor_dict(const std::string &storage_dir_)
       : storage_dir(storage_dir_) {
-    cyy::cxx_lib::log::set_level(spdlog::level::level_enum::warn);
-    auto cpu_num = cyy::cxx_lib::hardware::cpu_num();
+    cyy::naive_lib::log::set_level(spdlog::level::level_enum::warn);
+    auto cpu_num = cyy::naive_lib::hardware::cpu_num();
     saving_thread_num = cpu_num;
     fetch_thread_num = cpu_num;
     LOG_WARN("saving_thread_num and fetch_thread_num {}", cpu_num);
@@ -53,7 +53,7 @@ namespace cyy::cxx_lib::pytorch {
       t.start();
     }
 
-  } // namespace cyy::cxx_lib::pytorch
+  } // namespace cyy::naive_lib::pytorch
 
   synced_tensor_dict::~synced_tensor_dict() { release(); }
 
@@ -177,9 +177,9 @@ namespace cyy::cxx_lib::pytorch {
   }
   void synced_tensor_dict::set_logging(bool enable_debug) const {
     if (enable_debug) {
-      cyy::cxx_lib::log::set_level(spdlog::level::level_enum::debug);
+      cyy::naive_lib::log::set_level(spdlog::level::level_enum::debug);
     } else {
-      cyy::cxx_lib::log::set_level(spdlog::level::level_enum::warn);
+      cyy::naive_lib::log::set_level(spdlog::level::level_enum::warn);
     }
   }
 
@@ -384,4 +384,4 @@ namespace cyy::cxx_lib::pytorch {
     std::lock_guard lk(data_mutex);
     return in_memory_number;
   }
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

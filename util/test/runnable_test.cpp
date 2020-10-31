@@ -12,7 +12,7 @@
 #include "log/log.hpp"
 #include "util/runnable.hpp"
 
-class test_class : public cyy::cxx_lib::runnable {
+class test_class : public cyy::naive_lib::runnable {
 public:
   test_class() = default;
 

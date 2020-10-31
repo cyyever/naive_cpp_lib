@@ -14,7 +14,7 @@
 #include <sys/signalfd.h>
 #include <sys/types.h>
 
-namespace cyy::cxx_lib::this_thread {
+namespace cyy::naive_lib::this_thread {
 #ifndef _WIN32
 
   /// \brief 阻塞指定時間讀取信號
@@ -23,4 +23,4 @@ namespace cyy::cxx_lib::this_thread {
   read_signal(const sigset_t &set,
               const std::optional<std::chrono::milliseconds> &timeout = {});
 #endif
-} // namespace cyy::cxx_lib::this_thread
+} // namespace cyy::naive_lib::this_thread

@@ -20,7 +20,7 @@
 #include "util/error.hpp"
 #include "util/file.hpp"
 
-namespace cyy::cxx_lib::process {
+namespace cyy::naive_lib::process {
 
   std::optional<spawn_result> spawn(const spawn_config &config) {
     int pipefd[2]{};
@@ -122,4 +122,4 @@ namespace cyy::cxx_lib::process {
     return {};
   }
 
-} // namespace cyy::cxx_lib::process
+} // namespace cyy::naive_lib::process

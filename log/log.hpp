@@ -57,7 +57,7 @@ namespace std {
 } // namespace std
 #endif
 
-namespace cyy::cxx_lib::log {
+namespace cyy::naive_lib::log {
 
   void set_level(spdlog::level::level_enum level);
 
@@ -78,20 +78,20 @@ namespace cyy::cxx_lib::log {
     });
   }
 
-} // namespace cyy::cxx_lib::log
+} // namespace cyy::naive_lib::log
 
 #define LOG_DEBUG(...)                                                         \
-  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::debug,             \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::debug,             \
                                  std::source_location::current(), __VA_ARGS__)
 
 #define LOG_INFO(...)                                                          \
-  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::info,              \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::info,              \
                                  std::source_location::current(), __VA_ARGS__)
 
 #define LOG_WARN(...)                                                          \
-  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::warn,              \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::warn,              \
                                  std::source_location::current(), __VA_ARGS__)
 
 #define LOG_ERROR(...)                                                         \
-  cyy::cxx_lib::log::log_message(spdlog::level::level_enum::err,               \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::err,               \
                                  std::source_location::current(), __VA_ARGS__)

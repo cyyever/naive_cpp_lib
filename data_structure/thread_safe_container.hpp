@@ -21,7 +21,7 @@
 #include <shared_mutex>
 #include <type_traits>
 
-namespace cyy::cxx_lib {
+namespace cyy::naive_lib {
 
   //! \brief thread_safe_container 線程安全的容器模板
   template <typename ContainerType> class thread_safe_container {
@@ -252,4 +252,4 @@ namespace cyy::cxx_lib {
       cb(container[key]);
     }
   };
-} // namespace cyy::cxx_lib
+} // namespace cyy::naive_lib

@@ -13,7 +13,7 @@
 #include "data_structure/thread_safe_container.hpp"
 
 TEST_CASE("thread_safe_linear_container") {
-  cyy::cxx_lib::thread_safe_linear_container<std::vector<int>> container;
+  cyy::naive_lib::thread_safe_linear_container<std::vector<int>> container;
 
   CHECK(container.const_ref()->empty());
 

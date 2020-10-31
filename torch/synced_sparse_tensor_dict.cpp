@@ -3,7 +3,7 @@
 #include "log/log.hpp"
 #include "synced_sparse_tensor_dict.hpp"
 
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
 
   synced_sparse_tensor_dict::synced_sparse_tensor_dict(
       torch::Tensor mask_, torch::IntArrayRef tensor_shape_,
@@ -30,4 +30,4 @@ namespace cyy::cxx_lib::pytorch {
     auto value = synced_tensor_dict::get(key);
     return sparse_coo_tensor(mask._indices(), value, tensor_shape).to_dense();
   }
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

@@ -12,7 +12,7 @@
 #include <future>
 #include <optional>
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief 綫程任务
   class base_task {
@@ -103,4 +103,4 @@ namespace cyy::cxx_lib::task {
     ArgumentType argument;
   };
 
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

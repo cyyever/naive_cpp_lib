@@ -11,7 +11,7 @@
 #include <optional>
 #include <string>
 
-namespace cyy::cxx_lib::audio {
+namespace cyy::naive_lib::audio {
 
   //! brief 视频讀取接口类
   class reader {
@@ -36,4 +36,4 @@ namespace cyy::cxx_lib::audio {
 
     virtual std::optional<std::chrono::milliseconds> get_duration() = 0;
   };
-} // namespace cyy::cxx_lib::audio
+} // namespace cyy::naive_lib::audio

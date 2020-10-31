@@ -2,7 +2,7 @@
 
 #include "synced_tensor_dict.hpp"
 
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
   class synced_sparse_tensor_dict : public synced_tensor_dict {
   public:
     synced_sparse_tensor_dict(torch::Tensor mask_,
@@ -16,4 +16,4 @@ namespace cyy::cxx_lib::pytorch {
     torch::Tensor mask;
     std::vector<torch::IntArrayRef::value_type> tensor_shape;
   };
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

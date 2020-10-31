@@ -9,7 +9,7 @@
 
 #include "ffmpeg_reader_impl.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   reader::reader() : pimpl{std::make_unique<reader_impl<true>>()} {}
   reader::~reader() = default;
@@ -37,4 +37,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
     return pimpl->next_packet();
   }
 
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

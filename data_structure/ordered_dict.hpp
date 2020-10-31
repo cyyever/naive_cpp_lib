@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace cyy::cxx_lib {
+namespace cyy::naive_lib {
 
   template <class Key, class T> class ordered_dict {
   public:
@@ -129,4 +129,4 @@ namespace cyy::cxx_lib {
     data_list_type data;
     data_index_type data_index;
   };
-} // namespace cyy::cxx_lib
+} // namespace cyy::naive_lib

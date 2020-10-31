@@ -10,10 +10,10 @@
 
 #include "converter.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class converter final : public ::cyy::cxx_lib::video::converter {
+  class converter final : public ::cyy::naive_lib::video::converter {
   public:
     converter(const std::string &in_url, const std::string &out_url);
 
@@ -29,4 +29,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
     class impl;
     std::unique_ptr<impl> pimpl;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

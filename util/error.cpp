@@ -11,7 +11,7 @@
 #include <mutex>
 #include <system_error>
 
-namespace cyy::cxx_lib::util {
+namespace cyy::naive_lib::util {
 
   //! \brief 获取errno的字符串描述
   //! \note 本函数线程安全
@@ -48,4 +48,4 @@ namespace cyy::cxx_lib::util {
   }
 #endif
 
-} // namespace cyy::cxx_lib::util
+} // namespace cyy::naive_lib::util

@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace cyy::cxx_lib::strings {
+namespace cyy::naive_lib::strings {
 
   /// \brief split string by delimiter
   std::vector<std::string> split(const std::string &s, char c);
@@ -20,4 +20,4 @@ namespace cyy::cxx_lib::strings {
   std::string UTF16_to_UTF8(const char *str, size_t len);
   std::string UTF8_to_GBK(const std::string &str);
 #endif
-} // namespace cyy::cxx_lib::strings
+} // namespace cyy::naive_lib::strings

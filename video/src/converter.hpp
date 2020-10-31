@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace cyy::cxx_lib::video {
+namespace cyy::naive_lib::video {
 
   //! brief 视频轉換接口类
   class converter {
@@ -27,4 +27,4 @@ namespace cyy::cxx_lib::video {
     //	      <0 失敗
     virtual int convert() = 0;
   };
-} // namespace cyy::cxx_lib::video
+} // namespace cyy::naive_lib::video

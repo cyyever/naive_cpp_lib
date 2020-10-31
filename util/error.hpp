@@ -17,7 +17,7 @@
 #include <strsafe.h>
 #endif
 
-namespace cyy::cxx_lib::util {
+namespace cyy::naive_lib::util {
 
   //! \brief 获取errno的字符串描述
   //! \note 本函数线程安全
@@ -29,4 +29,4 @@ namespace cyy::cxx_lib::util {
   std::string get_winapi_error_msg(DWORD winapi_errno);
 #endif
 
-} // namespace cyy::cxx_lib::util
+} // namespace cyy::naive_lib::util

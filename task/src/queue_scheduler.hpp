@@ -19,7 +19,7 @@
 #include "base_scheduler.hpp"
 #include "data_structure/thread_safe_container.hpp"
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief 基于队列的任务调度器
   class queue_scheduler : public base_scheduler {
@@ -102,4 +102,4 @@ namespace cyy::cxx_lib::task {
     processor_list_type processors;
     std::mutex processor_mutex;
   }; // class queue_scheduler
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

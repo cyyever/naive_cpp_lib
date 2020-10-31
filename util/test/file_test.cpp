@@ -11,7 +11,7 @@
 #include "../file.hpp"
 
 TEST_CASE("get_file_content") {
-  CHECK(::cyy::cxx_lib::io::get_file_content(__FILE__));
+  CHECK(::cyy::naive_lib::io::get_file_content(__FILE__));
 }
 
 TEST_CASE("write_and_read") {
@@ -23,17 +23,17 @@ TEST_CASE("write_and_read") {
 #endif
 
   auto write_cnt_opt =
-      ::cyy::cxx_lib::io::write(pipefd[1], static_cast<const void *>("ab"), 2);
+      ::cyy::naive_lib::io::write(pipefd[1], static_cast<const void *>("ab"), 2);
   CHECK(write_cnt_opt);
 
   CHECK_EQ(write_cnt_opt.value(), 2);
 
-  auto [res, data] = ::cyy::cxx_lib::io::read(pipefd[0], 1);
+  auto [res, data] = ::cyy::naive_lib::io::read(pipefd[0], 1);
   CHECK(res);
   CHECK_EQ(data.size(), 1);
   CHECK_EQ((char)(data[0]), 'a');
 
-  std::tie(res, data) = ::cyy::cxx_lib::io::read(pipefd[0], 1);
+  std::tie(res, data) = ::cyy::naive_lib::io::read(pipefd[0], 1);
   CHECK(res);
   CHECK_EQ(data.size(), 1);
   CHECK_EQ((char)(data[0]), 'b');

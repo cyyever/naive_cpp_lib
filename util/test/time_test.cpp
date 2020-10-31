@@ -10,4 +10,4 @@
 
 #include "util/time.hpp"
 
-TEST_CASE("now_ms") { CHECK(cyy::cxx_lib::time::now_ms() > 0); }
+TEST_CASE("now_ms") { CHECK(cyy::naive_lib::time::now_ms() > 0); }

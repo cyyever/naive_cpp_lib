@@ -25,7 +25,7 @@
 #include "hardware.hpp"
 #include "util/error.hpp"
 
-namespace cyy::cxx_lib::hardware {
+namespace cyy::naive_lib::hardware {
 
   static void alloc_cpu(pthread_t pt, size_t cpu_no) {
     cpu_set_t cpuset{};
@@ -55,7 +55,7 @@ namespace cyy::cxx_lib::hardware {
     if (fd < 0) {
       auto socket_errno = errno;
       throw std::runtime_error(std::string("create UDP socket failed: ") +
-                               cyy::cxx_lib::util::errno_to_str(socket_errno));
+                               cyy::naive_lib::util::errno_to_str(socket_errno));
     }
 
     ifc.ifc_len = sizeof(buf);
@@ -64,7 +64,7 @@ namespace cyy::cxx_lib::hardware {
       auto socket_errno = errno;
       close(fd);
       throw std::runtime_error(std::string("ioctl failed: ") +
-                               cyy::cxx_lib::util::errno_to_str(socket_errno));
+                               cyy::naive_lib::util::errno_to_str(socket_errno));
     }
 
     struct ifreq *it = ifc.ifc_req;
@@ -79,7 +79,7 @@ namespace cyy::cxx_lib::hardware {
         close(fd);
         throw std::runtime_error(
             std::string("ioctl failed: ") +
-            cyy::cxx_lib::util::errno_to_str(socket_errno));
+            cyy::naive_lib::util::errno_to_str(socket_errno));
       }
       if (ifr.ifr_flags & IFF_LOOPBACK) {
         continue;
@@ -89,7 +89,7 @@ namespace cyy::cxx_lib::hardware {
         close(fd);
         throw std::runtime_error(
             std::string("ioctl failed: ") +
-            cyy::cxx_lib::util::errno_to_str(socket_errno));
+            cyy::naive_lib::util::errno_to_str(socket_errno));
       }
 
       const char *hex = "0123456789ABCDEF";
@@ -115,7 +115,7 @@ namespace cyy::cxx_lib::hardware {
     if (getifaddrs(&ifas) != 0) {
       auto tmp_errno = errno;
       throw std::runtime_error(std::string("getifaddrs failed: ") +
-                               cyy::cxx_lib::util::errno_to_str(tmp_errno));
+                               cyy::naive_lib::util::errno_to_str(tmp_errno));
     }
 
     if (!ifas) {
@@ -149,7 +149,7 @@ namespace cyy::cxx_lib::hardware {
                      buf, INET_ADDRSTRLEN + 1)) {
         auto tmp_errno = errno;
         throw std::runtime_error(std::string("inet_ntop failed: ") +
-                                 cyy::cxx_lib::util::errno_to_str(tmp_errno));
+                                 cyy::naive_lib::util::errno_to_str(tmp_errno));
       }
       res.insert(buf);
     }
@@ -189,6 +189,6 @@ namespace cyy::cxx_lib::hardware {
     return {};
   }
 
-} // namespace cyy::cxx_lib::hardware
+} // namespace cyy::naive_lib::hardware
 
 #endif

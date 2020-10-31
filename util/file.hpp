@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace cyy::cxx_lib::io {
+namespace cyy::naive_lib::io {
 
   //! \brief 读取文件内容
   std::optional<std::vector<std::byte>>
@@ -65,4 +65,4 @@ namespace cyy::cxx_lib::io {
     size_t file_size{0};
   };
 #endif
-} // namespace cyy::cxx_lib::io
+} // namespace cyy::naive_lib::io

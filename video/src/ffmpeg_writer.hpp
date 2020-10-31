@@ -11,10 +11,10 @@
 #include "frame.hpp"
 #include "writer.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class writer final : public ::cyy::cxx_lib::video::writer {
+  class writer final : public ::cyy::naive_lib::video::writer {
   public:
     writer();
 
@@ -38,4 +38,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
   private:
     std::unique_ptr<impl> pimpl;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

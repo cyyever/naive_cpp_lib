@@ -24,7 +24,7 @@ extern "C" {
 #include "ffmpeg_writer.hpp"
 #include "log/log.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   class writer::impl {
@@ -200,7 +200,7 @@ namespace cyy::cxx_lib::video::ffmpeg {
         ret = av_image_fill_pointers(src_data, pix_fmt, frame_mat.rows,
                                      frame_mat.data, src_linesize);
       } else {
-        resized_mat = ::cyy::cxx_lib::opencv::mat(frame_mat)
+        resized_mat = ::cyy::naive_lib::opencv::mat(frame_mat)
                           .convert_to(CV_8UC3)
                           .get_cv_mat();
         src_linesize[0] = resized_mat.step;
@@ -336,4 +336,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
     int64_t next_pts{};
     bool opened{false};
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

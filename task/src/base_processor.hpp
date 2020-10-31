@@ -18,10 +18,10 @@
 #include "base_task.hpp"
 #include "util/runnable.hpp"
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief 任務處理器
-  class base_processor : public cyy::cxx_lib::runnable {
+  class base_processor : public cyy::naive_lib::runnable {
   public:
     base_processor() {}
 
@@ -87,4 +87,4 @@ namespace cyy::cxx_lib::task {
     static inline std::mutex thd_mutex;
 
   }; // class base_processor
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

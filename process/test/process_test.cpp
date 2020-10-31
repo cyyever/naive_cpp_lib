@@ -11,9 +11,9 @@
 #include "process/src/process.hpp"
 
 TEST_CASE("spawn") {
-  CHECK(!::cyy::cxx_lib::process::spawn({"/", {"/"}}));
+  CHECK(!::cyy::naive_lib::process::spawn({"/", {"/"}}));
 
-  auto spawn_result_opt = ::cyy::cxx_lib::process::spawn(
+  auto spawn_result_opt = ::cyy::naive_lib::process::spawn(
       {"sh", {"sh", "-c", "echo ${CHANNEL_FD} "}, {}, true});
   CHECK(spawn_result_opt);
   CHECK(spawn_result_opt->channel_fd);

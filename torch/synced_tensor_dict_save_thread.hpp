@@ -6,9 +6,9 @@
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
 #include "util/time.hpp"
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
 
-  class synced_tensor_dict::save_thread final : public cyy::cxx_lib::runnable {
+  class synced_tensor_dict::save_thread final : public cyy::naive_lib::runnable {
   public:
     explicit save_thread(synced_tensor_dict &dict_, size_t id_)
         : dict(dict_), id(id_) {}
@@ -71,4 +71,4 @@ namespace cyy::cxx_lib::pytorch {
     synced_tensor_dict &dict;
     size_t id;
   };
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

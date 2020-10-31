@@ -15,7 +15,7 @@ extern "C" {
 #include "ffmpeg_base.hpp"
 #include "log/log.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   namespace {
     //! \brief RAII类用于封装ffmpeg库初始化
@@ -76,4 +76,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
     av_strerror(err, err_buf, sizeof(err_buf) - 1);
     return err_buf;
   }
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

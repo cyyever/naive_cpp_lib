@@ -62,7 +62,7 @@ namespace {
   } initer;
 } // namespace
 
-namespace cyy::cxx_lib::log {
+namespace cyy::naive_lib::log {
 
   void setup_file_logger(const std::string &log_dir, const std::string &name,
                          ::spdlog::level::level_enum level,
@@ -82,4 +82,4 @@ namespace cyy::cxx_lib::log {
   }
   void set_level(spdlog::level::level_enum level) { spdlog::set_level(level); }
 
-} // namespace cyy::cxx_lib::log
+} // namespace cyy::naive_lib::log

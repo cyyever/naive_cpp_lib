@@ -34,7 +34,7 @@
 
 #include "hardware.hpp"
 
-namespace cyy::cxx_lib::hardware {
+namespace cyy::naive_lib::hardware {
 
   std::set<std::string> mac_address() {
     DWORD dwRetVal = 0;
@@ -301,7 +301,7 @@ namespace cyy::cxx_lib::hardware {
       if (FAILED(res)) {
         return {};
       }
-      UUID = ::cyy::cxx_lib::strings::UTF16_to_UTF8(
+      UUID = ::cyy::naive_lib::strings::UTF16_to_UTF8(
           reinterpret_cast<char *>(vtProp.bstrVal),
           ::SysStringLen(vtProp.bstrVal));
       //去除空格
@@ -499,7 +499,7 @@ namespace cyy::cxx_lib::hardware {
       if (FAILED(res)) {
         return {};
       }
-      disk_serial_number = ::cyy::cxx_lib::strings::UTF16_to_UTF8(
+      disk_serial_number = ::cyy::naive_lib::strings::UTF16_to_UTF8(
           reinterpret_cast<char *>(vtProp.bstrVal),
           ::SysStringLen(vtProp.bstrVal));
       //去除空格
@@ -570,5 +570,5 @@ namespace cyy::cxx_lib::hardware {
     return "";
   }
 
-} // namespace cyy::cxx_lib::hardware
+} // namespace cyy::naive_lib::hardware
 #endif

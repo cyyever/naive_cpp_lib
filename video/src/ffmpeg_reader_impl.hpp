@@ -26,11 +26,11 @@ extern "C" {
 #include "log/log.hpp"
 #include "util/runnable.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   template <bool decode_frame>
-  class reader_impl : private cyy::cxx_lib::runnable {
+  class reader_impl : private cyy::naive_lib::runnable {
   public:
     reader_impl() {}
 
@@ -171,10 +171,10 @@ namespace cyy::cxx_lib::video::ffmpeg {
 
       if (url_scheme == "rtsp") {
         frame_buffer =
-            std::make_unique<cyy::cxx_lib::thread_safe_linear_container<
+            std::make_unique<cyy::naive_lib::thread_safe_linear_container<
                 std::vector<std::pair<int, frame>>>>();
         packet_buffer =
-            std::make_unique<cyy::cxx_lib::thread_safe_linear_container<
+            std::make_unique<cyy::naive_lib::thread_safe_linear_container<
                 std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>();
         start("ffmpeg_reader_impl");
       }
@@ -546,12 +546,12 @@ namespace cyy::cxx_lib::video::ffmpeg {
     SwsContext *sws_ctx{nullptr};
     // AVPacket * pkt{nullptr};
 
-    std::unique_ptr<cyy::cxx_lib::thread_safe_linear_container<
+    std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;
-    std::unique_ptr<cyy::cxx_lib::thread_safe_linear_container<
+    std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>
         packet_buffer;
     AVCodecID codec_id;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

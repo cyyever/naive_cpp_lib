@@ -10,7 +10,7 @@
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   try {
-    cyy::cxx_lib::opencv::mat::load(Data, Size);
+    cyy::naive_lib::opencv::mat::load(Data, Size);
   } catch (...) {
   }
   return 0; // Non-zero return values are reserved for future use.

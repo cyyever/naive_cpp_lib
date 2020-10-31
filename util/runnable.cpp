@@ -9,7 +9,7 @@
 #include "error.hpp"
 #include "log/log.hpp"
 
-namespace cyy::cxx_lib {
+namespace cyy::naive_lib {
   void runnable::start(std::string name) {
     std::lock_guard lock(sync_mutex);
     if (thd.joinable()) {
@@ -26,7 +26,7 @@ namespace cyy::cxx_lib {
                 auto err = pthread_setname_np(pthread_self(), name_.c_str());
                 if (err != 0) {
                   LOG_ERROR("pthread_setname_np failed:{}",
-                            cyy::cxx_lib::util::errno_to_str(err));
+                            cyy::naive_lib::util::errno_to_str(err));
                 }
               }
 #endif
@@ -50,4 +50,4 @@ namespace cyy::cxx_lib {
     }
   }
 
-} // namespace cyy::cxx_lib
+} // namespace cyy::naive_lib

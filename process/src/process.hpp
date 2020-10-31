@@ -15,7 +15,7 @@
 #include <gsl/gsl>
 #include <sys/types.h>
 
-namespace cyy::cxx_lib::process {
+namespace cyy::naive_lib::process {
 
   struct spawn_config {
     std::string binary_path;
@@ -62,4 +62,4 @@ namespace cyy::cxx_lib::process {
 
     bool monitored_process_exist(prog_id id);
   } // namespace monitor
-} // namespace cyy::cxx_lib::process
+} // namespace cyy::naive_lib::process

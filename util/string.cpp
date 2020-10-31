@@ -18,7 +18,7 @@
 #include "log/log.hpp"
 #include "string.hpp"
 
-namespace cyy::cxx_lib::strings {
+namespace cyy::naive_lib::strings {
 
   std::vector<std::string> split(const std::string &s, char c) {
     std::string buff;
@@ -152,4 +152,4 @@ namespace cyy::cxx_lib::strings {
   }
 #endif
 
-} // namespace cyy::cxx_lib::strings
+} // namespace cyy::naive_lib::strings

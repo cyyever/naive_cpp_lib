@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
   begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
-    cyy::cxx_lib::io::read_only_mmaped_file f(tensor_dir /
+    cyy::naive_lib::io::read_only_mmaped_file f(tensor_dir /
                                               (std::to_string(i) + ".tensor"));
     torch::load(value, reinterpret_cast<const char *>(f.data()), f.size());
   }
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
   begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
     std::vector<std::byte> buf;
-    cyy::cxx_lib::io::get_file_content(
+    cyy::naive_lib::io::get_file_content(
         tensor_dir / (std::to_string(i) + ".tensor"), buf);
     torch::load(value, reinterpret_cast<const char *>(buf.data()), buf.size());
   }

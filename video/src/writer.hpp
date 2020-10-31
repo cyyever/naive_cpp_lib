@@ -11,7 +11,7 @@
 
 #include "frame.hpp"
 
-namespace cyy::cxx_lib::video {
+namespace cyy::naive_lib::video {
 
   //! brief 视频讀取接口类
   class writer {
@@ -39,4 +39,4 @@ namespace cyy::cxx_lib::video {
     //! \brief 關閉视频
     virtual void close() = 0;
   };
-} // namespace cyy::cxx_lib::video
+} // namespace cyy::naive_lib::video

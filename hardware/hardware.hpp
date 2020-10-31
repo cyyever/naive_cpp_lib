@@ -13,7 +13,7 @@
 #include <string>
 #include <thread>
 
-namespace cyy::cxx_lib::hardware {
+namespace cyy::naive_lib::hardware {
 
   //! \brief 获取cpu数量
   size_t cpu_num();
@@ -65,4 +65,4 @@ namespace cyy::cxx_lib::hardware {
   std::string disk_serial_number() noexcept(false);
 #endif
 
-} // namespace cyy::cxx_lib::hardware
+} // namespace cyy::naive_lib::hardware

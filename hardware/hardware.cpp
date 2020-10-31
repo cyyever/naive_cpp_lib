@@ -22,7 +22,7 @@
 #include "hardware.hpp"
 #include "log/log.hpp"
 
-namespace cyy::cxx_lib::hardware {
+namespace cyy::naive_lib::hardware {
 
   size_t cpu_num() { return std::thread::hardware_concurrency(); }
 
@@ -105,4 +105,4 @@ namespace cyy::cxx_lib::hardware {
 
   } // namespace round_robin_allocator
 
-} // namespace cyy::cxx_lib::hardware
+} // namespace cyy::naive_lib::hardware

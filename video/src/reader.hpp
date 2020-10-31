@@ -13,7 +13,7 @@
 
 #include "frame.hpp"
 
-namespace cyy::cxx_lib::video {
+namespace cyy::naive_lib::video {
 
 //! brief 视频讀取接口类
 class reader {
@@ -48,4 +48,4 @@ public:
   //	如果first<=0，返回空内容
   virtual std::pair<int, frame> next_frame() = 0;
 };
-} // namespace cyy::cxx_lib::video
+} // namespace cyy::naive_lib::video

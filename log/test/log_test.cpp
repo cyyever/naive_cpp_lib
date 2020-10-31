@@ -19,7 +19,7 @@ TEST_CASE("default console logger") {
 }
 
 TEST_CASE("set logger level") {
-  cyy::cxx_lib::log::set_level(spdlog::level::err);
+  cyy::naive_lib::log::set_level(spdlog::level::err);
   LOG_WARN("no warns");
   LOG_ERROR("an error");
 }
@@ -27,7 +27,7 @@ TEST_CASE("set logger level") {
 TEST_CASE("single message") { LOG_ERROR("{} {}"); }
 
 TEST_CASE("file logger") {
-  cyy::cxx_lib::log::setup_file_logger(".", "file_logger",
+  cyy::naive_lib::log::setup_file_logger(".", "file_logger",
                                        spdlog::level::level_enum::info);
 
   LOG_ERROR("hello world.....error");

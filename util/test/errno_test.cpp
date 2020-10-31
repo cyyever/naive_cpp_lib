@@ -13,7 +13,7 @@
 #ifndef _WIN32
 TEST_CASE("errno_to_str") {
   for (int err = 0; err <= EACCES; err++) {
-    CHECK_EQ(cyy::cxx_lib::util::errno_to_str(err), std::string(strerror(err)));
+    CHECK_EQ(cyy::naive_lib::util::errno_to_str(err), std::string(strerror(err)));
   }
 }
 #endif
@@ -21,7 +21,7 @@ TEST_CASE("errno_to_str") {
 #ifdef _WIN32
 TEST_CASE("get_winapi_error_msg") {
   for (int err = 0; err < 35; err++) {
-    auto msg = cyy::cxx_lib::util::get_winapi_error_msg(err);
+    auto msg = cyy::naive_lib::util::get_winapi_error_msg(err);
     CHECK(!msg.empty());
   }
 }

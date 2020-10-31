@@ -20,7 +20,7 @@
 #include "log/log.hpp"
 #include "util/error.hpp"
 
-namespace cyy::cxx_lib::this_thread {
+namespace cyy::naive_lib::this_thread {
 #ifndef _WIN32
 
   namespace {
@@ -138,4 +138,4 @@ namespace cyy::cxx_lib::this_thread {
     return {};
   }
 #endif
-} // namespace cyy::cxx_lib::this_thread
+} // namespace cyy::naive_lib::this_thread

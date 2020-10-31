@@ -9,7 +9,7 @@
 #include "ffmpeg_reader_impl.hpp"
 #include "ffmpeg_writer_impl.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   class converter::impl : public reader_impl<false>, writer::impl {
@@ -57,4 +57,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
     std::string in_url;
     std::string out_url;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

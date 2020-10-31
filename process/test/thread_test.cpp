@@ -11,7 +11,7 @@
 #include "process/src/thread.hpp"
 
 TEST_CASE("no_signal") {
-  CHECK(!::cyy::cxx_lib::this_thread::read_signal({}, {}));
+  CHECK(!::cyy::naive_lib::this_thread::read_signal({}, {}));
 }
 
 TEST_CASE("one_signal") {
@@ -36,7 +36,7 @@ TEST_CASE("one_signal") {
   auto saved_errno = errno;
   errmsg = strerror(saved_errno);
   CHECK_MESSAGE(res == 0, errmsg);
-  auto siginfo = ::cyy::cxx_lib::this_thread::read_signal(all_set, {});
+  auto siginfo = ::cyy::naive_lib::this_thread::read_signal(all_set, {});
 
   CHECK(siginfo);
   CHECK(siginfo->ssi_signo == signo);

@@ -11,7 +11,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace cyy::cxx_lib::time {
+namespace cyy::naive_lib::time {
   /// \brief  get current time, in milliseconds
   /// \return milliseconds
   /// \note

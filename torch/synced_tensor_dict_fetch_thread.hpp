@@ -4,9 +4,9 @@
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
-namespace cyy::cxx_lib::pytorch {
+namespace cyy::naive_lib::pytorch {
 
-  class synced_tensor_dict::fetch_thread final : public cyy::cxx_lib::runnable {
+  class synced_tensor_dict::fetch_thread final : public cyy::naive_lib::runnable {
   public:
     fetch_thread(synced_tensor_dict &dict_) : dict(dict_) {}
     ~fetch_thread() override { stop(); }
@@ -60,4 +60,4 @@ namespace cyy::cxx_lib::pytorch {
     synced_tensor_dict &dict;
   };
 
-} // namespace cyy::cxx_lib::pytorch
+} // namespace cyy::naive_lib::pytorch

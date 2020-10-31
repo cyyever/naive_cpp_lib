@@ -14,14 +14,14 @@
 #include "hardware/hardware.hpp"
 #include "log/log.hpp"
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief
   //! 绑定在特定的cpu上，如果这个行为不适合特定的算法，子类可以不调用该函数
   void base_processor::init_thread_context() {
     /*
-    cyy::cxx_lib::hardware::alloc_cpu(
-        this_thd, cyy::cxx_lib::hardware::round_robin_allocator::next_cpu_no());
+    cyy::naive_lib::hardware::alloc_cpu(
+        this_thd, cyy::naive_lib::hardware::round_robin_allocator::next_cpu_no());
     */
   }
 
@@ -68,4 +68,4 @@ namespace cyy::cxx_lib::task {
     }
   }
 
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

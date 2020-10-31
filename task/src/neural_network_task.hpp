@@ -10,7 +10,7 @@
 
 #include "base_task.hpp"
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief 神经网络任务
   template <typename ArgumentType, typename ResultType = void>
@@ -25,4 +25,4 @@ namespace cyy::cxx_lib::task {
     std::string model_version;
   };
 
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

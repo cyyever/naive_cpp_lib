@@ -14,10 +14,10 @@ extern "C" {
 
 #include "frame.hpp"
 #include "reader.hpp"
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
   template <bool decode_frame> class reader_impl;
   //! \brief 封装ffmpeg对视频流的讀操作
-  class reader final : public ::cyy::cxx_lib::video::reader {
+  class reader final : public ::cyy::naive_lib::video::reader {
   public:
     reader();
 
@@ -51,4 +51,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
   private:
     std::unique_ptr<reader_impl<true>> pimpl;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

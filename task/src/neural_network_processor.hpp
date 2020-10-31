@@ -9,7 +9,7 @@
 
 #include "base_processor.hpp"
 
-namespace cyy::cxx_lib::task {
+namespace cyy::naive_lib::task {
 
   //! \brief 神经网络任务处理器
   class neural_network_processor : public base_processor {
@@ -24,4 +24,4 @@ namespace cyy::cxx_lib::task {
   protected:
     std::string model_version;
   };
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

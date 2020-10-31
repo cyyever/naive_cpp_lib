@@ -37,7 +37,7 @@
 #include "log/log.hpp"
 #include "util/error.hpp"
 
-namespace cyy::cxx_lib::io {
+namespace cyy::naive_lib::io {
 
   std::optional<std::vector<std::byte>>
   get_file_content(const std::filesystem::path &file_path) {
@@ -72,7 +72,7 @@ namespace cyy::cxx_lib::io {
 #endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
-                ::cyy::cxx_lib::util::errno_to_str());
+                ::cyy::naive_lib::util::errno_to_str());
       return false;
     }
 #ifdef WIN32
@@ -97,7 +97,7 @@ namespace cyy::cxx_lib::io {
 #endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
-                ::cyy::cxx_lib::util::errno_to_str());
+                ::cyy::naive_lib::util::errno_to_str());
       return {};
     }
 #ifdef WIN32
@@ -131,7 +131,7 @@ namespace cyy::cxx_lib::io {
         continue;
       } else {
         LOG_ERROR("write failed:{}",
-                  ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+                  ::cyy::naive_lib::util::errno_to_str(saved_errno));
         return {};
       }
     }
@@ -146,7 +146,7 @@ namespace cyy::cxx_lib::io {
     } else {
       struct stat sb;
       if (fstat(fd, &sb) != 0) {
-        LOG_ERROR("fstat failed:{}", ::cyy::cxx_lib::util::errno_to_str());
+        LOG_ERROR("fstat failed:{}", ::cyy::naive_lib::util::errno_to_str());
         return false;
       }
       max_read_size = sb.st_size;
@@ -178,7 +178,7 @@ namespace cyy::cxx_lib::io {
         continue;
       } else {
         LOG_ERROR("read failed:{}",
-                  ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+                  ::cyy::naive_lib::util::errno_to_str(saved_errno));
         buf.resize(total_cnt);
         return false;
       }
@@ -198,7 +198,7 @@ namespace cyy::cxx_lib::io {
     auto fd = open(file_path.c_str(), O_RDONLY);
     if (fd < 0) {
       throw std::runtime_error(std::string("open failed: ") +
-                               ::cyy::cxx_lib::util::errno_to_str(errno));
+                               ::cyy::naive_lib::util::errno_to_str(errno));
     }
     /* Obtain the size of the file and use it to specify the size of       the
      * mapping and the size of the buffer to be written */
@@ -207,7 +207,7 @@ namespace cyy::cxx_lib::io {
       close(fd);
       auto saved_errno = errno;
       throw std::runtime_error(std::string("fstat failed: ") +
-                               ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+                               ::cyy::naive_lib::util::errno_to_str(saved_errno));
     }
     file_size = sb.st_size;
     addr = mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
@@ -215,14 +215,14 @@ namespace cyy::cxx_lib::io {
     if (addr == MAP_FAILED) {
       auto saved_errno = errno;
       throw std::runtime_error(std::string("mmap failed: ") +
-                               ::cyy::cxx_lib::util::errno_to_str(saved_errno));
+                               ::cyy::naive_lib::util::errno_to_str(saved_errno));
     }
   }
   read_only_mmaped_file::~read_only_mmaped_file() {
     if (munmap(addr, file_size) != 0) {
-      LOG_ERROR("munmap failed:{}", ::cyy::cxx_lib::util::errno_to_str(errno));
+      LOG_ERROR("munmap failed:{}", ::cyy::naive_lib::util::errno_to_str(errno));
     }
   }
 #endif
 
-} // namespace cyy::cxx_lib::io
+} // namespace cyy::naive_lib::io

@@ -74,7 +74,7 @@ namespace {
     int get_device_id() {
       static thread_local int device_id = -1;
       if (device_id < 0) {
-        device_id = ::cyy::cxx_lib::hardware::gpu_no();
+        device_id = ::cyy::naive_lib::hardware::gpu_no();
         if (device_id < 0) {
           throw std::runtime_error("no in GPU");
         }
@@ -112,7 +112,7 @@ namespace {
 
   struct buddy_allocator_initer final {
     std::unique_ptr<device_allocator> device_allocator_ptr;
-    bool has_nvidia_driver{cyy::cxx_lib::hardware::gpu_num() != 0};
+    bool has_nvidia_driver{cyy::naive_lib::hardware::gpu_num() != 0};
     buddy_allocator_initer() {
       if (!has_nvidia_driver) {
         return;
@@ -129,7 +129,7 @@ namespace {
 } // namespace
 #endif
 
-namespace cyy::cxx_lib::opencv {
+namespace cyy::naive_lib::opencv {
   //! \brief cv::Mat的cpu/gpu操作
   class mat::mat_impl final {
   private:
@@ -512,7 +512,7 @@ namespace cyy::cxx_lib::opencv {
       static std::shared_ptr<cv::cuda::Stream> to_device_stream =
           std::make_shared<cv::cuda::Stream>(
               cv::cuda::StreamAccessor::wrapStream(
-                  cyy::cxx_lib::hardware::cuda::get_copy_to_device_stream()
+                  cyy::naive_lib::hardware::cuda::get_copy_to_device_stream()
                       .value()));
       return *to_device_stream;
     }
@@ -521,7 +521,7 @@ namespace cyy::cxx_lib::opencv {
       static std::shared_ptr<cv::cuda::Stream> to_host_stream =
           std::make_shared<cv::cuda::Stream>(
               cv::cuda::StreamAccessor::wrapStream(
-                  cyy::cxx_lib::hardware::cuda::get_copy_to_host_stream()
+                  cyy::naive_lib::hardware::cuda::get_copy_to_host_stream()
                       .value()));
       return *to_host_stream;
     }
@@ -643,7 +643,7 @@ namespace cyy::cxx_lib::opencv {
   mat mat::flip(int flip_code) const { return pimpl->flip(flip_code); }
 
   std::optional<mat> mat::load(const std::filesystem::path &image_path) {
-    auto res = ::cyy::cxx_lib::io::get_file_content(image_path);
+    auto res = ::cyy::naive_lib::io::get_file_content(image_path);
     if (!res) {
       return {};
     }
@@ -660,4 +660,4 @@ namespace cyy::cxx_lib::opencv {
     }
     return {};
   }
-} // namespace cyy::cxx_lib::opencv
+} // namespace cyy::naive_lib::opencv

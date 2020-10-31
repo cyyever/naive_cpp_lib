@@ -8,7 +8,7 @@
 
 #include "ffmpeg_writer_impl.hpp"
 
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   writer::writer() : pimpl{std::make_unique<impl>()} {}
   writer::~writer() = default;
@@ -23,4 +23,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
   }
 
   void writer::close() { pimpl->close(); }
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg

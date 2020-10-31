@@ -9,7 +9,7 @@
 
 #include "ffmpeg_audio_reader_impl.hpp"
 
-namespace cyy::cxx_lib::audio::ffmpeg {
+namespace cyy::naive_lib::audio::ffmpeg {
 
   reader::reader() : pimpl{std::make_unique<reader_impl>()} {}
   reader::~reader() = default;
@@ -20,4 +20,4 @@ namespace cyy::cxx_lib::audio::ffmpeg {
   std::optional<std::chrono::milliseconds> reader::get_duration() {
     return pimpl->get_duration();
   }
-} // namespace cyy::cxx_lib::audio::ffmpeg
+} // namespace cyy::naive_lib::audio::ffmpeg

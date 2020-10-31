@@ -13,7 +13,7 @@ TEST_CASE("synced_sparse_tensor_dict") {
   auto sparse_tensor = torch::eye(3);
   auto mask = (sparse_tensor != 0);
 
-  cyy::cxx_lib::pytorch::synced_sparse_tensor_dict dict(
+  cyy::naive_lib::pytorch::synced_sparse_tensor_dict dict(
       mask, sparse_tensor.sizes(), "");
 
   CHECK_EQ(dict.size(), 0);

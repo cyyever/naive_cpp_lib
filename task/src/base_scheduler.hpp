@@ -12,7 +12,7 @@
 
 #include "base_task.hpp"
 
-namespace cyy::cxx_lib::task{
+namespace cyy::naive_lib::task{
 
 class base_scheduler {
 public:
@@ -30,4 +30,4 @@ public:
                         const std::chrono::milliseconds &timeout) = 0;
 
 }; // class base_scheduler
-} // namespace cyy::cxx_lib::task
+} // namespace cyy::naive_lib::task

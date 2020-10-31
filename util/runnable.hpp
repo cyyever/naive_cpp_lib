@@ -14,7 +14,7 @@
 #include <optional>
 #include <thread>
 
-namespace cyy::cxx_lib {
+namespace cyy::naive_lib {
   //! \brief runnable 封裝線程啓動和關閉的同步控制
   class runnable {
   public:
@@ -81,4 +81,4 @@ namespace cyy::cxx_lib {
     std::recursive_mutex sync_mutex;
     std::condition_variable_any stop_cv;
   };
-} // namespace cyy::cxx_lib
+} // namespace cyy::naive_lib

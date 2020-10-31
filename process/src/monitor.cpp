@@ -23,10 +23,10 @@
 #include "util/file.hpp"
 #include "util/runnable.hpp"
 
-namespace cyy::cxx_lib::process::monitor {
+namespace cyy::naive_lib::process::monitor {
 
   namespace {
-    class monitor_thread final : public cyy::cxx_lib::runnable {
+    class monitor_thread final : public cyy::naive_lib::runnable {
     public:
       using exec_argument_tuple_type =
           std::tuple<std::string, std::vector<std::string>,
@@ -453,4 +453,4 @@ namespace cyy::cxx_lib::process::monitor {
     return get_monitor_thread().child_exist(id);
   }
 
-} // namespace cyy::cxx_lib::process::monitor
+} // namespace cyy::naive_lib::process::monitor

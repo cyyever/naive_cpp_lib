@@ -9,11 +9,11 @@
 #include <memory>
 
 #include "audio_reader.hpp"
-namespace cyy::cxx_lib::audio::ffmpeg {
+namespace cyy::naive_lib::audio::ffmpeg {
 
   class reader_impl;
   //! \brief 封装ffmpeg对视频流的讀操作
-  class reader final : public ::cyy::cxx_lib::audio::reader {
+  class reader final : public ::cyy::naive_lib::audio::reader {
   public:
     reader();
 
@@ -32,4 +32,4 @@ namespace cyy::cxx_lib::audio::ffmpeg {
   private:
     std::unique_ptr<reader_impl> pimpl;
   };
-} // namespace cyy::cxx_lib::audio::ffmpeg
+} // namespace cyy::naive_lib::audio::ffmpeg

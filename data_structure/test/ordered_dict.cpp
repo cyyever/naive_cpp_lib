@@ -9,7 +9,7 @@
 #include <doctest/doctest.h>
 
 TEST_CASE("ordered_dict") {
-  cyy::cxx_lib::ordered_dict<int, std::string> container;
+  cyy::naive_lib::ordered_dict<int, std::string> container;
 
   CHECK(container.empty());
 

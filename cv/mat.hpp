@@ -14,7 +14,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace cyy::cxx_lib::opencv {
+namespace cyy::naive_lib::opencv {
 
   //! \brief cv::Mat的cpu/gpu操作
   class mat final {
@@ -105,4 +105,4 @@ namespace cyy::cxx_lib::opencv {
     std::unique_ptr<mat_impl> pimpl;
   };
 
-} // namespace cyy::cxx_lib::opencv
+} // namespace cyy::naive_lib::opencv

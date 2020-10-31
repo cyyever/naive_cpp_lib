@@ -10,7 +10,7 @@
 #include "log/log.hpp"
 
 #ifdef HAVE_CUDA
-namespace cyy::cxx_lib::hardware::cuda {
+namespace cyy::naive_lib::hardware::cuda {
 
   std::optional<cudaStream_t> create_nonblock_stream() {
     cudaStream_t stream{};
@@ -34,6 +34,6 @@ namespace cyy::cxx_lib::hardware::cuda {
     static std::optional<cudaStream_t> to_host_stream{create_nonblock_stream()};
     return to_host_stream;
   }
-} // namespace cyy::cxx_lib::hardware::cuda
+} // namespace cyy::naive_lib::hardware::cuda
 
 #endif

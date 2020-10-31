@@ -14,7 +14,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 }
-namespace cyy::cxx_lib::video::ffmpeg {
+namespace cyy::naive_lib::video::ffmpeg {
 
   template <bool decode_frame> class reader_impl;
 
@@ -52,4 +52,4 @@ namespace cyy::cxx_lib::video::ffmpeg {
   private:
     std::unique_ptr<reader_impl<false>> pimpl;
   };
-} // namespace cyy::cxx_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video::ffmpeg
