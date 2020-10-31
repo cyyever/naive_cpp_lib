@@ -1,5 +1,3 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
-
 find_package(doctest REQUIRED)
 find_package(Threads REQUIRED)
 

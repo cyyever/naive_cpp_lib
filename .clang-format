@@ -8,12 +8,11 @@ SortIncludes: true
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '<windows.h>'
-    Priority:        0
-  - Regex:           '<[[:alnum:].]+>'
+    Priority:        -1
+  - Regex:           '<[[:alnum:]._]+>'
     Priority:        1
-  - Regex:           '<[[:alnum:].]+\/.*>'
+  - Regex:           '<[[:alnum:]._]+\/.*>'
     Priority:        2
   - Regex:           '.*'
     Priority:        3
-    SortPriority:    4
 ...

@@ -8,9 +8,8 @@
 #ifdef HAVE_CUDA
 #pragma once
 
-#include <optional>
-
 #include <cuda_runtime.h>
+#include <optional>
 
 namespace cyy::cxx_lib::hardware::cuda {
 

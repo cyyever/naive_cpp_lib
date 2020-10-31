@@ -9,7 +9,6 @@
 #include "error.hpp"
 
 #include <mutex>
-
 #include <system_error>
 
 namespace cyy::cxx_lib::util {

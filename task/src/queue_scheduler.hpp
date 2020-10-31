@@ -24,7 +24,7 @@ namespace cyy::cxx_lib::task {
   //! \brief 基于队列的任务调度器
   class queue_scheduler : public base_scheduler {
   public:
-    using processor_factory = std::function<std::unique_ptr<base_processor >()>;
+    using processor_factory = std::function<std::unique_ptr<base_processor>()>;
 
   public:
     queue_scheduler() = default;

@@ -4,11 +4,12 @@
  * \brief 测试mat相关函数
  * \author cyy
  */
-#include <doctest/doctest.h>
 #include <functional>
 #include <iostream>
 #include <mutex>
 #include <thread>
+
+#include <doctest/doctest.h>
 
 #include "cv/mat.hpp"
 

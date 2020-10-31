@@ -8,12 +8,11 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <functional>
 #include <mutex>
 #include <optional>
 #include <thread>
-
-#include <condition_variable>
 
 namespace cyy::cxx_lib {
   //! \brief runnable 封裝線程啓動和關閉的同步控制
