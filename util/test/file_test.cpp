@@ -22,8 +22,8 @@ TEST_CASE("write_and_read") {
   CHECK_EQ(pipe(pipefd), 0);
 #endif
 
-  auto write_cnt_opt =
-      ::cyy::naive_lib::io::write(pipefd[1], static_cast<const void *>("ab"), 2);
+  auto write_cnt_opt = ::cyy::naive_lib::io::write(
+      pipefd[1], static_cast<const void *>("ab"), 2);
   CHECK(write_cnt_opt);
 
   CHECK_EQ(write_cnt_opt.value(), 2);

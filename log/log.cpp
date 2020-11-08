@@ -30,41 +30,34 @@ namespace {
     return buf;
   }
 
-  std::string get_full_path(const std::string &log_dir,
-                            const std::string &name) {
-    std::string log_path = log_dir;
-    std::string tail = log_path.substr(log_path.size() - 1);
-    if (tail != "/") {
-      log_path += "/";
-    }
-    log_path += name;
-    log_path += "-";
-    log_path += now_str();
-    log_path += "--";
+  std::filesystem::path get_full_path(const std::filesystem::path &log_dir,
+                                      std::string logger_name) {
+    logger_name += "-";
+    logger_name += now_str();
+    logger_name += "--";
 #ifdef _WIN32
-    log_path += std::to_string(_getpid());
+    logger_name += std::to_string(_getpid());
 #else
-    log_path += std::to_string(getpid());
+    logger_name += std::to_string(getpid());
 #endif
-    log_path += ".log";
-    return log_path;
+    logger_name += ".log";
+    return log_dir / logger_name;
   }
 
-  struct init {
-    init() {
-      // call this function on program starup to avoid race condition
-      spdlog::details::registry::instance();
-      constexpr auto log_pattern = "[%Y-%m-%d %H:%M:%S.%f][%t][%l] %v";
-      spdlog::set_pattern(log_pattern);
-      auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
-      spdlog::set_default_logger(console_logger);
-    }
-  } initer;
 } // namespace
 
 namespace cyy::naive_lib::log {
 
-  void setup_file_logger(const std::string &log_dir, const std::string &name,
+  initer::initer() {
+    // call this function on program starup to avoid race condition
+    spdlog::details::registry::instance();
+    auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
+    spdlog::set_default_logger(console_logger);
+    constexpr auto log_pattern = "%^[%Y-%m-%d %H:%M:%S.%f][thd %t][%l]%v%$";
+    spdlog::set_pattern(log_pattern);
+  }
+  void setup_file_logger(const std::filesystem::path &log_dir,
+                         const std::string &name,
                          ::spdlog::level::level_enum level,
                          size_t max_file_size, size_t max_file_num) {
     using ::spdlog::level::level_enum;

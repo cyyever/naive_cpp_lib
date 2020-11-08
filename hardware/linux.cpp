@@ -54,8 +54,9 @@ namespace cyy::naive_lib::hardware {
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (fd < 0) {
       auto socket_errno = errno;
-      throw std::runtime_error(std::string("create UDP socket failed: ") +
-                               cyy::naive_lib::util::errno_to_str(socket_errno));
+      throw std::runtime_error(
+          std::string("create UDP socket failed: ") +
+          cyy::naive_lib::util::errno_to_str(socket_errno));
     }
 
     ifc.ifc_len = sizeof(buf);
@@ -63,8 +64,9 @@ namespace cyy::naive_lib::hardware {
     if (ioctl(fd, SIOCGIFCONF, &ifc) != 0) {
       auto socket_errno = errno;
       close(fd);
-      throw std::runtime_error(std::string("ioctl failed: ") +
-                               cyy::naive_lib::util::errno_to_str(socket_errno));
+      throw std::runtime_error(
+          std::string("ioctl failed: ") +
+          cyy::naive_lib::util::errno_to_str(socket_errno));
     }
 
     struct ifreq *it = ifc.ifc_req;
