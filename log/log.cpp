@@ -30,7 +30,7 @@ namespace {
     return buf;
   }
 
-  std::filesystem::path get_full_path(const std::filesystem::path &log_dir,
+  std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
     logger_name += "-";
     logger_name += now_str();
@@ -67,7 +67,7 @@ namespace cyy::naive_lib::log {
           name + "-" +
           spdlog::level::to_short_c_str(static_cast<level_enum>(l));
       auto file_logger = ::spdlog::rotating_logger_mt(
-          logger_name, get_full_path(log_dir, logger_name), max_file_size,
+          logger_name, get_file_path(log_dir, logger_name).string(), max_file_size,
           max_file_num);
       file_logger->set_level(static_cast<level_enum>(l));
       file_logger->flush_on(static_cast<level_enum>(l));
