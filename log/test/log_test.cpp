@@ -24,11 +24,11 @@ TEST_CASE("set logger level") {
   LOG_ERROR("an error");
 }
 
-TEST_CASE("single message") { LOG_ERROR("{} {}"); }
+TEST_CASE("check format string") { LOG_ERROR("{} {}"); }
 
 TEST_CASE("file logger") {
   cyy::naive_lib::log::setup_file_logger(".", "file_logger",
-                                       spdlog::level::level_enum::info);
+                                         spdlog::level::level_enum::info);
 
   LOG_ERROR("hello world.....error");
   LOG_INFO("hello world.....info");
