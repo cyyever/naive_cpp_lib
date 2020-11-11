@@ -42,8 +42,7 @@ namespace cyy::naive_lib::task {
     bool is_invalid() const { return status == task_status::invalid; }
     bool can_process() const { return status == task_status::unprocessed; }
 
-
-  private:
+  protected:
     virtual bool _wait_done(const std::chrono::milliseconds &timeout) = 0;
 
   private:
@@ -53,45 +52,72 @@ namespace cyy::naive_lib::task {
     std::mutex sync_mu;
   };
 
-  template <typename ResultType = void>
-  class task_with_result : public base_task {
+  template <typename ResultType = void> class task : public base_task {
   public:
-    ~task_with_result() override = default;
+    task() = default;
+    ~task() override = default;
 
-    auto const &get_result(const std::chrono::milliseconds &timeout =
-                               std::chrono::milliseconds(1)) {
-      wait_done(timeout);
-      return result_opt;
-    }
-
-  private:
+  protected:
     bool _wait_done(const std::chrono::milliseconds &timeout) override {
-      if (result_opt.has_value()) {
-        return true;
+      if (!future_opt) {
+        future_opt = result_promise.get_future();
       }
-      if (is_invalid()) {
+      if (!future_opt->valid()) {
         return false;
       }
-
-      auto future = result_promise.get_future();
-      if (!future.valid()) {
-        return false;
-      }
-      if (future.wait_for(timeout) == std::future_status::ready) {
-        result_opt = future.get();
-        return true;
-      }
-      return false;
+      return future_opt->wait_for(timeout) == std::future_status::ready;
     }
 
   public:
     std::promise<ResultType> result_promise;
 
+  protected:
+    std::optional<std::future<ResultType>> future_opt;
+  };
+
+  template <typename ResultType>
+  class task_with_result : public task<ResultType> {
+    static_assert(!std::is_same_v<ResultType, void>);
+
+  public:
+    ~task_with_result() override = default;
+
+    auto const &get_result(const std::chrono::milliseconds &timeout =
+                               std::chrono::milliseconds(1)) {
+      this->wait_done(timeout);
+      return result_opt;
+    }
+
+  protected:
+    bool _wait_done(const std::chrono::milliseconds &timeout) override {
+      if (result_opt.has_value()) {
+        return true;
+      }
+      if (task<ResultType>::_wait_done(timeout)) {
+        result_opt = this->future_opt->get();
+        this->future_opt.reset();
+        return true;
+      }
+
+      return false;
+    }
+
   private:
     std::optional<ResultType> result_opt;
   };
 
-  template <typename ArgumentType, typename ResultType = void>
+  template <typename ArgumentType> class task_with_argument : public task<> {
+  public:
+    explicit task_with_argument(ArgumentType argument_)
+        : argument{std::move(argument_)} {}
+    ~task_with_argument() override = default;
+    auto const &get_argument() const { return argument; }
+
+  private:
+    ArgumentType argument;
+  };
+
+  template <typename ArgumentType, typename ResultType>
   class task_with_argument_and_result : public task_with_result<ResultType> {
   public:
     explicit task_with_argument_and_result(ArgumentType argument_)
