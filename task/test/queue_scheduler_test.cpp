@@ -7,8 +7,8 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/neural_network_task.hpp"
-#include "../src/queue_scheduler.hpp"
+#include "../neural_network_task.hpp"
+#include "../queue_scheduler.hpp"
 
 class succ_processor : public cyy::naive_lib::task::base_processor {
 public:
