@@ -1,4 +1,3 @@
-# file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 find_package(Threads REQUIRED)
 
 add_library(cyy_naive_lib_data_structure INTERFACE)
