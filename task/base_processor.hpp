@@ -30,7 +30,7 @@ namespace cyy::naive_lib::task {
 
     ~base_processor() override = default;
 
-    virtual bool can_use_gpu() const {return false}
+    virtual bool can_use_gpu() const {return false;}
 
     void set_gpu_no(int gpu_no_) {
       if (gpu_no != -1) {
