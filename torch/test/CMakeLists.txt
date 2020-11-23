@@ -1,5 +1,3 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
-
 find_package(doctest REQUIRED)
 
 file(GLOB test_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp

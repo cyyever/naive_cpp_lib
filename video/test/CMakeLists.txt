@@ -1,5 +1,3 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/test.cmake)
-
 find_package(doctest REQUIRED)
 
 set(test_progs reader_test writer_test package_reader_test)
