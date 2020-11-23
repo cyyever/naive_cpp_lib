@@ -43,6 +43,10 @@ foreach(submodule_name IN LISTS submodule_names)
   endif()
   set_target_properties(cyy_naive_lib_${submodule_name}
                         PROPERTIES EXPORT_NAME ${submodule_name})
+  target_include_directories(
+    cyy_naive_lib_${submodule_name}
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+           $<INSTALL_INTERFACE:include/cyy/naive_lib>)
 
   list(APPEND submodule_libs cyy_naive_lib_${submodule_name})
 
