@@ -22,6 +22,9 @@ public:
 
   base_scheduler &operator=(const base_scheduler &) = delete;
 
+  base_scheduler(base_scheduler &&) = default;
+
+  base_scheduler &operator=(base_scheduler &&) = default;
   virtual ~base_scheduler() = default;
 
   //! \brief 調度任务
