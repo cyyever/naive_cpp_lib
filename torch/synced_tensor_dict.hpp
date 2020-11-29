@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include <torch/torch.h>
+#include <torch/types.h>
 
 #include "data_structure/ordered_dict.hpp"
 #include "data_structure/thread_safe_container.hpp"

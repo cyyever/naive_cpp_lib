@@ -8,7 +8,7 @@
 #include "util/file.hpp"
 #include <chrono>
 #include <filesystem>
-#include <torch/torch.h>
+#include <torch/serialize.h>
 
 uint64_t now_ms() {
   return static_cast<uint64_t>(

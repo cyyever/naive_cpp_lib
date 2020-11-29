@@ -6,7 +6,7 @@
  */
 
 #include <chrono>
-#include <torch/torch.h>
+#include <torch/serialize.h>
 
 #include "log/log.hpp"
 #include "torch/synced_tensor_dict.hpp"

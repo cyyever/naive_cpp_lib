@@ -8,7 +8,6 @@
 #include <thread>
 
 #include "torch/synced_tensor_dict.hpp"
-#include <torch/torch.h>
 
 TEST_CASE("synced_tensor_dict") {
   cyy::naive_lib::pytorch::synced_tensor_dict dict("tensor_dir");
