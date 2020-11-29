@@ -17,7 +17,7 @@ namespace cyy::naive_lib {
     }
     try {
       thd = std::jthread(
-          [this](std::string name_) {
+          [this]([[maybe_unused]]std::string name_) {
             try {
 #if defined(__linux__)
               if (!name_.empty()) {
