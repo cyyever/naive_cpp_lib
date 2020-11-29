@@ -23,6 +23,8 @@ endif()
 find_package(Torch REQUIRED)
 
 target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES})
+find_package(Threads REQUIRED)
+target_link_libraries(cyy_naive_lib_torch PUBLIC Threads::Threads)
 
 add_subdirectory(test)
 if(BUILD_FUZZING)
