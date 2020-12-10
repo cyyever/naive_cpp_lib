@@ -4,15 +4,17 @@ project(CyyNaiveLib LANGUAGES CXX)
 
 include(cmake/all.cmake)
 
-option(BUILD_ML "Build machine learning modules" OFF)
-
 set(submodule_names log util hardware data_structure task)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # list(APPEND submodule_names process)
 endif()
-if(BUILD_ML)
-  # list(APPEND submodule_names torch cv)
+option(BUILD_TORCH "Build torch module" OFF)
+if(BUILD_TORCH)
   list(APPEND submodule_names torch)
+endif()
+option(BUILD_CV "Build opencv module" OFF)
+if(BUILD_CV)
+  list(APPEND submodule_names cv)
 endif()
 
 option(BUILD_VIDEO "Build video modules" OFF)
@@ -46,7 +48,7 @@ foreach(submodule_name IN LISTS submodule_names)
   target_include_directories(
     cyy_naive_lib_${submodule_name}
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-           $<INSTALL_INTERFACE:include/cyy/naive_lib>)
+              $<INSTALL_INTERFACE:include/cyy/naive_lib>)
 
   list(APPEND submodule_libs cyy_naive_lib_${submodule_name})
 

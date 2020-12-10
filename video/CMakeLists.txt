@@ -25,7 +25,7 @@ target_link_libraries(
          PkgConfig::libswscale PkgConfig::libavdevice)
 target_link_libraries(
   cyy_naive_lib_audio PUBLIC PkgConfig::libavcodec PkgConfig::libavutil
-                          PkgConfig::libavformat PkgConfig::libavdevice)
+                             PkgConfig::libavformat PkgConfig::libavdevice)
 
 find_package(OpenCV REQUIRED COMPONENTS core)
 
