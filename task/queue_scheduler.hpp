@@ -32,7 +32,7 @@ namespace cyy::naive_lib::task {
     queue_scheduler &operator=(const queue_scheduler &) = delete;
     queue_scheduler(queue_scheduler &&) = default;
 
-  queue_scheduler &operator=(queue_scheduler &&) = default;
+    queue_scheduler &operator=(queue_scheduler &&) = default;
 
     explicit queue_scheduler(const std::vector<processor_factory> &makers) {
       this->replace_processor(makers);
