@@ -11,6 +11,7 @@
 
 #include "../src/ffmpeg_reader.hpp"
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 
 int main(int argc, char **argv) {
   if (argc != 2) {
@@ -48,12 +49,16 @@ int main(int argc, char **argv) {
       std::cout << "reach EOF" << std::endl;
       break;
     }
+    /* if (!frame.is_key) { */
+    /*   continue */
+    /* } */
+    /*   std::cout << "seq is"<<frame.seq << std::endl; */
 
     cv::Mat tmp;
     cv::resize(frame.content, tmp, cv::Size(640, 480));
 
-    //   cv::imshow("win", tmp);
-    //  cv::waitKey(1);
+       cv::imwrite("win", tmp);
+      cv::waitKey(1);
   }
   return 0;
 }

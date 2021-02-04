@@ -1,5 +1,3 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/fuzzing.cmake)
-
 set(fuzzing_progs reader_fuzzing writer_fuzzing)
 
 foreach(fuzzing_prog ${fuzzing_progs})
