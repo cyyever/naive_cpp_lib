@@ -31,39 +31,6 @@ namespace cyy::naive_lib::video::ffmpeg {
 #else
         av_log_set_level(AV_LOG_VERBOSE);
 #endif
-
-        if (av_lockmgr_register(lock_manager) != 0) {
-          throw std::runtime_error("av_lockmgr_register failed");
-        }
-      }
-
-    private:
-      //! \brief ffmpeg库要求我们提供该函数来实现线程安全
-      static int lock_manager(void **mutex, enum AVLockOp op) {
-#ifdef _WIN32
-        LOG_error("windows not support thread safty");
-        return 1;
-#endif
-        switch (op) {
-          case AV_LOCK_CREATE:
-            *mutex = malloc(sizeof(pthread_mutex_t));
-            if (!*mutex) {
-              return 1;
-            }
-            return pthread_mutex_init(
-                reinterpret_cast<pthread_mutex_t *>(*mutex), nullptr);
-          case AV_LOCK_OBTAIN:
-            return pthread_mutex_lock(
-                reinterpret_cast<pthread_mutex_t *>(*mutex));
-          case AV_LOCK_RELEASE:
-            return pthread_mutex_unlock(
-                reinterpret_cast<pthread_mutex_t *>(*mutex));
-          case AV_LOCK_DESTROY:
-            pthread_mutex_destroy(reinterpret_cast<pthread_mutex_t *>(*mutex));
-            free(*mutex);
-            return 0;
-        }
-        return 1;
       }
     };
   } // namespace
