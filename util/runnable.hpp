@@ -62,9 +62,6 @@ namespace cyy::naive_lib {
   protected:
     bool needs_stop() {
       std::unique_lock lock(sync_mutex);
-      if (!thd.joinable()) {
-        return true;
-      }
       return thd.get_stop_token().stop_requested();
     }
 
