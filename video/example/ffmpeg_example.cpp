@@ -9,8 +9,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <deepir/video/ffmpeg_reader.hpp>
-#include <deepir/video/ffmpeg_writer.hpp>
+#include "../src/ffmpeg_reader.hpp"
+#include "../src/ffmpeg_writer.hpp"
 #include <opencv2/opencv.hpp>
 
 int main(int argc, char **argv) {
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  deepir::video::ffmpeg::reader reader;
+  cyy::naive_lib::video::ffmpeg::reader reader;
 
   const char *in_url = argv[1];
   if (!reader.open(in_url)) {
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   std::cout << "frame rate=[" << frame_rate[0] << "," << frame_rate[1] << "]"
             << std::endl;
 
-  deepir::video::ffmpeg::writer writer;
+  cyy::naive_lib::video::ffmpeg::writer writer;
   const char *out_url = argv[2];
   if (!writer.open(out_url, "flv", 1280, 720)) {
     std::cerr << "open " << out_url << " failed" << std::endl;

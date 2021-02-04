@@ -9,7 +9,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <deepir/video/ffmpeg_reader.hpp>
+#include "../src/ffmpeg_reader.hpp"
 #include <opencv2/opencv.hpp>
 
 int main(int argc, char **argv) {
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  deepir::video::ffmpeg::reader reader;
+  cyy::naive_lib::video::ffmpeg::reader reader;
 
   const char *url = argv[1];
   if (!reader.open(url)) {

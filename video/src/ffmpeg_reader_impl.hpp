@@ -98,7 +98,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       ret = avformat_open_input(&input_ctx, url.c_str(), nullptr, &opts);
       if (ret != 0) {
-        LOG_ERROR("avformat_open_input {} failed:{}",url, errno_to_str(ret));
+        LOG_ERROR("avformat_open_input {} failed:{}", url, errno_to_str(ret));
         return false;
       }
 

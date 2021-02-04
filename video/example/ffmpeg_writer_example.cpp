@@ -9,9 +9,9 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <deepir/image/image.hpp>
-#include <deepir/video/ffmpeg_writer.hpp>
+#include <cyy/naive_lib/cv/mat.hpp>
 #include <opencv2/opencv.hpp>
+#include "../src/ffmpeg_writer.hpp"
 
 int main(int argc, char **argv) {
   if (argc != 3) {
@@ -24,13 +24,13 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  auto mat_opt = deepir::image::load(argv[1]);
+  auto mat_opt = cyy::naive_lib::opencv::mat::load(argv[1]);
   if (!mat_opt) {
     std::cerr << "load image failed" << std::endl;
     return -1;
   }
 
-  deepir::video::ffmpeg::writer writer;
+  cyy::naive_lib::video::ffmpeg::writer writer;
   const char *out_url = argv[2];
   if (!writer.open(out_url, "flv", 320, 240)) {
     std::cerr << "open " << out_url << " failed" << std::endl;
@@ -38,8 +38,7 @@ int main(int argc, char **argv) {
   }
 
   for (size_t i = 0; i < 100; i++) {
-
-    if (!writer.write_frame(mat_opt.value())) {
+    if (!writer.write_frame(mat_opt.value().get_cv_mat())) {
       std::cerr << "write_frame failed" << std::endl;
       return -1;
     }
