@@ -21,4 +21,6 @@ TEST_CASE("ffmpeg_reader") {
   CHECK(reader.get_frame_rate());
   auto [res, _] = reader.next_frame();
   CHECK(res > 0);
+  res = reader.next_frame().first;
+  CHECK(res == 0);
 }

@@ -98,7 +98,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       ret = avformat_open_input(&input_ctx, url.c_str(), nullptr, &opts);
       if (ret != 0) {
-        LOG_ERROR("avformat_open_input failed:{}", errno_to_str(ret));
+        LOG_ERROR("avformat_open_input {} failed:{}",url, errno_to_str(ret));
         return false;
       }
 
@@ -347,6 +347,7 @@ namespace cyy::naive_lib::video::ffmpeg {
   private:
     static int interrupt_cb(void *ctx) {
       if (reinterpret_cast<reader_impl<decode_frame> *>(ctx)->needs_stop()) {
+        LOG_WARN("stop decode thread");
         return 1;
       }
       return 0;
