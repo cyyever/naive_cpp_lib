@@ -40,7 +40,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
     std::optional<AVCodecParameters *> get_codec_parameters();
 
-    std::pair<int, std::shared_ptr<AVPacket>> next_packet();
+    /* std::pair<int, std::shared_ptr<AVPacket>> next_packet(); */
     //! \brief 获取下一帧
     //! \return first>0 成功
     //	      first=0 EOF

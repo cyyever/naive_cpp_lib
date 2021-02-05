@@ -33,8 +33,8 @@ namespace cyy::naive_lib::video::ffmpeg {
     return pimpl->get_codec_parameters();
   }
 
-  std::pair<int, std::shared_ptr<AVPacket>> reader::next_packet() {
-    return pimpl->next_packet();
-  }
+  /* std::pair<int, std::shared_ptr<AVPacket>> reader::next_packet() { */
+  /*   return pimpl->next_packet(); */
+  /* } */
 
 } // namespace cyy::naive_lib::video::ffmpeg
