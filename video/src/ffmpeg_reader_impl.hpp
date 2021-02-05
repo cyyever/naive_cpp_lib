@@ -118,7 +118,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       stream_index = ret;
       auto video_stream = input_ctx->streams[ret];
 
-      /*
       AVCodec *codec = nullptr;
 
       //尝试用nvidia解码
@@ -128,13 +127,11 @@ namespace cyy::naive_lib::video::ffmpeg {
       if (!codec) {
         codec = avcodec_find_decoder(video_stream->codecpar->codec_id);
       }
-      */
-      AVCodec *codec = avcodec_find_decoder(video_stream->codecpar->codec_id);
       if (!codec) {
         LOG_ERROR("can't find decoder for {}", url);
         return false;
       }
-
+      LOG_WARN("use codec {}",codec->long_name);
       codec_id = codec->id;
       decode_ctx = avcodec_alloc_context3(codec);
       if (!decode_ctx) {
@@ -545,7 +542,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     AVDictionary *opts{nullptr};
     AVFrame *avframe{nullptr};
     SwsContext *sws_ctx{nullptr};
-    // AVPacket * pkt{nullptr};
 
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
