@@ -38,9 +38,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     //! \note 如果无法获取视频帧率，則返回空
     std::optional<std::array<size_t, 2>> get_frame_rate() override;
 
-    std::optional<AVCodecParameters *> get_codec_parameters();
-
-    /* std::pair<int, std::shared_ptr<AVPacket>> next_packet(); */
     //! \brief 获取下一帧
     //! \return first>0 成功
     //	      first=0 EOF

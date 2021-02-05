@@ -29,12 +29,6 @@ namespace cyy::naive_lib::video::ffmpeg {
 
   void reader::close() { pimpl->close(); }
 
-  std::optional<AVCodecParameters *> reader::get_codec_parameters() {
-    return pimpl->get_codec_parameters();
-  }
 
-  /* std::pair<int, std::shared_ptr<AVPacket>> reader::next_packet() { */
-  /*   return pimpl->next_packet(); */
-  /* } */
 
 } // namespace cyy::naive_lib::video::ffmpeg

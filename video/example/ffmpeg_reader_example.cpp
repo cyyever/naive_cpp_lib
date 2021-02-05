@@ -56,9 +56,8 @@ int main(int argc, char **argv) {
 
     cv::Mat tmp;
     cv::resize(frame.content, tmp, cv::Size(640, 480));
-
-       cv::imwrite("win", tmp);
-      cv::waitKey(1);
+    cv::imshow("win", tmp);
+    cv::waitKey(1);
   }
   return 0;
 }

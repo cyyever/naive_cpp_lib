@@ -435,6 +435,10 @@ namespace cyy::naive_lib::video::ffmpeg {
       return {1, packet_ptr};
     }
 
+    void add_frame_filter(std::string_view name, std::function<bool(AVFrame&)> filter) {
+      frame_filters.emplace(name,filter);
+    }
+
     //! \brief 获取下一帧
     //! \return first>0 成功
     //	      first=0 EOF
@@ -462,7 +466,18 @@ namespace cyy::naive_lib::video::ffmpeg {
       while (true) {
         auto ret = avcodec_receive_frame(decode_ctx, avframe);
         if (ret == 0) {
-          break;
+          frame_seq++;
+          bool pass_filters=true;
+          for(auto const &[name,filter]:frame_filters) {
+            if (!filter(*avframe)) {
+              pass_filters=false;
+              break;
+            }
+          }
+          if(pass_filters) {
+            break;
+          }
+          LOG_DEBUG("ignore frame seq {}",frame_seq-1);
         }
         if (ret != AVERROR(EAGAIN)) {
           LOG_ERROR("avcodec_receive_frame failed:{}", errno_to_str(ret));
@@ -492,7 +507,7 @@ namespace cyy::naive_lib::video::ffmpeg {
       }
 
       frame new_frame;
-      new_frame.seq = frame_seq++;
+      new_frame.seq = frame_seq-1;
       new_frame.is_key = ((avframe->key_frame == 1) ||
                           (avframe->pict_type == AV_PICTURE_TYPE_I));
 
@@ -543,6 +558,7 @@ namespace cyy::naive_lib::video::ffmpeg {
     AVFrame *avframe{nullptr};
     SwsContext *sws_ctx{nullptr};
 
+    std::map<std::string,std::function<bool(AVFrame&)>> frame_filters;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;
