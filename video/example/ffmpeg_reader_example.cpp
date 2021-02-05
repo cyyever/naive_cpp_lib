@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
   auto frame_rate = reader.get_frame_rate().value();
   std::cout << "frame rate=[" << frame_rate[0] << "," << frame_rate[1] << "]"
             << std::endl;
+  reader.drop_non_key_frames();
 
   while (true) {
     auto [res, frame] = reader.next_frame();
@@ -49,13 +50,11 @@ int main(int argc, char **argv) {
       std::cout << "reach EOF" << std::endl;
       break;
     }
-    /* if (!frame.is_key) { */
-    /*   continue */
-    /* } */
-    /*   std::cout << "seq is"<<frame.seq << std::endl; */
+    std::cout << "seq is "<<frame.seq << std::endl;
 
     cv::Mat tmp;
     cv::resize(frame.content, tmp, cv::Size(640, 480));
+    /* cv::imwrite(std::to_string(frame.seq)+".jpg",tmp); */
     cv::imshow("win", tmp);
     cv::waitKey(1);
   }

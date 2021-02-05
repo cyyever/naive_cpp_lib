@@ -27,6 +27,8 @@ namespace cyy::naive_lib::video::ffmpeg {
     pimpl->set_play_frame_rate(frame_rate);
   }
 
+    void reader::drop_non_key_frames() {pimpl->drop_non_key_frames();
+    }
   void reader::close() { pimpl->close(); }
 
 

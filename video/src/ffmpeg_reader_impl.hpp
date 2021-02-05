@@ -132,7 +132,6 @@ namespace cyy::naive_lib::video::ffmpeg {
         return false;
       }
       LOG_WARN("use codec {}",codec->long_name);
-      codec_id = codec->id;
       decode_ctx = avcodec_alloc_context3(codec);
       if (!decode_ctx) {
         LOG_ERROR("avcodec_alloc_context3 failed");
@@ -341,6 +340,11 @@ namespace cyy::naive_lib::video::ffmpeg {
       // frame_seq我們不清零
     }
 
+    void drop_non_key_frames() {
+      add_frame_filter("key_frame",[](auto const &frame){
+          return is_key_frame(frame);
+          });
+    }
   private:
     static int interrupt_cb(void *ctx) {
       if (reinterpret_cast<reader_impl<decode_frame> *>(ctx)->needs_stop()) {
@@ -348,6 +352,15 @@ namespace cyy::naive_lib::video::ffmpeg {
         return 1;
       }
       return 0;
+    }
+    static bool is_key_frame(const AVFrame &frame) {
+
+      return ((frame.key_frame == 1) ||
+                          (frame.pict_type == AV_PICTURE_TYPE_I));
+    }
+
+    void add_frame_filter(std::string_view name, std::function<bool(const AVFrame&)> filter) {
+      frame_filters.emplace(name,filter);
     }
 
     void run() override {
@@ -396,6 +409,12 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       return 1;
     }
+
+
+
+
+
+
     //! \brief 获取下一AVPacket
     //! \return first>0 成功
     //	      first=0 EOF
@@ -435,9 +454,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       return {1, packet_ptr};
     }
 
-    void add_frame_filter(std::string_view name, std::function<bool(AVFrame&)> filter) {
-      frame_filters.emplace(name,filter);
-    }
 
     //! \brief 获取下一帧
     //! \return first>0 成功
@@ -478,6 +494,7 @@ namespace cyy::naive_lib::video::ffmpeg {
             break;
           }
           LOG_DEBUG("ignore frame seq {}",frame_seq-1);
+          continue;
         }
         if (ret != AVERROR(EAGAIN)) {
           LOG_ERROR("avcodec_receive_frame failed:{}", errno_to_str(ret));
@@ -508,8 +525,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       frame new_frame;
       new_frame.seq = frame_seq-1;
-      new_frame.is_key = ((avframe->key_frame == 1) ||
-                          (avframe->pict_type == AV_PICTURE_TYPE_I));
+      new_frame.is_key = is_key_frame(*avframe);
 
       uint8_t *dst_data[4]{};
       int dst_linesize[4]{};
@@ -558,13 +574,12 @@ namespace cyy::naive_lib::video::ffmpeg {
     AVFrame *avframe{nullptr};
     SwsContext *sws_ctx{nullptr};
 
-    std::map<std::string,std::function<bool(AVFrame&)>> frame_filters;
+    std::map<std::string,std::function<bool(const AVFrame&)>> frame_filters;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>
         packet_buffer;
-    AVCodecID codec_id;
   };
 } // namespace cyy::naive_lib::video::ffmpeg
