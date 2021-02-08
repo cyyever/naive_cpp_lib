@@ -9,9 +9,10 @@
 #include <iostream>
 #include <unistd.h>
 
+#include <opencv2/opencv.hpp>
+
 #include "../src/ffmpeg_reader.hpp"
 #include "../src/ffmpeg_writer.hpp"
-#include <opencv2/opencv.hpp>
 
 int main(int argc, char **argv) {
   if (argc != 3) {

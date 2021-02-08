@@ -9,9 +9,10 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "../src/ffmpeg_reader.hpp"
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
+
+#include "../src/ffmpeg_reader.hpp"
 
 int main(int argc, char **argv) {
   if (argc != 2) {
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
       std::cout << "reach EOF" << std::endl;
       break;
     }
-    std::cout << "seq is "<<frame.seq << std::endl;
+    std::cout << "seq is " << frame.seq << std::endl;
 
     cv::Mat tmp;
     cv::resize(frame.content, tmp, cv::Size(640, 480));
