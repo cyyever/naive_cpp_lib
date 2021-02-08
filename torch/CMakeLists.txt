@@ -16,8 +16,8 @@ if(Python3_FOUND)
   if(NOT ${_exitcode} EQUAL 0)
     message(FATAL_ERROR "failed to found pytorch path")
   endif()
-  string(STRIP ${_path} _path)
-  list(PREPEND CMAKE_PREFIX_PATH ${_path}/share/cmake)
+  string(STRIP ${_path} pytorch_path)
+  list(PREPEND CMAKE_PREFIX_PATH ${pytorch_path}/share/cmake)
 endif()
 
 find_package(Torch REQUIRED)
@@ -26,8 +26,15 @@ find_package(Threads REQUIRED)
 target_link_libraries(cyy_naive_lib_torch PUBLIC Threads::Threads)
 
 if(BUILD_PYTHON_BINDING)
-  find_package(pybind11 REQUIRED)
-
+  unset(Python3_FOUND)
+  find_package(pybind11 CONFIG REQUIRED)
+  file(GLOB PYTHON_BINDING_SOURCE
+       ${CMAKE_CURRENT_SOURCE_DIR}/python_binding/*.cpp)
+  pybind11_add_module(cyy_naive_cpp_extension ${PYTHON_BINDING_SOURCE})
+  target_link_directories(cyy_naive_cpp_extension PUBLIC ${pytorch_path}/lib)
+  target_link_libraries(cyy_naive_cpp_extension PUBLIC torch_python)
+  target_link_libraries(cyy_naive_cpp_extension PUBLIC cyy_naive_lib_torch
+                                                       ${PYTHON_LIBRARY})
 endif()
 
 add_subdirectory(test)
