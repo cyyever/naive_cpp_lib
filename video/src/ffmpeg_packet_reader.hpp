@@ -1,5 +1,5 @@
 /*!
- * \file ffmpeg_package_reader.h
+ * \file ffmpeg_packet_reader.h
  *
  * \brief 封装ffmpeg对视频流的讀操作
  * \author Yue Wu,cyy
@@ -19,11 +19,11 @@ namespace cyy::naive_lib::video::ffmpeg {
   template <bool decode_frame> class reader_impl;
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class package_reader final {
+  class packet_reader final {
   public:
-    package_reader();
+    packet_reader();
 
-    ~package_reader();
+    ~packet_reader();
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -42,7 +42,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
     std::optional<AVCodecParameters *> get_codec_parameters();
 
-    //! \brief 获取下一package
+    //! \brief 获取下一packet
     //! \return first>0 成功
     //	      first=0 EOF
     //	      first<0 失敗

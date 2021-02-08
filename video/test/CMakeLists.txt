@@ -1,6 +1,6 @@
 find_package(doctest REQUIRED)
 
-set(test_progs reader_test writer_test package_reader_test)
+set(test_progs reader_test writer_test packet_reader_test)
 
 set(TEST_IMAGE_DIR ${CMAKE_CURRENT_LIST_DIR}/test_images)
 foreach(test_prog ${test_progs})

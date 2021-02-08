@@ -70,7 +70,7 @@ namespace cyy::naive_lib::video::ffmpeg {
       } else {
         url_scheme = "file";
       }
-      if (url_scheme == "rtsp") {
+      if (is_live_stream()) {
         ret = av_dict_set(&opts, "rtsp_transport", "tcp", 0);
         if (ret != 0) {
           LOG_ERROR("av_dict_set failed:{}", errno_to_str(ret));
@@ -131,7 +131,7 @@ namespace cyy::naive_lib::video::ffmpeg {
         LOG_ERROR("can't find decoder for {}", url);
         return false;
       }
-      LOG_WARN("use codec {}",codec->long_name);
+      LOG_WARN("use codec {}", codec->long_name);
       decode_ctx = avcodec_alloc_context3(codec);
       if (!decode_ctx) {
         LOG_ERROR("avcodec_alloc_context3 failed");
@@ -165,13 +165,17 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       opened = true;
 
-      if (url_scheme == "rtsp") {
-        frame_buffer =
-            std::make_unique<cyy::naive_lib::thread_safe_linear_container<
-                std::vector<std::pair<int, frame>>>>();
-        packet_buffer =
-            std::make_unique<cyy::naive_lib::thread_safe_linear_container<
-                std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>();
+      if (is_live_stream()) {
+        if constexpr (decode_frame) {
+          frame_buffer =
+              std::make_unique<cyy::naive_lib::thread_safe_linear_container<
+                  std::vector<std::pair<int, frame>>>>();
+
+        } else {
+          packet_buffer =
+              std::make_unique<cyy::naive_lib::thread_safe_linear_container<
+                  std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>();
+        }
         start("ffmpeg_reader_impl");
       }
 
@@ -185,6 +189,7 @@ namespace cyy::naive_lib::video::ffmpeg {
     //	      first=0 EOF
     //	      first<0 失敗
     //	如果first<=0，返回空内容
+
     std::pair<int, std::shared_ptr<AVPacket>> next_packet() {
       if (!has_open()) {
         LOG_ERROR("video is not opened");
@@ -222,6 +227,7 @@ namespace cyy::naive_lib::video::ffmpeg {
     //	      first=0 EOF
     //	      first<0 失敗
     //	如果first<=0，返回空内容
+
     std::pair<int, frame> next_frame() {
       if (!has_open()) {
         LOG_ERROR("video is not opened");
@@ -229,7 +235,7 @@ namespace cyy::naive_lib::video::ffmpeg {
       }
 
       std::pair<int, frame> p;
-      if (url_scheme == "rtsp") {
+      if (is_live_stream()) {
         auto frame_opt = frame_buffer->pop_front(std::chrono::seconds(5));
         if (!frame_opt) {
           LOG_ERROR("pop frame timeout");
@@ -341,10 +347,10 @@ namespace cyy::naive_lib::video::ffmpeg {
     }
 
     void drop_non_key_frames() {
-      add_frame_filter("key_frame",[](auto const &frame){
-          return is_key_frame(frame);
-          });
+      add_frame_filter("key_frame",
+                       [](auto const &frame) { return is_key_frame(frame); });
     }
+
   private:
     static int interrupt_cb(void *ctx) {
       if (reinterpret_cast<reader_impl<decode_frame> *>(ctx)->needs_stop()) {
@@ -355,12 +361,12 @@ namespace cyy::naive_lib::video::ffmpeg {
     }
     static bool is_key_frame(const AVFrame &frame) {
 
-      return ((frame.key_frame == 1) ||
-                          (frame.pict_type == AV_PICTURE_TYPE_I));
+      return ((frame.key_frame == 1) || (frame.pict_type == AV_PICTURE_TYPE_I));
     }
 
-    void add_frame_filter(std::string_view name, std::function<bool(const AVFrame&)> filter) {
-      frame_filters.emplace(name,filter);
+    void add_frame_filter(std::string_view name,
+                          std::function<bool(const AVFrame &)> filter) {
+      frame_filters.emplace(name, filter);
     }
 
     void run() override {
@@ -410,11 +416,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       return 1;
     }
 
-
-
-
-
-
     //! \brief 获取下一AVPacket
     //! \return first>0 成功
     //	      first=0 EOF
@@ -454,7 +455,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       return {1, packet_ptr};
     }
 
-
     //! \brief 获取下一帧
     //! \return first>0 成功
     //	      first=0 EOF
@@ -483,17 +483,17 @@ namespace cyy::naive_lib::video::ffmpeg {
         auto ret = avcodec_receive_frame(decode_ctx, avframe);
         if (ret == 0) {
           frame_seq++;
-          bool pass_filters=true;
-          for(auto const &[name,filter]:frame_filters) {
+          bool pass_filters = true;
+          for (auto const &[name, filter] : frame_filters) {
             if (!filter(*avframe)) {
-              pass_filters=false;
+              pass_filters = false;
               break;
             }
           }
-          if(pass_filters) {
+          if (pass_filters) {
             break;
           }
-          LOG_DEBUG("ignore frame seq {}",frame_seq-1);
+          LOG_DEBUG("ignore frame seq {}", frame_seq - 1);
           continue;
         }
         if (ret != AVERROR(EAGAIN)) {
@@ -513,18 +513,23 @@ namespace cyy::naive_lib::video::ffmpeg {
         }
       }
 
-      sws_ctx = sws_getCachedContext(
+      auto new_sws_ctx = sws_getCachedContext(
           sws_ctx, avframe->width, avframe->height,
           static_cast<enum AVPixelFormat>(avframe->format), video_width,
           video_height, pix_fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
 
-      if (!sws_ctx) {
+      if (!new_sws_ctx) {
         LOG_ERROR("sws_getContext failed");
         return {-1, {}};
       }
+      if(sws_ctx && sws_ctx !=new_sws_ctx) {
+        sws_freeContext(sws_ctx);
+        LOG_WARN("sws_freeContext");
+      }
+      sws_ctx=new_sws_ctx;
 
       frame new_frame;
-      new_frame.seq = frame_seq-1;
+      new_frame.seq = frame_seq - 1;
       new_frame.is_key = is_key_frame(*avframe);
 
       uint8_t *dst_data[4]{};
@@ -557,6 +562,8 @@ namespace cyy::naive_lib::video::ffmpeg {
       return {1, new_frame};
     }
 
+    bool is_live_stream() const { return url_scheme == "rtsp"; }
+
   private:
     int stream_index{-1};
     uint64_t frame_seq{0};
@@ -574,7 +581,7 @@ namespace cyy::naive_lib::video::ffmpeg {
     AVFrame *avframe{nullptr};
     SwsContext *sws_ctx{nullptr};
 
-    std::map<std::string,std::function<bool(const AVFrame&)>> frame_filters;
+    std::map<std::string, std::function<bool(const AVFrame &)>> frame_filters;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;

@@ -10,13 +10,13 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/ffmpeg_package_reader.hpp"
+#include "../src/ffmpeg_packet_reader.hpp"
 
 #define STR_H(x) #x
 #define STR_HELPER(x) STR_H(x)
 
 TEST_CASE("ffmpeg_reader") {
-  cyy::naive_lib::video::ffmpeg::package_reader reader;
+  cyy::naive_lib::video::ffmpeg::packet_reader reader;
   CHECK(reader.open(STR_HELPER(IN_URL)));
   CHECK(reader.get_frame_rate());
   auto [res, _] = reader.next_packet();

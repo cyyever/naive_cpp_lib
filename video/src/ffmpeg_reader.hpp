@@ -40,7 +40,6 @@ namespace cyy::naive_lib::video::ffmpeg {
 
     void drop_non_key_frames();
 
-
     //! \brief 获取下一帧
     //! \return first>0 成功
     //	      first=0 EOF
