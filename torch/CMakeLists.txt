@@ -21,10 +21,14 @@ if(Python3_FOUND)
 endif()
 
 find_package(Torch REQUIRED)
-
 target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES})
 find_package(Threads REQUIRED)
 target_link_libraries(cyy_naive_lib_torch PUBLIC Threads::Threads)
+
+if(BUILD_PYTHON_BINDING)
+  find_package(pybind11 REQUIRED)
+
+endif()
 
 add_subdirectory(test)
 if(BUILD_FUZZING)

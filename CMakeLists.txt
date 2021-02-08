@@ -25,6 +25,7 @@ endif()
 option(WITH_ASAN "Build with address sanitizer" OFF)
 
 option(BUILD_FUZZING "Build fuzzing" OFF)
+option(BUILD_PYTHON_BINDING "Build python bindings" OFF)
 
 include_directories(${CMAKE_SOURCE_DIR})
 set(submodule_libs)
