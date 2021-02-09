@@ -32,6 +32,7 @@ find_package(OpenCV REQUIRED COMPONENTS core)
 target_include_directories(cyy_naive_lib_video PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(cyy_naive_lib_video PRIVATE ${OpenCV_LIBRARIES})
 target_link_libraries(cyy_naive_lib_video PUBLIC opencv_core)
+target_link_libraries(cyy_naive_lib_video PRIVATE cyy_naive_lib_util cyy_naive_lib_cv)
 
 if(BUILD_PYTHON_BINDING)
   unset(Python3_FOUND)
@@ -45,8 +46,9 @@ if(BUILD_PYTHON_BINDING)
     pybind11_add_module(cyy_naive_cpp_extension ${PYTHON_BINDING_SOURCE})
   endif()
   target_link_directories(cyy_naive_cpp_extension PUBLIC ${pytorch_path}/lib)
-  target_link_libraries(cyy_naive_cpp_extension PUBLIC cyy_naive_lib_video
-                                                       ${PYTHON_LIBRARY})
+  target_link_libraries(
+    cyy_naive_cpp_extension PUBLIC cyy_naive_lib_video ${PYTHON_LIBRARY}
+                                   ${OpenCV_LIBRARIES})
 endif()
 
 add_subdirectory(test)

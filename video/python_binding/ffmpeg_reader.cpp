@@ -9,6 +9,8 @@ PYBIND11_MODULE(cyy_naive_cpp_extension, m) {
       .def(py::init<>())
       .def("open", &ffmpeg_video_reader::open)
       .def("close", &ffmpeg_video_reader::close)
-      .def("drop_non_key_frames", &ffmpeg_video_reader::drop_non_key_frames)
-      ;
+      .def("set_play_frame_rate", &ffmpeg_video_reader::set_play_frame_rate)
+      .def("get_frame_rate", &ffmpeg_video_reader::get_frame_rate)
+      .def("next_frame", &ffmpeg_video_reader::next_frame)
+      .def("drop_non_key_frames", &ffmpeg_video_reader::drop_non_key_frames);
 }
