@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "video/src/ffmpeg_video_reader.hpp"
 namespace py = pybind11;
@@ -7,14 +8,15 @@ inline void define_video_extension(py::module_ &m) {
   py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())
       .def_buffer([](cv::Mat &mat) -> py::buffer_info {
         return py::buffer_info(
-            mat.ptr(),                                /* Pointer to buffer */
-            sizeof(uint8_t),                          /* Size of one scalar */
-            py::format_descriptor<uint8_t>::format(), /* Python struct-style
-                                                         format descriptor */
-            2,                                        /* Number of dimensions */
-            {mat.rows, mat.cols},                     /* Buffer dimensions */
+            mat.data,            /* Pointer to buffer */
+            sizeof(unsigned char), /* Size of one scalar */
+            py::format_descriptor<unsigned char>::format(), /* Python
+                                                         struct-style format
+                                                         descriptor */
+            3,                                    /* Number of dimensions */
+            {mat.rows, mat.cols, mat.channels()}, /* Buffer dimensions */
             {mat.step[0], /* Strides (in bytes) for each index */
-             mat.step[1]});
+             mat.step[1], sizeof(unsigned char)});
       });
 
   auto sub_m = m.def_submodule("video", "Contains video decoding");

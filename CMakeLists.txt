@@ -25,8 +25,8 @@ if(BUILD_VIDEO)
   list(APPEND submodule_names video)
 endif()
 
-option(BUILD_TORCH_PYTHON_BINDING "Build python bindings for torch" ON)
-option(BUILD_VIDEO_PYTHON_BINDING "Build python bindings for video" ON)
+option(BUILD_TORCH_PYTHON_BINDING "Build python bindings for torch" OFF)
+option(BUILD_VIDEO_PYTHON_BINDING "Build python bindings for video" OFF)
 
 if(BUILD_TORCH_PYTHON_BINDING OR BUILD_VIDEO_PYTHON_BINDING)
   list(APPEND submodule_names python_binding)
