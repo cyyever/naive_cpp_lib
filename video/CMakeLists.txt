@@ -44,13 +44,13 @@ if(BUILD_VIDEO_PYTHON_BINDING)
 
   if(TARGET cyy_naive_cpp_extension)
     target_sources(cyy_naive_cpp_extension PUBLIC ${PYTHON_BINDING_SOURCE})
+    target_link_libraries(cyy_naive_cpp_extension PUBLIC ${PYTHON_LIBRARY})
   else()
     pybind11_add_module(cyy_naive_cpp_extension ${PYTHON_BINDING_SOURCE})
   endif()
   target_link_directories(cyy_naive_cpp_extension PUBLIC ${pytorch_path}/lib)
-  target_link_libraries(
-    cyy_naive_cpp_extension PUBLIC cyy_naive_lib_video ${PYTHON_LIBRARY}
-                                 ${OpenCV_LIBRARIES})
+  target_link_libraries(cyy_naive_cpp_extension PUBLIC cyy_naive_lib_video
+                                                       ${OpenCV_LIBRARIES})
 endif()
 
 add_subdirectory(test)
