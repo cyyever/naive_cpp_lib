@@ -522,11 +522,11 @@ namespace cyy::naive_lib::video::ffmpeg {
         LOG_ERROR("sws_getContext failed");
         return {-1, {}};
       }
-      if(sws_ctx && sws_ctx !=new_sws_ctx) {
+      if (sws_ctx && sws_ctx != new_sws_ctx) {
         sws_freeContext(sws_ctx);
         LOG_WARN("sws_freeContext");
       }
-      sws_ctx=new_sws_ctx;
+      sws_ctx = new_sws_ctx;
 
       frame new_frame;
       new_frame.seq = frame_seq - 1;
