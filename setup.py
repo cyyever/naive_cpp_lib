@@ -26,9 +26,7 @@ class CMakeBuild(build_ext):
             extdir += os.path.sep
         os.makedirs(extdir, exist_ok=True)
         cmake_build_dir = os.getenv("cmake_build_dir")
-        for f in glob.glob(
-            os.path.join(cmake_build_dir, "**", "*_py*")
-        ):
+        for f in glob.glob(os.path.join(cmake_build_dir, "**", "*cyy_naive_cpp_extension*")):
             if not f.endswith(".so"):
                 continue
             shutil.copy(f, extdir)
