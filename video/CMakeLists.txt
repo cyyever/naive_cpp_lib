@@ -32,23 +32,25 @@ find_package(OpenCV REQUIRED COMPONENTS core)
 target_include_directories(cyy_naive_lib_video PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(cyy_naive_lib_video PRIVATE ${OpenCV_LIBRARIES})
 target_link_libraries(cyy_naive_lib_video PUBLIC opencv_core)
-target_link_libraries(cyy_naive_lib_video PRIVATE cyy_naive_lib_util cyy_naive_lib_cv)
+target_link_libraries(cyy_naive_lib_video PRIVATE cyy_naive_lib_util
+                                                  cyy_naive_lib_cv)
 
-if(BUILD_PYTHON_BINDING)
+option(BUILD_VIDEO_PYTHON_BINDING "Build video python bindings" ON)
+if(BUILD_VIDEO_PYTHON_BINDING)
   unset(Python3_FOUND)
   find_package(pybind11 CONFIG REQUIRED)
   file(GLOB PYTHON_BINDING_SOURCE
        ${CMAKE_CURRENT_SOURCE_DIR}/python_binding/*.cpp)
 
-  if(TARGET cyy_naive_cpp_extension)
-    target_sources(cyy_naive_cpp_extension PUBLIC ${PYTHON_BINDING_SOURCE})
+  if(TARGET cyy_naive_lib_util_py)
+    target_sources(cyy_naive_lib_util_py PUBLIC ${PYTHON_BINDING_SOURCE})
   else()
-    pybind11_add_module(cyy_naive_cpp_extension ${PYTHON_BINDING_SOURCE})
+    pybind11_add_module(cyy_naive_lib_util_py ${PYTHON_BINDING_SOURCE})
   endif()
-  target_link_directories(cyy_naive_cpp_extension PUBLIC ${pytorch_path}/lib)
+  target_link_directories(cyy_naive_lib_util_py PUBLIC ${pytorch_path}/lib)
   target_link_libraries(
-    cyy_naive_cpp_extension PUBLIC cyy_naive_lib_video ${PYTHON_LIBRARY}
-                                   ${OpenCV_LIBRARIES})
+    cyy_naive_lib_util_py PUBLIC cyy_naive_lib_video ${PYTHON_LIBRARY}
+                                 ${OpenCV_LIBRARIES})
 endif()
 
 add_subdirectory(test)

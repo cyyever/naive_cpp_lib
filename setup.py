@@ -27,7 +27,7 @@ class CMakeBuild(build_ext):
         os.makedirs(extdir, exist_ok=True)
         cmake_build_dir = os.getenv("cmake_build_dir")
         for f in glob.glob(
-            os.path.join(cmake_build_dir, "**", "*cyy_naive_cpp_extension*")
+            os.path.join(cmake_build_dir, "**", "*_py*")
         ):
             if not f.endswith(".so"):
                 continue
