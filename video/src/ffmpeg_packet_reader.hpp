@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "frame.hpp"
-#include "reader.hpp"
+#include "video_reader.hpp"
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>

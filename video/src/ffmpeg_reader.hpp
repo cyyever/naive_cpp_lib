@@ -13,7 +13,7 @@ extern "C" {
 }
 
 #include "frame.hpp"
-#include "reader.hpp"
+#include "video_reader.hpp"
 namespace cyy::naive_lib::video::ffmpeg {
   template <bool decode_frame> class reader_impl;
   //! \brief 封装ffmpeg对视频流的讀操作

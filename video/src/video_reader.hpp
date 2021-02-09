@@ -1,5 +1,5 @@
 /*!
- * \file reader.hpp
+ * \file video_reader.hpp
  *
  * \brief 视频讀取接口类
  * \author yuewu,cyy
