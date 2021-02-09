@@ -5,9 +5,9 @@
  * \author Yue Wu,cyy
  */
 
-#include "ffmpeg_reader.hpp"
+#include "ffmpeg_video_reader.hpp"
 
-#include "ffmpeg_reader_impl.hpp"
+#include "ffmpeg_video_reader_impl.hpp"
 
 namespace cyy::naive_lib::video::ffmpeg {
 

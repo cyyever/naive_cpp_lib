@@ -6,7 +6,7 @@
  */
 
 #include "ffmpeg_converter.hpp"
-#include "ffmpeg_reader_impl.hpp"
+#include "ffmpeg_video_reader_impl.hpp"
 #include "ffmpeg_writer_impl.hpp"
 
 namespace cyy::naive_lib::video::ffmpeg {

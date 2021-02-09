@@ -22,7 +22,7 @@ extern "C" {
 
 #include "data_structure/thread_safe_container.hpp"
 #include "ffmpeg_base.hpp"
-#include "ffmpeg_reader.hpp"
+#include "ffmpeg_video_reader.hpp"
 #include "log/log.hpp"
 #include "util/runnable.hpp"
 
