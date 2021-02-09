@@ -3,9 +3,23 @@
 #include "video/src/ffmpeg_video_reader.hpp"
 namespace py = pybind11;
 inline void define_video_extension(  py::module_ &m) {
+
+  py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())
+	.def_buffer([](cv::Mat &mat) -> py::buffer_info {
+		return py::buffer_info(
+            mat.ptr(),/* Pointer to buffer */
+            sizeof(uint8_t), /* Size of one scalar */
+			py::format_descriptor<uint8_t>::format(), /* Python struct-style format descriptor */
+			2,                                      /* Number of dimensions */
+			{ mat.rows, mat.cols },                 /* Buffer dimensions */
+			{ mat.step[0],             /* Strides (in bytes) for each index */
+            mat.step[1]}
+			);
+		});
+
   using ffmpeg_video_reader = cyy::naive_lib::video::ffmpeg::reader;
   auto sub_m = m.def_submodule("video", "Contains video decoding");
-  py::class_<ffmpeg_video_reader>(sub_m, "FFmpegVideoReader")
+  py::class_<ffmpeg_video_reader>(sub_m, "FFmpegVideoReader",py::buffer_protocol())
       .def(py::init<>())
       .def("open", &ffmpeg_video_reader::open)
       .def("close", &ffmpeg_video_reader::close)

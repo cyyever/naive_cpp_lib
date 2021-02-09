@@ -536,7 +536,8 @@ namespace cyy::naive_lib::video::ffmpeg {
       int dst_linesize[4]{};
 
       new_frame.content = cv::Mat(video_height, video_width, CV_8UC3);
-      dst_linesize[0] = new_frame.content.step;
+      dst_linesize[0] = new_frame.content.step[0];
+      /* dst_linesize[1] = new_frame.content.step[1]; */
 
       auto ret = av_image_fill_pointers(dst_data, pix_fmt, video_height,
                                         new_frame.content.data, dst_linesize);
