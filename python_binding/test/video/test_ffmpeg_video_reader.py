@@ -6,4 +6,8 @@ def test_ffpmeg_video_reader_dict():
     reader.open("test_images/1.jpg")
     print(reader.get_frame_rate())
     res = reader.next_frame()
-    print(res)
+    assert res[0] == 0
+    assert res[1].seq == 0
+    # print(dir(res[1].seq))
+    # print(res[1].content)
+    # # print(res)

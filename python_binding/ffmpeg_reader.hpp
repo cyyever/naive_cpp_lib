@@ -17,8 +17,15 @@ inline void define_video_extension(  py::module_ &m) {
 			);
 		});
 
-  using ffmpeg_video_reader = cyy::naive_lib::video::ffmpeg::reader;
   auto sub_m = m.def_submodule("video", "Contains video decoding");
+  using  frame= cyy::naive_lib::video::frame;
+  py::class_<frame>(sub_m, "Frame")
+    .def_readwrite("seq",&frame::seq)
+    .def_readwrite("content",&frame::content)
+    .def_readwrite("is_key",&frame::is_key);
+
+  using ffmpeg_video_reader = cyy::naive_lib::video::ffmpeg::reader;
+
   py::class_<ffmpeg_video_reader>(sub_m, "FFmpegVideoReader",py::buffer_protocol())
       .def(py::init<>())
       .def("open", &ffmpeg_video_reader::open)
