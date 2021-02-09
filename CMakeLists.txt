@@ -25,33 +25,42 @@ if(BUILD_VIDEO)
   list(APPEND submodule_names video)
 endif()
 
+option(BUILD_TORCH_PYTHON_BINDING "Build python bindings for torch" ON)
+option(BUILD_VIDEO_PYTHON_BINDING "Build python bindings for video" ON)
+
+if(BUILD_TORCH_PYTHON_BINDING OR BUILD_VIDEO_PYTHON_BINDING)
+  list(APPEND submodule_names python_binding)
+endif()
+
 option(WITH_ASAN "Build with address sanitizer" OFF)
 
 option(BUILD_FUZZING "Build fuzzing" OFF)
-option(BUILD_PYTHON_BINDING "Build python bindings" ON)
 
-include_directories(${CMAKE_SOURCE_DIR})
+# include_directories(${CMAKE_SOURCE_DIR})
 set(submodule_libs)
 
 foreach(submodule_name IN LISTS submodule_names)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${submodule_name})
+  set(lib_name cyy_naive_lib_${submodule_name})
+  if(submodule_name STREQUAL "python_binding")
+    set(lib_name cyy_naive_cpp_extension)
+  endif()
   if(WITH_ASAN)
     find_package(GoogleSanitizer)
-    target_link_libraries(cyy_naive_lib_${submodule_name}
-                          PUBLIC GoogleSanitizer::address)
+    target_link_libraries(${lib_name} PUBLIC GoogleSanitizer::address)
   endif()
   if(MSVC)
-    target_link_libraries(cyy_naive_lib_${submodule_name}
-                          INTERFACE Microsoft::STL)
+    target_link_libraries(${lib_name} INTERFACE Microsoft::STL)
   endif()
-  set_target_properties(cyy_naive_lib_${submodule_name}
-                        PROPERTIES EXPORT_NAME ${submodule_name})
   target_include_directories(
-    cyy_naive_lib_${submodule_name}
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-              $<INSTALL_INTERFACE:include/cyy/naive_lib>)
+    ${lib_name} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                          $<INSTALL_INTERFACE:include/cyy/naive_lib>)
 
-  list(APPEND submodule_libs cyy_naive_lib_${submodule_name})
+  if(submodule_name STREQUAL "python_binding")
+    continue()
+  endif()
+  set_target_properties(${lib_name} PROPERTIES EXPORT_NAME ${submodule_name})
+  list(APPEND submodule_libs ${lib_name})
 
   install(
     DIRECTORY ${submodule_name}/
