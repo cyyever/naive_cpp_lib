@@ -12,7 +12,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "../src/ffmpeg_reader.hpp"
+#include "../src/ffmpeg_video_reader.hpp"
 
 int main(int argc, char **argv) {
   if (argc != 2) {

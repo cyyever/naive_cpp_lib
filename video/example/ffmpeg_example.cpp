@@ -11,7 +11,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "../src/ffmpeg_reader.hpp"
+#include "../src/ffmpeg_video_reader.hpp"
 #include "../src/ffmpeg_writer.hpp"
 
 int main(int argc, char **argv) {
