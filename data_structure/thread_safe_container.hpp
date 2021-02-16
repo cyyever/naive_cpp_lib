@@ -33,12 +33,12 @@ namespace cyy::naive_lib {
     thread_safe_container() = default;
     ~thread_safe_container() = default;
 
-    thread_safe_container(const thread_safe_container &) = delete;
-    thread_safe_container &operator=(const thread_safe_container &) = delete;
+    thread_safe_container(const thread_safe_container &) =default;
+    thread_safe_container &operator=(const thread_safe_container &) =default;
 
-    thread_safe_container(thread_safe_container &&) noexcept = delete;
+    thread_safe_container(thread_safe_container &&) noexcept = default;
     thread_safe_container &
-    operator=(thread_safe_container &&) noexcept = delete;
+    operator=(thread_safe_container &&) noexcept = default;
 
   public:
     class const_reference final {
