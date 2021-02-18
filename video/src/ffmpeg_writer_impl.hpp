@@ -70,7 +70,7 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       if (video_width <= 0 || video_height <= 0) {
         LOG_ERROR("invalid video size [{} * {}]", video_width, video_height);
-        return -1;
+        return false;
       }
 
       encode_ctx->width = video_width;

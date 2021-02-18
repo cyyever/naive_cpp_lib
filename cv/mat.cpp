@@ -431,18 +431,18 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
       upload();
       if (location != storage_location::cpu) {
-        std::vector<cv::cuda::GpuMat> channels;
-        cv::cuda::split(gpu_mat, channels, get_thread_stream());
-        for (auto &channel : channels) {
+        std::vector<cv::cuda::GpuMat> output_channels;
+        cv::cuda::split(gpu_mat, output_channels, get_thread_stream());
+        for (auto &channel : output_channels) {
           res.emplace_back(channel);
         }
       } else
 #endif
       {
-        std::vector<cv::Mat> channels;
-        cv::split(cpu_mat, channels);
+        std::vector<cv::Mat> output_channels;
+        cv::split(cpu_mat, output_channels);
 
-        for (auto &channel : channels) {
+        for (auto &channel : output_channels) {
           res.emplace_back(channel);
         }
       }
@@ -635,7 +635,7 @@ namespace cyy::naive_lib::opencv {
   std::vector<mat> mat::split() const {
     std::vector<mat> res;
     for (auto &tmp : pimpl->split()) {
-      res.push_back(mat(std::move(tmp)));
+      res.emplace_back(std::move(tmp));
     }
     return res;
   }

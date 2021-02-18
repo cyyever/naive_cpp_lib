@@ -21,9 +21,9 @@ namespace cyy::naive_lib::opencv {
   public:
     mat();
 
-    mat(const cv::Mat &cv_mat);
+    explicit mat(const cv::Mat &cv_mat);
 #ifdef HAVE_GPU_MAT
-    mat(const cv::cuda::GpuMat &cv_gpu_mat);
+    explicit mat(const cv::cuda::GpuMat &cv_gpu_mat);
 #endif
 
     mat(const mat &);

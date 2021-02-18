@@ -81,7 +81,7 @@ namespace cyy::naive_lib::audio::ffmpeg {
 
     bool has_open() const { return opened; }
 
-    std::optional<std::chrono::milliseconds> get_duration() {
+    std::optional<std::chrono::milliseconds> get_duration() const {
       if (input_ctx->duration == AV_NOPTS_VALUE) {
         return {};
       }
