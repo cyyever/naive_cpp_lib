@@ -12,7 +12,6 @@ add_library(CyyNaiveLib::audio ALIAS cyy_naive_lib_audio)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::log)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::util)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::data_structure)
-target_link_libraries(cyy_naive_lib_video PUBLIC CyyNaiveLib::cv)
 target_link_libraries(cyy_naive_lib_audio PRIVATE CyyNaiveLib::util)
 target_link_libraries(cyy_naive_lib_audio PRIVATE CyyNaiveLib::data_structure)
 
@@ -31,12 +30,10 @@ target_link_libraries(
                              PkgConfig::libavformat PkgConfig::libavdevice)
 
 find_package(OpenCV REQUIRED COMPONENTS core)
-
-target_include_directories(cyy_naive_lib_video PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(cyy_naive_lib_video PUBLIC ${OpenCV_LIBRARIES})
+target_link_libraries(cyy_naive_lib_video PUBLIC CyyNaiveLib::cv)
 
 add_subdirectory(test)
 if(BUILD_FUZZING)
   add_subdirectory(fuzz_test)
 endif()
-add_subdirectory(example)
+# add_subdirectory(example)
