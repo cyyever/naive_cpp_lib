@@ -4,8 +4,9 @@
  * \brief 测试container相关函数
  * \author cyy
  */
-#include <doctest/doctest.h>
 #include <thread>
+
+#include <doctest/doctest.h>
 
 #include "torch/synced_sparse_tensor_dict.hpp"
 

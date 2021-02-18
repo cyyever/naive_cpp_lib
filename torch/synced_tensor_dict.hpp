@@ -1,6 +1,5 @@
 #pragma once
 #include <filesystem>
-#include <mutex>
 #include <optional>
 #include <tuple>
 #include <unordered_map>
@@ -10,7 +9,6 @@
 
 #include "data_structure/ordered_dict.hpp"
 #include "data_structure/thread_safe_container.hpp"
-#include "util/runnable.hpp"
 
 namespace cyy::naive_lib::pytorch {
   class synced_tensor_dict {

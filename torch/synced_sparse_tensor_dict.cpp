@@ -1,7 +1,8 @@
+#include "synced_sparse_tensor_dict.hpp"
+
 #include <stdexcept>
 
 #include "log/log.hpp"
-#include "synced_sparse_tensor_dict.hpp"
 
 namespace cyy::naive_lib::pytorch {
 

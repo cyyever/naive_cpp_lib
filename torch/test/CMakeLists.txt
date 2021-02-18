@@ -1,4 +1,5 @@
 find_package(doctest REQUIRED)
+find_package(Torch REQUIRED)
 
 file(GLOB test_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp)

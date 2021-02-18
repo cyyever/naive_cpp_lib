@@ -27,7 +27,7 @@ namespace cyy::naive_lib::strings {
     for (auto const &n : s) {
       if (n != c) {
         buff += n;
-      } else if (n == c && !buff.empty()) {
+      } else if (!buff.empty()) {
         v.push_back(buff);
         buff.clear();
       }
