@@ -1,7 +1,7 @@
 /*!
- * \file reader.cpp
+ * \file ffmpeg_audio_reader_impl.hpp
  *
- * \brief 封装ffmpeg对视频流的操作
+ * \brief 封装ffmpeg对音频流的操作
  * \author Yue Wu,cyy
  */
 

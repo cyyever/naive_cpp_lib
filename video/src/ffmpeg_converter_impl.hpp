@@ -4,7 +4,7 @@
  * \brief 封装ffmpeg对视频流的轉換
  * \author Yue Wu,cyy
  */
-
+#pragma once
 #include "ffmpeg_converter.hpp"
 #include "ffmpeg_video_reader_impl.hpp"
 #include "ffmpeg_writer_impl.hpp"

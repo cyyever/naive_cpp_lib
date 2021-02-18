@@ -22,12 +22,12 @@ if(BUILD_ALL)
   set(BUILD_TORCH_PYTHON_BINDING ON)
   set(BUILD_VIDEO_PYTHON_BINDING ON)
 endif()
+if(BUILD_VIDEO)
+  set(BUILD_CV ON)
+endif()
 
 if(BUILD_TORCH)
   list(APPEND submodule_names torch)
-endif()
-if(BUILD_VIDEO)
-  set(BUILD_CV ON)
 endif()
 if(BUILD_CV)
   list(APPEND submodule_names cv)
@@ -45,7 +45,6 @@ option(WITH_ASAN "Build with address sanitizer" OFF)
 
 option(BUILD_FUZZING "Build fuzzing" OFF)
 
-# include_directories(${CMAKE_SOURCE_DIR})
 set(submodule_libs)
 
 foreach(submodule_name IN LISTS submodule_names)

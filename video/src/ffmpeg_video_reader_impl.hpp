@@ -1,10 +1,11 @@
 /*!
- * \file reader.cpp
+ * \file ffmpeg_video_reader_impl.hpp
  *
  * \brief 封装ffmpeg对视频流的操作
  * \author Yue Wu,cyy
  */
 
+#pragma once
 #include <iostream>
 #include <memory>
 #include <mutex>

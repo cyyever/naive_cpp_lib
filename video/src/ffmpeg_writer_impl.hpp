@@ -1,11 +1,11 @@
 /*!
- * \file writer.cpp
+ * \file ffmpeg_writer_impl.hpp
  *
  * \brief
  * 封装ffmpeg对视频流的寫操作，參考ffmpeg源碼目錄下的doc/examples/muxing.c文件
  * \author Yue Wu,cyy
  */
-
+#pragma once
 #include <iostream>
 #include <memory>
 #include <mutex>

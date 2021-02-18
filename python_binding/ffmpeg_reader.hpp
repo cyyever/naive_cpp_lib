@@ -1,3 +1,10 @@
+/*!
+ * \file ffmpeg_read.hpp
+ *
+ * \author cyy
+ */
+
+#pragma once
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -8,7 +15,7 @@ inline void define_video_extension(py::module_ &m) {
   py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())
       .def_buffer([](cv::Mat &mat) -> py::buffer_info {
         return py::buffer_info(
-            mat.data,            /* Pointer to buffer */
+            mat.data,              /* Pointer to buffer */
             sizeof(unsigned char), /* Size of one scalar */
             py::format_descriptor<unsigned char>::format(), /* Python
                                                          struct-style format

@@ -1,3 +1,4 @@
+#pragma once
 #include <stdexcept>
 
 #include <torch/csrc/api/include/torch/serialize.h>
@@ -6,7 +7,8 @@
 #include "synced_tensor_dict.hpp"
 namespace cyy::naive_lib::pytorch {
 
-  class synced_tensor_dict::fetch_thread final : public cyy::naive_lib::runnable {
+  class synced_tensor_dict::fetch_thread final
+      : public cyy::naive_lib::runnable {
   public:
     fetch_thread(synced_tensor_dict &dict_) : dict(dict_) {}
     ~fetch_thread() override { stop(); }

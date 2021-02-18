@@ -12,8 +12,10 @@
 #include <stdexcept>
 
 #ifdef HAVE_GPU_MAT
-#include <cuda_buddy/pool.hpp>
 #include <cuda_runtime.h>
+#include <shared_mutex>
+
+#include <cuda_buddy/pool.hpp>
 #include <opencv2/core/core_c.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/cuda/common.hpp>
@@ -21,15 +23,13 @@
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudawarping.hpp>
 #include <opencv2/cudev/common.hpp>
-#include <shared_mutex>
 
 #include "hardware/cuda.hpp"
 #include "hardware/hardware.hpp"
 #endif
 #include "log/log.hpp"
-#include "util/file.hpp"
-
 #include "mat.hpp"
+#include "util/file.hpp"
 
 #ifdef HAVE_GPU_MAT
 namespace {

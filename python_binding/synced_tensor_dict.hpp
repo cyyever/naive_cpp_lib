@@ -1,3 +1,10 @@
+/*!
+ * \file synced_tensor_dict.hpp
+ *
+ * \author cyy
+ */
+
+#pragma once
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
 

@@ -1,5 +1,5 @@
 /*!
- * \file ffmpeg_writer.h
+ * \file ffmpeg_writer.hpp
  *
  * \brief 封装ffmpeg对视频流的讀操作
  * \author Yue Wu,cyy

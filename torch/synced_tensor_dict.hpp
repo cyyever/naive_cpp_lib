@@ -80,15 +80,17 @@ namespace cyy::naive_lib::pytorch {
     size_t in_memory_number{128};
     bool permanent{true};
 
-    using save_request_queue_type = cyy::naive_lib::thread_safe_linear_container<
-        std::list<std::optional<save_task>>>;
+    using save_request_queue_type =
+        cyy::naive_lib::thread_safe_linear_container<
+            std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
     size_t saving_thread_num{8};
     std::list<save_thread> saving_threads;
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
-    using fetch_request_queue_type = cyy::naive_lib::thread_safe_linear_container<
-        std::list<std::optional<fetch_task>>>;
+    using fetch_request_queue_type =
+        cyy::naive_lib::thread_safe_linear_container<
+            std::list<std::optional<fetch_task>>>;
     fetch_request_queue_type fetch_request_queue;
     size_t fetch_thread_num{8};
     std::list<fetch_thread> fetch_threads;

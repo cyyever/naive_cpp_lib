@@ -1,3 +1,4 @@
+#pragma once
 #include <chrono>
 #include <filesystem>
 #include <mutex>
@@ -8,7 +9,8 @@
 #include "util/time.hpp"
 namespace cyy::naive_lib::pytorch {
 
-  class synced_tensor_dict::save_thread final : public cyy::naive_lib::runnable {
+  class synced_tensor_dict::save_thread final
+      : public cyy::naive_lib::runnable {
   public:
     explicit save_thread(synced_tensor_dict &dict_, size_t id_)
         : dict(dict_), id(id_) {}
