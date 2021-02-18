@@ -635,7 +635,7 @@ namespace cyy::naive_lib::opencv {
   std::vector<mat> mat::split() const {
     std::vector<mat> res;
     for (auto &tmp : pimpl->split()) {
-      res.emplace_back(std::move(tmp));
+      res.emplace_back(mat(std::move(tmp)));
     }
     return res;
   }

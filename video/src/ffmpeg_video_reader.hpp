@@ -31,6 +31,11 @@ namespace cyy::naive_lib::video::ffmpeg {
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
     void close() override;
 
+    //! \brief 获取視頻寬
+    std::optional<int> get_video_width() const;
+    //! \brief 获取視頻高
+    std::optional<int> get_video_height() const;
+
     //! 設置播放的幀率，用於控制next_frame的速度
     void set_play_frame_rate(const std::array<size_t, 2> &frame_rate);
 
