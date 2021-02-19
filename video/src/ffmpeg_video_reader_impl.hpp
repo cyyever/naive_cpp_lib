@@ -9,7 +9,6 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <regex>
 #include <thread>
 
 extern "C" {
@@ -31,7 +30,8 @@ namespace cyy::naive_lib::video {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   template <bool decode_frame>
-  class ffmpeg_reader_impl : private cyy::naive_lib::runnable, ffmpeg_base {
+  class ffmpeg_reader_impl : private cyy::naive_lib::runnable,
+                             public ffmpeg_base {
   public:
     ffmpeg_reader_impl() = default;
 
@@ -40,9 +40,12 @@ namespace cyy::naive_lib::video {
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
-    bool open(const std::string &url) {
+    bool open(const std::string &url) override {
+      if (!ffmpeg_base::open(url)) {
+        LOG_ERROR("ffmpeg_base failed");
+        return false;
+      }
       int ret = 0;
-      this->close();
 
       input_ctx = avformat_alloc_context();
       if (!input_ctx) {
@@ -55,21 +58,6 @@ namespace cyy::naive_lib::video {
         input_ctx->interrupt_callback.opaque = this;
       }
 
-      std::regex scheme_regex("([a-z][a-z0-9+-.]+)://",
-                              std::regex_constants::ECMAScript |
-                                  std::regex_constants::icase);
-
-      std::smatch match;
-      if (std::regex_search(url, match, scheme_regex)) {
-        url_scheme = match[1].str();
-        for (auto &c : url_scheme) {
-          if (c >= 'A' && c <= 'Z') {
-            c = c - 'A' + 'a';
-          }
-        }
-      } else {
-        url_scheme = "file";
-      }
       if (is_live_stream()) {
         ret = av_dict_set(&opts, "rtsp_transport", "tcp", 0);
         if (ret != 0) {
@@ -181,8 +169,6 @@ namespace cyy::naive_lib::video {
 
       return true;
     }
-
-    bool has_open() const { return opened; }
 
     //! \brief 获取下一個AVPacket
     //! \return first>0 成功
@@ -300,7 +286,7 @@ namespace cyy::naive_lib::video {
     }
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() {
+    void close() override {
       stop();
       frame_buffer.reset();
       packet_buffer.reset();
@@ -333,10 +319,10 @@ namespace cyy::naive_lib::video {
       stream_index = -1;
       video_width = -1;
       video_height = -1;
-      opened = false;
       if (!is_live_stream()) {
         frame_seq = 0;
       }
+      ffmpeg_base::close();
       // frame_seq我們不清零
     }
 
@@ -565,15 +551,11 @@ namespace cyy::naive_lib::video {
       return {1, new_frame};
     }
 
-    bool is_live_stream() const { return url_scheme == "rtsp"; }
-
   private:
     int stream_index{-1};
     uint64_t frame_seq{0};
     int video_width{-1};
     int video_height{-1};
-    bool opened{false};
-    std::string url_scheme;
 
     std::optional<std::array<size_t, 2>> play_frame_rate;
     std::optional<std::chrono::time_point<std::chrono::steady_clock>>

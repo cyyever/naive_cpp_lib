@@ -38,7 +38,10 @@ namespace cyy::naive_lib::video {
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url, const std::string &format_name,
               int video_width, int video_height) {
-      this->close();
+      if (!ffmpeg_base::open(url)) {
+        LOG_ERROR("ffmpeg_base failed");
+        return false;
+      }
 
       int ret = 0;
       ret = avformat_alloc_output_context2(&output_ctx, nullptr,
@@ -263,7 +266,7 @@ namespace cyy::naive_lib::video {
     }
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() {
+    void close() override {
       if (output_ctx) {
         auto ret = av_write_trailer(output_ctx);
         if (ret != 0) {

@@ -33,10 +33,13 @@ namespace cyy::naive_lib::audio::ffmpeg {
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
-    bool open(const std::string &url) {
-      /* ::cyy::naive_lib::video::ffmpeg::init_library(); */
+    bool open(const std::string &url) override {
+      if (!ffmpeg_base::open(url)) {
+        LOG_ERROR("ffmpeg_base failed");
+        return false;
+      }
+
       int ret = 0;
-      this->close();
 
       input_ctx = avformat_alloc_context();
       if (!input_ctx) {
@@ -88,7 +91,7 @@ namespace cyy::naive_lib::audio::ffmpeg {
     }
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() {
+    void close() override {
 
       if (input_ctx) {
         avformat_close_input(&input_ctx);
@@ -99,8 +102,7 @@ namespace cyy::naive_lib::audio::ffmpeg {
         av_dict_free(&opts);
         opts = nullptr;
       }
-
-      opened = false;
+      ffmpeg_base::close();
     }
 
   private:
@@ -125,8 +127,6 @@ namespace cyy::naive_lib::audio::ffmpeg {
     }
 
   private:
-    bool opened{false};
-
     AVFormatContext *input_ctx{nullptr};
     AVDictionary *opts{nullptr};
   };
