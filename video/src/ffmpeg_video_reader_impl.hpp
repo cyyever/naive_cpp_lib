@@ -33,10 +33,6 @@ namespace cyy::naive_lib::video {
   class ffmpeg_reader_impl : private cyy::naive_lib::runnable,
                              public ffmpeg_base {
   public:
-    ffmpeg_reader_impl() = default;
-
-    ~ffmpeg_reader_impl() override { close(); }
-
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
@@ -278,7 +274,7 @@ namespace cyy::naive_lib::video {
 
     //! 設置播放的幀率，用於控制next_frame的速度
     void set_play_frame_rate(const std::array<size_t, 2> &frame_rate) {
-      if (play_frame_rate && play_frame_rate.value() == frame_rate) {
+      if (play_frame_rate == frame_rate) {
         return;
       }
       play_frame_rate = frame_rate;

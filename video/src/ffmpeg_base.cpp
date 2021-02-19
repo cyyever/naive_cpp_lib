@@ -20,7 +20,7 @@ namespace cyy::naive_lib::video {
   //! \brief 初始化ffmpeg库
   ffmpeg_base::ffmpeg_base() {
 
-    av_register_all();
+    /* av_register_all(); */
     avdevice_register_all();
     avformat_network_init();
 

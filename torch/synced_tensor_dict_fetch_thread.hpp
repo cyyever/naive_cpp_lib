@@ -1,10 +1,10 @@
 #pragma once
-#include <stdexcept>
 
 #include <torch/csrc/api/include/torch/serialize.h>
 
 #include "log/log.hpp"
 #include "synced_tensor_dict.hpp"
+#include "util/runnable.hpp"
 namespace cyy::naive_lib::pytorch {
 
   class synced_tensor_dict::fetch_thread final

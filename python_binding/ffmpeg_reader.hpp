@@ -33,7 +33,7 @@ inline void define_video_extension(py::module_ &m) {
       .def_readwrite("content", &frame::content)
       .def_readwrite("is_key", &frame::is_key);
 
-  using ffmpeg_video_reader = cyy::naive_lib::video::ffmpeg::reader;
+  using ffmpeg_video_reader = cyy::naive_lib::video::ffmpeg_reader;
 
   py::class_<ffmpeg_video_reader>(sub_m, "FFmpegVideoReader",
                                   py::buffer_protocol())

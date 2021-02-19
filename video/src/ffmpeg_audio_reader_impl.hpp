@@ -28,8 +28,6 @@ namespace cyy::naive_lib::audio::ffmpeg {
   public:
     reader_impl() = default;
 
-    ~reader_impl() { close(); }
-
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
@@ -47,7 +45,6 @@ namespace cyy::naive_lib::audio::ffmpeg {
         return false;
       }
 
-      auto url_scheme = get_url_scheme(url);
       AVInputFormat *iformat = nullptr;
       if (url_scheme == "file") {
         auto ext = std::filesystem::path(url).extension();
@@ -103,27 +100,6 @@ namespace cyy::naive_lib::audio::ffmpeg {
         opts = nullptr;
       }
       ffmpeg_base::close();
-    }
-
-  private:
-    static std::string get_url_scheme(const std::string &url) {
-      std::regex scheme_regex("([a-z][a-z0-9+-.]+)://",
-                              std::regex_constants::ECMAScript |
-                                  std::regex_constants::icase);
-
-      std::string url_scheme;
-      std::smatch match;
-      if (std::regex_search(url, match, scheme_regex)) {
-        url_scheme = match[1].str();
-        for (auto &c : url_scheme) {
-          if (c >= 'A' && c <= 'Z') {
-            c = c - 'A' + 'a';
-          }
-        }
-      } else {
-        url_scheme = "file";
-      }
-      return url_scheme;
     }
 
   private:

@@ -31,8 +31,6 @@ namespace cyy::naive_lib::video {
   public:
     ffmpeg_writer_impl() = default;
 
-    ~ffmpeg_writer_impl() { close(); }
-
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
@@ -179,11 +177,8 @@ namespace cyy::naive_lib::video {
         LOG_ERROR("av_packet_alloc failed");
         return false;
       }
-      opened = true;
       return true;
     }
-
-    bool has_open() const { return opened; }
 
     //! \brief 寫入一幀
     bool write_frame(const cv::Mat &frame_mat) {
@@ -304,7 +299,7 @@ namespace cyy::naive_lib::video {
         av_dict_free(&opts);
         opts = nullptr;
       }
-      opened = false;
+      ffmpeg_base::close();
     }
 
   protected:
@@ -336,6 +331,5 @@ namespace cyy::naive_lib::video {
     AVFrame *avframe{nullptr};
     AVPacket *packet{nullptr};
     int64_t next_pts{};
-    bool opened{false};
   };
 } // namespace cyy::naive_lib::video
