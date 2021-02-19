@@ -18,9 +18,9 @@ inline void define_torch_extension(py::module_ &m) {
   auto sub_m = m.def_submodule("data_structure", "Contains data structures");
   py::class_<synced_tensor_dict>(sub_m, "SyncedTensorDict")
       .def(py::init<const std::string &>())
-      .def("prefetch", (void (synced_tensor_dict::*)(
-                           const std::vector<std::string> &keys)) &
-                           synced_tensor_dict::prefetch)
+      .def("prefetch", static_cast<void (synced_tensor_dict::*)(
+                           const std::vector<std::string> &keys)>(
+                           &synced_tensor_dict::prefetch))
       .def("set_in_memory_number", &synced_tensor_dict::set_in_memory_number)
       .def("get_in_memory_number", &synced_tensor_dict::get_in_memory_number)
       .def("set_storage_dir", &synced_tensor_dict::set_storage_dir)
@@ -48,8 +48,8 @@ inline void define_torch_extension(py::module_ &m) {
       .def("clear", &synced_tensor_dict::clear)
       .def("flush_all", &synced_tensor_dict::flush_all,
            "flush all in-memory data to the disk", py::arg("wait") = true)
-      .def("flush",
-           (void (synced_tensor_dict::*)(size_t)) & synced_tensor_dict::flush);
+      .def("flush", static_cast<void (synced_tensor_dict::*)(size_t)>(
+                        &synced_tensor_dict::flush));
   py::class_<synced_sparse_tensor_dict, synced_tensor_dict>(
       sub_m, "SyncedSparseTensorDict")
       .def(py::init<torch::Tensor, torch::IntArrayRef, const std::string &>())

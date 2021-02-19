@@ -7,32 +7,29 @@
  */
 
 #ifdef _WIN32
+#include <Commctrl.h>
+#include <Wbemidl.h>
+#include <Ws2tcpip.h>
 #include <cassert>
 #include <cerrno>
+#include <comdef.h>
 #include <iostream>
+#include <iphlpapi.h>
 #include <locale>
 #include <memory>
 #include <mutex>
 #include <string>
-
 #include <winsock2.h>
-
-#include <Commctrl.h>
-#include <Wbemidl.h>
-#include <Ws2tcpip.h>
-#include <comdef.h>
-#include <iphlpapi.h>
 #include <ws2tcpip.h>
 
 #pragma comment(lib, "wbemuuid.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 #pragma comment(lib, "Ws2_32.lib")
 
+#include "hardware.hpp"
 #include "log/log.hpp"
 #include "util/error.hpp"
 #include "util/string.hpp"
-
-#include "hardware.hpp"
 
 namespace cyy::naive_lib::hardware {
 

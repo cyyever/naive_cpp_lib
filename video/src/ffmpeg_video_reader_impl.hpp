@@ -319,23 +319,15 @@ namespace cyy::naive_lib::video {
         frame_seq = 0;
       }
       ffmpeg_base::close();
-      // frame_seq我們不清零
     }
 
     void drop_non_key_frames() {
-      add_frame_filter("key_frame",
-                       [](auto const &frame) { return is_key_frame(frame); });
+      frame_filters.emplace(
+          "key_frame", [](auto const &frame) { return is_key_frame(frame); });
     }
+    void keep_key_frames() { frame_filters.erase("key_frame"); }
 
   private:
-    std::optional<AVCodecParameters *> get_codec_parameters() {
-      if (!has_open()) {
-        LOG_ERROR("video is not opened");
-        return {};
-      }
-      auto stream = input_ctx->streams[stream_index];
-      return {stream->codecpar};
-    }
     static int interrupt_cb(void *ctx) {
       if (reinterpret_cast<ffmpeg_reader_impl<decode_frame> *>(ctx)
               ->needs_stop()) {
@@ -346,11 +338,6 @@ namespace cyy::naive_lib::video {
     }
     static bool is_key_frame(const AVFrame &frame) {
       return ((frame.key_frame == 1) || (frame.pict_type == AV_PICTURE_TYPE_I));
-    }
-
-    void add_frame_filter(std::string_view name,
-                          std::function<bool(const AVFrame &)> filter) {
-      frame_filters.emplace(name, filter);
     }
 
     void run() override {
