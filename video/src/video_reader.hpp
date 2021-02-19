@@ -47,5 +47,9 @@ public:
   //	      first<0 失敗
   //	如果first<=0，返回空内容
   virtual std::pair<int, frame> next_frame() = 0;
+
+    //! \brief jump to a frame
+    virtual bool seek_frame(size_t frame_seq)=0;
+    
 };
 } // namespace cyy::naive_lib::video

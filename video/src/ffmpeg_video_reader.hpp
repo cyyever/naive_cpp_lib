@@ -53,6 +53,9 @@ namespace cyy::naive_lib::video {
     //	如果first<=0，返回空内容
     std::pair<int, frame> next_frame() override;
 
+    //! \brief jump to a frame
+    bool seek_frame(size_t frame_seq) override;
+
   private:
     std::unique_ptr<ffmpeg_reader_impl<true>> pimpl;
   };

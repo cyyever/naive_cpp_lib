@@ -19,8 +19,11 @@ TEST_CASE("ffmpeg_reader") {
   cyy::naive_lib::video::ffmpeg_reader reader;
   CHECK(reader.open(STR_HELPER(IN_URL)));
   CHECK(reader.get_frame_rate());
-  auto [res, _] = reader.next_frame();
+  auto [res, frame] = reader.next_frame();
   CHECK(res > 0);
-  res = reader.next_frame().first;
+  CHECK(frame.seq == 1);
+  CHECK(frame.is_key);
+  std::tie(res, frame) = reader.next_frame();
   CHECK(res == 0);
+  CHECK(reader.seek_frame(1));
 }

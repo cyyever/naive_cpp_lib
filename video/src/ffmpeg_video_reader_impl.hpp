@@ -166,6 +166,27 @@ namespace cyy::naive_lib::video {
       return true;
     }
 
+    //! \brief jump to a frame
+    bool seek_frame(size_t frame_seq) {
+      LOG_INFO("input_ctx is {},stream_index is {},pts is {}",(void*)input_ctx, stream_index, pts);
+      auto it = key_frame_timestamps.find(frame_seq);
+      if (it == key_frame_timestamps.end()) {
+        LOG_ERROR("can't find the past key frame {} record", frame_seq);
+        return false;
+      }
+      auto pts = it->second;
+
+      LOG_INFO("input_ctx is {},stream_index is {},pts is {}",(void*)input_ctx, stream_index, pts);
+      if (av_seek_frame(input_ctx, stream_index, pts, AVSEEK_FLAG_BACKWARD) <
+          0) {
+        LOG_ERROR("av_seek_frame failed");
+        return false;
+      }
+      next_frame_seq = frame_seq;
+      frame_buffer->clear();
+      return true;
+    }
+
     //! \brief 获取下一個AVPacket
     //! \return first>0 成功
     //	      first=0 EOF
@@ -316,7 +337,7 @@ namespace cyy::naive_lib::video {
       video_width = -1;
       video_height = -1;
       if (!is_live_stream()) {
-        frame_seq = 0;
+        next_frame_seq = 1;
       }
       ffmpeg_base::close();
     }
@@ -432,7 +453,6 @@ namespace cyy::naive_lib::video {
     //	      first<0 失敗
     //	如果first<=0，返回空内容
     std::pair<int, frame> get_frame() {
-
       //我们在循环中不断解码直到成功获取一帧或者失败
       const enum AVPixelFormat pix_fmt { AV_PIX_FMT_BGR24 };
 
@@ -453,7 +473,9 @@ namespace cyy::naive_lib::video {
       while (true) {
         auto ret = avcodec_receive_frame(decode_ctx, avframe);
         if (ret == 0) {
-          frame_seq++;
+          if (can_seek()) {
+            key_frame_timestamps.emplace(next_frame_seq, avframe->pts);
+          }
           bool pass_filters = true;
           for (auto const &[name, filter] : frame_filters) {
             if (!filter(*avframe)) {
@@ -464,7 +486,8 @@ namespace cyy::naive_lib::video {
           if (pass_filters) {
             break;
           }
-          LOG_DEBUG("ignore frame seq {}", frame_seq - 1);
+          LOG_DEBUG("ignore frame seq {}", next_frame_seq);
+          next_frame_seq++;
           continue;
         }
         if (ret != AVERROR(EAGAIN)) {
@@ -484,37 +507,28 @@ namespace cyy::naive_lib::video {
         }
       }
 
-      auto new_sws_ctx = sws_getCachedContext(
-          sws_ctx, avframe->width, avframe->height,
-          static_cast<enum AVPixelFormat>(avframe->format), video_width,
-          video_height, pix_fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
-
-      if (!new_sws_ctx) {
-        LOG_ERROR("sws_getContext failed");
-        return {-1, {}};
-      }
-      if (sws_ctx && sws_ctx != new_sws_ctx) {
-        sws_freeContext(sws_ctx);
-        LOG_WARN("sws_freeContext");
-      }
-      sws_ctx = new_sws_ctx;
-
       frame new_frame;
-      new_frame.seq = frame_seq - 1;
+      new_frame.seq = next_frame_seq;
+      next_frame_seq++;
       new_frame.is_key = is_key_frame(*avframe);
 
       uint8_t *dst_data[4]{};
       int dst_linesize[4]{};
 
       new_frame.content = cv::Mat(video_height, video_width, CV_8UC3);
-      dst_linesize[0] = new_frame.content.step[0];
-      /* dst_linesize[1] = new_frame.content.step[1]; */
+      dst_linesize[0] = static_cast<int>(new_frame.content.step[0]);
 
       auto ret = av_image_fill_pointers(dst_data, pix_fmt, video_height,
                                         new_frame.content.data, dst_linesize);
 
       if (ret <= 0) {
         LOG_ERROR("av_image_fill_pointers failed:{}", errno_to_str(ret));
+        return {-1, {}};
+      }
+
+      get_sws_ctx(pix_fmt);
+      if (!sws_ctx) {
+        LOG_ERROR("get_sws_ctx failed");
         return {-1, {}};
       }
 
@@ -534,9 +548,28 @@ namespace cyy::naive_lib::video {
       return {1, new_frame};
     }
 
+    bool can_seek() const { return !is_live_stream(); }
+
+    void get_sws_ctx(const enum AVPixelFormat pix_fmt) {
+      auto new_sws_ctx = sws_getCachedContext(
+          sws_ctx, avframe->width, avframe->height,
+          static_cast<enum AVPixelFormat>(avframe->format), video_width,
+          video_height, pix_fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
+
+      if (!new_sws_ctx) {
+        LOG_ERROR("sws_getContext failed");
+        return;
+      }
+      if (sws_ctx && sws_ctx != new_sws_ctx) {
+        sws_freeContext(sws_ctx);
+        LOG_WARN("sws_freeContext");
+      }
+      sws_ctx = new_sws_ctx;
+    }
+
   private:
     int stream_index{-1};
-    uint64_t frame_seq{0};
+    uint64_t next_frame_seq{0};
     int video_width{-1};
     int video_height{-1};
 
@@ -549,7 +582,10 @@ namespace cyy::naive_lib::video {
     AVFrame *avframe{nullptr};
     SwsContext *sws_ctx{nullptr};
 
-    std::map<std::string, std::function<bool(const AVFrame &)>> frame_filters;
+    std::unordered_map<size_t, int64_t> key_frame_timestamps;
+
+    std::unordered_map<std::string, std::function<bool(const AVFrame &)>>
+        frame_filters;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;
