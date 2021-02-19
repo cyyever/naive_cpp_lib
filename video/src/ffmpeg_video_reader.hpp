@@ -14,14 +14,14 @@ extern "C" {
 
 #include "frame.hpp"
 #include "video_reader.hpp"
-namespace cyy::naive_lib::video::ffmpeg {
-  template <bool decode_frame> class reader_impl;
+namespace cyy::naive_lib::video {
+  template <bool decode_frame> class ffmpeg_reader_impl;
   //! \brief 封装ffmpeg对视频流的讀操作
-  class reader final : public ::cyy::naive_lib::video::reader {
+  class ffmpeg_reader final : public reader {
   public:
-    reader();
+    ffmpeg_reader();
 
-    ~reader() override;
+    ~ffmpeg_reader() override;
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -53,6 +53,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     std::pair<int, frame> next_frame() override;
 
   private:
-    std::unique_ptr<reader_impl<true>> pimpl;
+    std::unique_ptr<ffmpeg_reader_impl<true>> pimpl;
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

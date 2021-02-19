@@ -24,14 +24,14 @@ extern "C" {
 #include "ffmpeg_writer.hpp"
 #include "log/log.hpp"
 
-namespace cyy::naive_lib::video::ffmpeg {
+namespace cyy::naive_lib::video {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class writer::impl : public ffmpeg_base {
+  class ffmpeg_writer_impl : public ffmpeg_base {
   public:
-    impl() = default;
+    ffmpeg_writer_impl() = default;
 
-    ~impl() { close(); }
+    ~ffmpeg_writer_impl() { close(); }
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -335,4 +335,4 @@ namespace cyy::naive_lib::video::ffmpeg {
     int64_t next_pts{};
     bool opened{false};
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

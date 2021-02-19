@@ -11,14 +11,15 @@
 #include "frame.hpp"
 #include "writer.hpp"
 
-namespace cyy::naive_lib::video::ffmpeg {
+namespace cyy::naive_lib::video {
 
+  class ffmpeg_writer_impl;
   //! \brief 封装ffmpeg对视频流的讀操作
-  class writer final : public ::cyy::naive_lib::video::writer {
+  class ffmpeg_writer final : public writer {
   public:
-    writer();
+    ffmpeg_writer();
 
-    ~writer() override;
+    ~ffmpeg_writer() override;
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -32,10 +33,7 @@ namespace cyy::naive_lib::video::ffmpeg {
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
     void close() override;
 
-  public:
-    class impl;
-
   private:
-    std::unique_ptr<impl> pimpl;
+    std::unique_ptr<ffmpeg_writer_impl> pimpl;
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

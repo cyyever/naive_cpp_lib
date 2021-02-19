@@ -14,6 +14,7 @@
 #ifdef HAVE_GPU_MAT
 #include <cuda_runtime.h>
 #include <shared_mutex>
+#include <utility>
 
 #include <cuda_buddy/pool.hpp>
 #include <opencv2/core/core_c.h>
@@ -139,8 +140,8 @@ namespace cyy::naive_lib::opencv {
   public:
     mat_impl() = default;
 
-    mat_impl(const cv::Mat &cv_mat)
-        : cpu_mat(cv_mat), location(storage_location::cpu) {}
+    mat_impl(cv::Mat cv_mat)
+        : cpu_mat(std::move(cv_mat)), location(storage_location::cpu) {}
 
 #ifdef HAVE_GPU_MAT
     mat_impl(const cv::cuda::GpuMat &cv_mat)

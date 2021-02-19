@@ -27,15 +27,15 @@ extern "C" {
 #include "log/log.hpp"
 #include "util/runnable.hpp"
 
-namespace cyy::naive_lib::video::ffmpeg {
+namespace cyy::naive_lib::video {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   template <bool decode_frame>
-  class reader_impl : private cyy::naive_lib::runnable, ffmpeg_base {
+  class ffmpeg_reader_impl : private cyy::naive_lib::runnable, ffmpeg_base {
   public:
-    reader_impl() = default;
+    ffmpeg_reader_impl() = default;
 
-    ~reader_impl() override { close(); }
+    ~ffmpeg_reader_impl() override { close(); }
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -334,6 +334,9 @@ namespace cyy::naive_lib::video::ffmpeg {
       video_width = -1;
       video_height = -1;
       opened = false;
+      if (!is_live_stream()) {
+        frame_seq = 0;
+      }
       // frame_seq我們不清零
     }
 
@@ -352,7 +355,8 @@ namespace cyy::naive_lib::video::ffmpeg {
       return {stream->codecpar};
     }
     static int interrupt_cb(void *ctx) {
-      if (reinterpret_cast<reader_impl<decode_frame> *>(ctx)->needs_stop()) {
+      if (reinterpret_cast<ffmpeg_reader_impl<decode_frame> *>(ctx)
+              ->needs_stop()) {
         LOG_WARN("stop decode thread");
         return 1;
       }
@@ -588,4 +592,4 @@ namespace cyy::naive_lib::video::ffmpeg {
         std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>
         packet_buffer;
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

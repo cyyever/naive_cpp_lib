@@ -14,16 +14,16 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 }
-namespace cyy::naive_lib::video::ffmpeg {
+namespace cyy::naive_lib::video {
 
-  template <bool decode_frame> class reader_impl;
+  template <bool decode_frame> class ffmpeg_reader_impl;
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class packet_reader final {
+  class ffmpeg_packet_reader final {
   public:
-    packet_reader();
+    ffmpeg_packet_reader();
 
-    ~packet_reader();
+    ~ffmpeg_packet_reader();
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -50,6 +50,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     std::pair<int, std::shared_ptr<AVPacket>> next_packet();
 
   private:
-    std::unique_ptr<reader_impl<false>> pimpl;
+    std::unique_ptr<ffmpeg_reader_impl<false>> pimpl;
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

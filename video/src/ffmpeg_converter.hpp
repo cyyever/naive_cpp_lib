@@ -10,14 +10,15 @@
 
 #include "converter.hpp"
 
-namespace cyy::naive_lib::video::ffmpeg {
+namespace cyy::naive_lib::video {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class converter final : public ::cyy::naive_lib::video::converter {
+  class ffmpeg_converter_impl;
+  class ffmpeg_converter final : public ::cyy::naive_lib::video::converter {
   public:
-    converter(const std::string &in_url, const std::string &out_url);
+    ffmpeg_converter(const std::string &in_url, const std::string &out_url);
 
-    ~converter() override;
+    ~ffmpeg_converter() override;
 
     //! \brief 轉換視頻
     //! \return >0 成功
@@ -26,7 +27,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     int convert() override;
 
   private:
-    class impl;
-    std::unique_ptr<impl> pimpl;
+    std::unique_ptr<ffmpeg_converter_impl> pimpl;
   };
-} // namespace cyy::naive_lib::video::ffmpeg
+} // namespace cyy::naive_lib::video

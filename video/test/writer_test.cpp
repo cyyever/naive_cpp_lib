@@ -21,7 +21,7 @@ TEST_CASE("ffmpeg_writer") {
   auto mat_opt = cyy::naive_lib::opencv::mat::load(STR_HELPER(IN_IMAGE));
   CHECK(mat_opt);
 
-  cyy::naive_lib::video::ffmpeg::writer writer;
+  cyy::naive_lib::video::ffmpeg_writer writer;
   CHECK(writer.open("a.flv", "flv", 320, 240));
   CHECK(writer.write_frame(mat_opt.value().get_cv_mat()));
 }
