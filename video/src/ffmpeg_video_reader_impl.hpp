@@ -31,9 +31,9 @@ namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
   template <bool decode_frame>
-  class reader_impl : private cyy::naive_lib::runnable {
+  class reader_impl : private cyy::naive_lib::runnable, ffmpeg_base {
   public:
-    reader_impl() {}
+    reader_impl() = default;
 
     ~reader_impl() override { close(); }
 
@@ -41,7 +41,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url) {
-      init_library();
       int ret = 0;
       this->close();
 
@@ -121,10 +120,10 @@ namespace cyy::naive_lib::video::ffmpeg {
 
       AVCodec *codec = nullptr;
 
-      //尝试用nvidia解码
-      if (video_stream->codecpar->codec_id == AV_CODEC_ID_H264) {
-        codec = avcodec_find_decoder_by_name("h264_cuvid");
-      }
+      /* //尝试用nvidia解码 */
+      /* if (video_stream->codecpar->codec_id == AV_CODEC_ID_H264) { */
+      /*   codec = avcodec_find_decoder_by_name("h264_cuvid"); */
+      /* } */
       if (!codec) {
         codec = avcodec_find_decoder(video_stream->codecpar->codec_id);
       }
@@ -300,15 +299,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       next_play_time.reset();
     }
 
-    std::optional<AVCodecParameters *> get_codec_parameters() {
-      if (!has_open()) {
-        LOG_ERROR("video is not opened");
-        return {};
-      }
-      auto stream = input_ctx->streams[stream_index];
-      return {stream->codecpar};
-    }
-
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
     void close() {
       stop();
@@ -353,6 +343,14 @@ namespace cyy::naive_lib::video::ffmpeg {
     }
 
   private:
+    std::optional<AVCodecParameters *> get_codec_parameters() {
+      if (!has_open()) {
+        LOG_ERROR("video is not opened");
+        return {};
+      }
+      auto stream = input_ctx->streams[stream_index];
+      return {stream->codecpar};
+    }
     static int interrupt_cb(void *ctx) {
       if (reinterpret_cast<reader_impl<decode_frame> *>(ctx)->needs_stop()) {
         LOG_WARN("stop decode thread");
@@ -361,7 +359,6 @@ namespace cyy::naive_lib::video::ffmpeg {
       return 0;
     }
     static bool is_key_frame(const AVFrame &frame) {
-
       return ((frame.key_frame == 1) || (frame.pict_type == AV_PICTURE_TYPE_I));
     }
 

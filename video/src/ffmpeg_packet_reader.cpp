@@ -22,10 +22,6 @@ namespace cyy::naive_lib::video::ffmpeg {
 
   void packet_reader::close() { pimpl->close(); }
 
-  std::optional<AVCodecParameters *> packet_reader::get_codec_parameters() {
-    return pimpl->get_codec_parameters();
-  }
-
   void
   packet_reader::set_play_frame_rate(const std::array<size_t, 2> &frame_rate) {
     return pimpl->set_play_frame_rate(frame_rate);

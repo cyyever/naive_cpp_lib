@@ -27,7 +27,7 @@ extern "C" {
 namespace cyy::naive_lib::video::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class writer::impl {
+  class writer::impl : public ffmpeg_base {
   public:
     impl() = default;
 
@@ -38,7 +38,6 @@ namespace cyy::naive_lib::video::ffmpeg {
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url, const std::string &format_name,
               int video_width, int video_height) {
-      init_library();
       this->close();
 
       int ret = 0;

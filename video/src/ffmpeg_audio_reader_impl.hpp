@@ -24,7 +24,7 @@ extern "C" {
 namespace cyy::naive_lib::audio::ffmpeg {
 
   //! \brief 封装ffmpeg对视频流的讀操作
-  class reader_impl final {
+  class reader_impl final : public video::ffmpeg_base {
   public:
     reader_impl() = default;
 
@@ -34,7 +34,7 @@ namespace cyy::naive_lib::audio::ffmpeg {
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url) {
-      ::cyy::naive_lib::video::ffmpeg::init_library();
+      /* ::cyy::naive_lib::video::ffmpeg::init_library(); */
       int ret = 0;
       this->close();
 
@@ -54,8 +54,7 @@ namespace cyy::naive_lib::audio::ffmpeg {
 
           ret = av_dict_set(&opts, "ar", "8000", 0);
           if (ret != 0) {
-            LOG_ERROR("av_dict_set failed:{}",
-                      ::cyy::naive_lib::video::ffmpeg::errno_to_str(ret));
+            LOG_ERROR("av_dict_set failed:{}", errno_to_str(ret));
             return false;
           }
         }
@@ -63,15 +62,13 @@ namespace cyy::naive_lib::audio::ffmpeg {
 
       ret = avformat_open_input(&input_ctx, url.c_str(), iformat, &opts);
       if (ret != 0) {
-        LOG_ERROR("avformat_open_input failed:{}",
-                  ::cyy::naive_lib::video::ffmpeg::errno_to_str(ret));
+        LOG_ERROR("avformat_open_input failed:{}", errno_to_str(ret));
         return false;
       }
 
       ret = avformat_find_stream_info(input_ctx, &opts);
       if (ret < 0) {
-        LOG_ERROR("avformat_find_stream_info failed:{}",
-                  ::cyy::naive_lib::video::ffmpeg::errno_to_str(ret));
+        LOG_ERROR("avformat_find_stream_info failed:{}", errno_to_str(ret));
         return false;
       }
 

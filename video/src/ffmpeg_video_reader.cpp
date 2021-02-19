@@ -19,11 +19,14 @@ namespace cyy::naive_lib::video::ffmpeg {
   //! \note 如果失败，返回空内容
   std::pair<int, frame> reader::next_frame() { return pimpl->next_frame(); }
 
-
-    //! \brief 获取視頻寬
-  std::optional<int> reader::get_video_width() const { return pimpl->get_video_width(); }
-    //! \brief 获取視頻高
-  std::optional<int> reader::get_video_height() const { return pimpl->get_video_height(); }
+  //! \brief 获取視頻寬
+  std::optional<int> reader::get_video_width() const {
+    return pimpl->get_video_width();
+  }
+  //! \brief 获取視頻高
+  std::optional<int> reader::get_video_height() const {
+    return pimpl->get_video_height();
+  }
 
   std::optional<std::array<size_t, 2>> reader::get_frame_rate() {
     return pimpl->get_frame_rate();
