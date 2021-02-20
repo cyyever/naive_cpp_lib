@@ -10,6 +10,7 @@ add_library(CyyNaiveLib::audio ALIAS cyy_naive_lib_audio)
 
 # dependency
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::log)
+target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::cv)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::util)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::data_structure)
 target_link_libraries(cyy_naive_lib_audio PRIVATE CyyNaiveLib::util)
