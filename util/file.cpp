@@ -9,27 +9,21 @@
 #define NOMINMAX
 #endif
 
-#include <algorithm>
-#include <cassert>
 #include <fcntl.h>
 #include <fstream>
 #include <stdexcept>
 
-#include <gsl/gsl>
 #ifndef WIN32
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
 
-#include <fcntl.h>
 #ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
 #endif
-
-#include <cassert>
 
 #include <gsl/gsl>
 
@@ -206,21 +200,24 @@ namespace cyy::naive_lib::io {
     if (fstat(fd, &sb) != 0) {
       close(fd);
       auto saved_errno = errno;
-      throw std::runtime_error(std::string("fstat failed: ") +
-                               ::cyy::naive_lib::util::errno_to_str(saved_errno));
+      throw std::runtime_error(
+          std::string("fstat failed: ") +
+          ::cyy::naive_lib::util::errno_to_str(saved_errno));
     }
     file_size = sb.st_size;
     addr = mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
     if (addr == MAP_FAILED) {
       auto saved_errno = errno;
-      throw std::runtime_error(std::string("mmap failed: ") +
-                               ::cyy::naive_lib::util::errno_to_str(saved_errno));
+      throw std::runtime_error(
+          std::string("mmap failed: ") +
+          ::cyy::naive_lib::util::errno_to_str(saved_errno));
     }
   }
   read_only_mmaped_file::~read_only_mmaped_file() {
     if (munmap(addr, file_size) != 0) {
-      LOG_ERROR("munmap failed:{}", ::cyy::naive_lib::util::errno_to_str(errno));
+      LOG_ERROR("munmap failed:{}",
+                ::cyy::naive_lib::util::errno_to_str(errno));
     }
   }
 #endif

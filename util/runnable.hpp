@@ -6,12 +6,10 @@
  */
 #pragma once
 
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#include <optional>
 #include <thread>
 
 namespace cyy::naive_lib {

@@ -7,10 +7,7 @@
  */
 
 #if defined(__linux__)
-#include <cassert>
 #include <cerrno>
-#include <cstdio>
-#include <cstring>
 #include <fstream>
 #include <ifaddrs.h>
 #include <pthread.h>

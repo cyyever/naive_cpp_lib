@@ -10,8 +10,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <atomic>
-#include <cerrno>
 #include <cstdlib>
 #include <mutex>
 

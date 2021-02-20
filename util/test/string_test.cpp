@@ -10,14 +10,6 @@
 
 #include "util/string.hpp"
 
-TEST_CASE("split") {
-  auto tmp = cyy::naive_lib::strings::split(" a b ", ' ');
-
-  CHECK(tmp.size() == 2);
-  CHECK(tmp[0] == "a");
-  CHECK(tmp[1] == "b");
-}
-
 #ifdef _WIN32
 TEST_CASE("UTF8_and_GBK_conv") {
   std::string test_str = "a123";

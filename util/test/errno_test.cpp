@@ -13,7 +13,8 @@
 #ifndef _WIN32
 TEST_CASE("errno_to_str") {
   for (int err = 0; err <= EACCES; err++) {
-    CHECK_EQ(cyy::naive_lib::util::errno_to_str(err), std::string(strerror(err)));
+    CHECK_EQ(cyy::naive_lib::util::errno_to_str(err),
+             std::string(strerror(err)));
   }
 }
 #endif

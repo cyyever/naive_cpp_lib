@@ -8,12 +8,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 namespace cyy::naive_lib::strings {
-
-  /// \brief split string by delimiter
-  std::vector<std::string> split(const std::string &s, char c);
 
 #ifdef _WIN32
   std::string GBK_to_UTF8(const std::string &str);

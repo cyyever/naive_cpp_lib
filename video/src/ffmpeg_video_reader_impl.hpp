@@ -168,7 +168,6 @@ namespace cyy::naive_lib::video {
 
     //! \brief jump to a frame
     bool seek_frame(size_t frame_seq) {
-      LOG_INFO("input_ctx is {},stream_index is {},pts is {}",(void*)input_ctx, stream_index, pts);
       auto it = key_frame_timestamps.find(frame_seq);
       if (it == key_frame_timestamps.end()) {
         LOG_ERROR("can't find the past key frame {} record", frame_seq);
@@ -176,14 +175,15 @@ namespace cyy::naive_lib::video {
       }
       auto pts = it->second;
 
-      LOG_INFO("input_ctx is {},stream_index is {},pts is {}",(void*)input_ctx, stream_index, pts);
       if (av_seek_frame(input_ctx, stream_index, pts, AVSEEK_FLAG_BACKWARD) <
           0) {
         LOG_ERROR("av_seek_frame failed");
         return false;
       }
       next_frame_seq = frame_seq;
-      frame_buffer->clear();
+      if(frame_buffer) {
+        frame_buffer->clear();
+      }
       return true;
     }
 
