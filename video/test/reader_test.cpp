@@ -1,12 +1,8 @@
 /*!
- * \file string_test.cpp
+ * \file reader_test.cpp
  *
- * \brief 测试string函数
- * \author cyy
- * \date 2017-01-17
+ * \brief
  */
-
-#include <iostream>
 
 #include <doctest/doctest.h>
 
@@ -18,12 +14,31 @@
 TEST_CASE("ffmpeg_reader") {
   cyy::naive_lib::video::ffmpeg_reader reader;
   CHECK(reader.open(STR_HELPER(IN_URL)));
+  /* CHECK(reader.open("/home/cyy/Downloads/Data_Grid.mp4")); */
   CHECK(reader.get_frame_rate());
-  auto [res, frame] = reader.next_frame();
-  CHECK(res > 0);
-  CHECK(frame.seq == 1);
-  CHECK(frame.is_key);
-  std::tie(res, frame) = reader.next_frame();
-  CHECK(res == 0);
-  CHECK(reader.seek_frame(1));
+  reader.drop_non_key_frames();
+  std::vector<cyy::naive_lib::video::frame> frames;
+  for (size_t i = 1; i < 10; i++) {
+    auto [res, frame] = reader.next_frame();
+    CHECK(res >= 0);
+    if (res == 0) {
+      break;
+    }
+    frames.emplace_back(std::move(frame));
+  }
+  CHECK(frames.size() == 9);
+
+  auto seek_res = reader.seek_frame(1);
+  CHECK(seek_res);
+  std::vector<cyy::naive_lib::video::frame> reread_frames;
+
+  for (size_t i = 1; i < 10; i++) {
+    auto [res, frame] = reader.next_frame();
+    CHECK(res >= 0);
+    if (res == 0) {
+      break;
+    }
+    reread_frames.emplace_back(std::move(frame));
+  }
+  CHECK(frames == reread_frames);
 }
