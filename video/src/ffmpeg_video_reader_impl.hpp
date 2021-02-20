@@ -175,13 +175,16 @@ namespace cyy::naive_lib::video {
       }
       auto pts = it->second;
 
-      if (av_seek_frame(input_ctx, stream_index, pts, AVSEEK_FLAG_BACKWARD) <
-          0) {
-        LOG_ERROR("av_seek_frame failed");
+      auto res =
+          av_seek_frame(input_ctx, stream_index, pts, AVSEEK_FLAG_BACKWARD);
+      if (res < 0) {
+        LOG_ERROR("av_seek_frame failed:{}", errno_to_str(res));
         return false;
       }
+      avformat_flush(input_ctx);
+      avcodec_flush_buffers(decode_ctx);
       next_frame_seq = frame_seq;
-      if(frame_buffer) {
+      if (frame_buffer) {
         frame_buffer->clear();
       }
       return true;
@@ -290,6 +293,7 @@ namespace cyy::naive_lib::video {
         LOG_ERROR("invalid frame rate [{} {}]", res.num, res.den);
         return {};
       }
+      LOG_DEBUG("frame rate [{} {}]", res.num, res.den);
       return {{static_cast<size_t>(res.num), static_cast<size_t>(res.den)}};
     }
 
@@ -543,8 +547,6 @@ namespace cyy::naive_lib::video {
         }
         return {-1, {}};
       }
-
-      LOG_DEBUG("new frame");
       return {1, new_frame};
     }
 
@@ -569,7 +571,7 @@ namespace cyy::naive_lib::video {
 
   private:
     int stream_index{-1};
-    uint64_t next_frame_seq{0};
+    uint64_t next_frame_seq{1};
     int video_width{-1};
     int video_height{-1};
 
