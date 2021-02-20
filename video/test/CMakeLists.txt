@@ -12,6 +12,8 @@ foreach(test_prog ${test_progs})
   target_compile_definitions(${test_prog}
                              PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
   target_compile_definitions(${test_prog}
+                             PRIVATE IN_IMAGE=${TEST_IMAGE_DIR}/1.jpg)
+  target_compile_definitions(${test_prog}
                              PRIVATE IN_URL=${TEST_VIDEO_DIR}/output.mp4)
   add_test_with_runtime_analysis(TARGET ${test_prog})
 endforeach()

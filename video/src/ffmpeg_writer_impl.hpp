@@ -177,6 +177,7 @@ namespace cyy::naive_lib::video {
         LOG_ERROR("av_packet_alloc failed");
         return false;
       }
+      opened=true;
       return true;
     }
 
