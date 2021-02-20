@@ -13,7 +13,6 @@ foreach(test_prog ${test_progs})
                              PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
   target_compile_definitions(${test_prog}
                              PRIVATE IN_URL=${TEST_VIDEO_DIR}/output.mp4)
-  set_target_properties(${test_prog} PROPERTIES ENVIRONMENT TEST_NO_CUDA=1)
   add_test_with_runtime_analysis(TARGET ${test_prog})
 endforeach()
 
