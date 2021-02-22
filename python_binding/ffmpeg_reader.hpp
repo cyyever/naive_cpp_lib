@@ -51,7 +51,7 @@ inline void define_video_extension(py::module_ &m) {
       .def("seek_frame", &ffmpeg_video_reader::seek_frame);
   using ffmpeg_video_writer = cyy::naive_lib::video::ffmpeg_writer;
 
-  py::class_<ffmpeg_video_writer>(sub_m, "FFmpegVideowriter",
+  py::class_<ffmpeg_video_writer>(sub_m, "FFmpegVideoWriter",
                                   py::buffer_protocol())
       .def(py::init<>())
       .def("open", &ffmpeg_video_writer::open)
