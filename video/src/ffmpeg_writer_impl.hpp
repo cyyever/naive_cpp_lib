@@ -177,7 +177,7 @@ namespace cyy::naive_lib::video {
         LOG_ERROR("av_packet_alloc failed");
         return false;
       }
-      opened=true;
+      opened = true;
       return true;
     }
 
@@ -194,14 +194,14 @@ namespace cyy::naive_lib::video {
       int ret = 0;
       cv::Mat resized_mat;
       if (frame_mat.type() == CV_8UC3) {
-        src_linesize[0] = frame_mat.step;
+        src_linesize[0] = static_cast<int>(frame_mat.step[0]);
         ret = av_image_fill_pointers(src_data, pix_fmt, frame_mat.rows,
                                      frame_mat.data, src_linesize);
       } else {
         resized_mat = ::cyy::naive_lib::opencv::mat(frame_mat)
                           .convert_to(CV_8UC3)
                           .get_cv_mat();
-        src_linesize[0] = resized_mat.step;
+        src_linesize[0] = static_cast<int>(resized_mat.step[0]);
         ret = av_image_fill_pointers(src_data, pix_fmt, resized_mat.rows,
                                      resized_mat.data, src_linesize);
       }
