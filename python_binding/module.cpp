@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #ifdef BUILD_VIDEO_PYTHON_BINDING
-#include "ffmpeg_reader.hpp"
+#include "ffmpeg.hpp"
 #endif
 #ifdef BUILD_TORCH_PYTHON_BINDING
 #include "synced_tensor_dict.hpp"

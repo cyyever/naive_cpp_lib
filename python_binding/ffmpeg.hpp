@@ -5,6 +5,7 @@
  */
 
 #pragma once
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -12,8 +13,21 @@
 #include "video/src/ffmpeg_writer.hpp"
 namespace py = pybind11;
 inline void define_video_extension(py::module_ &m) {
-
   py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())
+      .def(py::init([](py::buffer mat) {
+        /* Request a buffer descriptor from Python */
+        py::buffer_info info = mat.request();
+        std::vector<int> shape;
+        for (auto s : info.shape) {
+          shape.push_back(s);
+        }
+        std::vector<size_t> steps;
+        for (auto s : info.strides) {
+          steps.push_back(s);
+        }
+        // FIXME: CV_8UC3
+        return cv::Mat(shape, CV_8UC3, info.ptr, steps.data());
+      }))
       .def_buffer([](cv::Mat &mat) -> py::buffer_info {
         return py::buffer_info(
             mat.data,              /* Pointer to buffer */
@@ -25,21 +39,7 @@ inline void define_video_extension(py::module_ &m) {
             {mat.rows, mat.cols, mat.channels()}, /* Buffer dimensions */
             {mat.step[0], /* Strides (in bytes) for each index */
              mat.step[1], sizeof(unsigned char)});
-      })
-      .def(py::init([](py::buffer b) {
-        /* Request a buffer descriptor from Python */
-        py::buffer_info info = b.request();
-        std::vector<int> shape;
-        for (auto s : info.shape) {
-          shape.push_back(s);
-        }
-        std::vector<size_t> steps;
-        for (auto s : info.strides) {
-          steps.push_back(s);
-        }
-        //FIXME: CV_8UC3
-        return cv::Mat(shape, CV_8UC3, info.ptr, steps.data());
-      }));
+      });
 
   auto sub_m = m.def_submodule("video", "Contains video decoding");
   using frame = cyy::naive_lib::video::frame;
