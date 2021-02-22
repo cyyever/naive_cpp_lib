@@ -562,10 +562,6 @@ namespace cyy::naive_lib::video {
         LOG_ERROR("sws_getContext failed");
         return;
       }
-      if (sws_ctx && sws_ctx != new_sws_ctx) {
-        sws_freeContext(sws_ctx);
-        LOG_WARN("sws_freeContext");
-      }
       sws_ctx = new_sws_ctx;
     }
 
