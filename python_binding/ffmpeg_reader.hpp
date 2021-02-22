@@ -9,6 +9,7 @@
 #include <pybind11/stl.h>
 
 #include "video/src/ffmpeg_video_reader.hpp"
+#include "video/src/ffmpeg_writer.hpp"
 namespace py = pybind11;
 inline void define_video_extension(py::module_ &m) {
 
@@ -48,4 +49,12 @@ inline void define_video_extension(py::module_ &m) {
       .def("drop_non_key_frames", &ffmpeg_video_reader::drop_non_key_frames)
       .def("keep_non_key_frames", &ffmpeg_video_reader::keep_non_key_frames)
       .def("seek_frame", &ffmpeg_video_reader::seek_frame);
+  using ffmpeg_video_writer = cyy::naive_lib::video::ffmpeg_writer;
+
+  py::class_<ffmpeg_video_writer>(sub_m, "FFmpegVideowriter",
+                                  py::buffer_protocol())
+      .def(py::init<>())
+      .def("open", &ffmpeg_video_writer::open)
+      .def("close", &ffmpeg_video_writer::close)
+      .def("write_frame", &ffmpeg_video_writer::write_frame);
 }
