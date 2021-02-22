@@ -25,7 +25,21 @@ inline void define_video_extension(py::module_ &m) {
             {mat.rows, mat.cols, mat.channels()}, /* Buffer dimensions */
             {mat.step[0], /* Strides (in bytes) for each index */
              mat.step[1], sizeof(unsigned char)});
-      });
+      })
+      .def(py::init([](py::buffer b) {
+        /* Request a buffer descriptor from Python */
+        py::buffer_info info = b.request();
+        std::vector<int> shape;
+        for (auto s : info.shape) {
+          shape.push_back(s);
+        }
+        std::vector<size_t> steps;
+        for (auto s : info.strides) {
+          steps.push_back(s);
+        }
+        //FIXME: CV_8UC3
+        return cv::Mat(shape, CV_8UC3, info.ptr, steps.data());
+      }));
 
   auto sub_m = m.def_submodule("video", "Contains video decoding");
   using frame = cyy::naive_lib::video::frame;
