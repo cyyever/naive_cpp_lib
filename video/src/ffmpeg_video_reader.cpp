@@ -40,7 +40,7 @@ namespace cyy::naive_lib::video {
     pimpl->set_play_frame_rate(frame_rate);
   }
 
-  void ffmpeg_reader::keep_key_frames() { pimpl->keep_key_frames(); }
+  void ffmpeg_reader::keep_non_key_frames() { pimpl->keep_non_key_frames(); }
   void ffmpeg_reader::drop_non_key_frames() { pimpl->drop_non_key_frames(); }
   void ffmpeg_reader::close() { pimpl->close(); }
   bool ffmpeg_reader::seek_frame(size_t frame_seq) {

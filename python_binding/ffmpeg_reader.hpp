@@ -46,6 +46,6 @@ inline void define_video_extension(py::module_ &m) {
       .def("get_frame_rate", &ffmpeg_video_reader::get_frame_rate)
       .def("next_frame", &ffmpeg_video_reader::next_frame)
       .def("drop_non_key_frames", &ffmpeg_video_reader::drop_non_key_frames)
-      .def("keep_key_frames", &ffmpeg_video_reader::keep_key_frames)
+      .def("keep_non_key_frames", &ffmpeg_video_reader::keep_non_key_frames)
       .def("seek_frame", &ffmpeg_video_reader::seek_frame);
 }

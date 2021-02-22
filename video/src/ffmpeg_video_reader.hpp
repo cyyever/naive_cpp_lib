@@ -43,7 +43,7 @@ namespace cyy::naive_lib::video {
     //! \note 如果无法获取视频帧率，則返回空
     std::optional<std::array<size_t, 2>> get_frame_rate() override;
 
-    void keep_key_frames();
+    void keep_non_key_frames();
     void drop_non_key_frames();
 
     //! \brief 获取下一帧

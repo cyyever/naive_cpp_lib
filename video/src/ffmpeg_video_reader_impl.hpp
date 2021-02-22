@@ -350,7 +350,7 @@ namespace cyy::naive_lib::video {
       frame_filters.emplace(
           "key_frame", [](auto const &frame) { return is_key_frame(frame); });
     }
-    void keep_key_frames() { frame_filters.erase("key_frame"); }
+    void keep_non_key_frames() { frame_filters.erase("key_frame"); }
 
   private:
     static int interrupt_cb(void *ctx) {
