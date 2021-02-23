@@ -18,9 +18,12 @@ inline void define_video_extension(py::module_ &m) {
         /* Request a buffer descriptor from Python */
         py::buffer_info info = mat.request();
         // FIXME: CV_8UC3
-        std::vector<int> shape{(int)info.shape[0], (int)info.shape[1]};
-        std::vector<size_t> steps{info.strides[0]};
-        return cv::Mat(shape, CV_8UC3, info.ptr,steps.data());
+        std::vector<int> shape{static_cast<int>(info.shape[0]),
+                               static_cast<int>(info.shape[1])};
+        std::vector<size_t> steps{static_cast<size_t>(
+
+            info.strides[0])};
+        return cv::Mat(shape, CV_8UC3, info.ptr, steps.data());
       }))
       .def_buffer([](cv::Mat &mat) -> py::buffer_info {
         return py::buffer_info(

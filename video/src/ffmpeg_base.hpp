@@ -23,7 +23,7 @@ namespace cyy::naive_lib::video {
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
-    virtual bool open(const std::string &url);
+    bool open(const std::string &url);
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
     virtual void close() { opened = false; }
     std::string errno_to_str(int err);
