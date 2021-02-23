@@ -21,7 +21,8 @@ namespace cyy::naive_lib::task {
   void base_processor::init_thread_context() {
     /*
     cyy::naive_lib::hardware::alloc_cpu(
-        this_thd, cyy::naive_lib::hardware::round_robin_allocator::next_cpu_no());
+        this_thd,
+    cyy::naive_lib::hardware::round_robin_allocator::next_cpu_no());
     */
   }
 

@@ -21,7 +21,7 @@ extern "C" {
 
 #include "cv/mat.hpp"
 #include "ffmpeg_base.hpp"
-#include "ffmpeg_writer.hpp"
+#include "ffmpeg_video_writer.hpp"
 #include "log/log.hpp"
 
 namespace cyy::naive_lib::video {

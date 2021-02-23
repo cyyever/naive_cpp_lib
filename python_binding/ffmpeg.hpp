@@ -10,7 +10,7 @@
 #include <pybind11/stl.h>
 
 #include "video/src/ffmpeg_video_reader.hpp"
-#include "video/src/ffmpeg_writer.hpp"
+#include "video/src/ffmpeg_video_writer.hpp"
 namespace py = pybind11;
 inline void define_video_extension(py::module_ &m) {
   py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())

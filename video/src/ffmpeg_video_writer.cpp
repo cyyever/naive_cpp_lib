@@ -6,9 +6,9 @@
  * \author Yue Wu,cyy
  */
 
-#include "ffmpeg_writer.hpp"
+#include "ffmpeg_video_writer.hpp"
 
-#include "ffmpeg_writer_impl.hpp"
+#include "ffmpeg_video_writer_impl.hpp"
 
 namespace cyy::naive_lib::video {
 
