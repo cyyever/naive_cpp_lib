@@ -18,7 +18,7 @@
 
 TEST_CASE("ffmpeg_writer") {
 
-  auto mat_opt = cyy::naive_lib::opencv::mat::load(STR_HELPER(  IN_IMAGE));
+  auto mat_opt = cyy::naive_lib::opencv::mat::load(STR_HELPER(IN_IMAGE));
   CHECK(mat_opt);
 
   cyy::naive_lib::video::ffmpeg_writer writer;
