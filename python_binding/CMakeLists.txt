@@ -1,7 +1,6 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(cyy_naive_cpp_extension ${SOURCE})
-target_link_libraries(cyy_naive_cpp_extension PUBLIC ${PYTHON_LIBRARY})
 if(BUILD_TORCH_PYTHON_BINDING)
   find_package(Torch REQUIRED)
   target_link_directories(cyy_naive_cpp_extension PUBLIC ${pytorch_path}/lib)
