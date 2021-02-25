@@ -1,7 +1,5 @@
-
 #include "synced_tensor_dict.hpp"
 
-#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <stdexcept>

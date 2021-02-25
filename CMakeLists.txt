@@ -1,8 +1,6 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.19)
 
 project(CyyNaiveLib LANGUAGES CXX)
-
-include(cmake/all.cmake)
 
 set(submodule_names log util hardware data_structure task)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -27,6 +25,7 @@ if(BUILD_VIDEO)
 endif()
 
 if(BUILD_TORCH)
+  enable_language(CUDA)
   list(APPEND submodule_names torch)
 endif()
 if(BUILD_CV)
@@ -44,6 +43,8 @@ endif()
 option(WITH_ASAN "Build with address sanitizer" OFF)
 
 option(BUILD_FUZZING "Build fuzzing" OFF)
+
+include(cmake/all.cmake)
 
 set(submodule_libs)
 
