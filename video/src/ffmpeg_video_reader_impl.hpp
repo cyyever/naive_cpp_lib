@@ -353,7 +353,7 @@ namespace cyy::naive_lib::video {
     }
     void add_named_filter(std::string name,
                           std::function<bool(uint64_t)> filter) {
-      frame_filters.emplace(name, [&filter](uint64_t seq, auto const &frame) {
+      frame_filters.emplace(name, [filter](uint64_t seq, auto const &frame) {
         return filter(seq);
       });
     }
