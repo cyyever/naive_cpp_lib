@@ -48,6 +48,7 @@ namespace cyy::naive_lib::video {
     void add_named_filter(std::string_view name,
                           std::function<bool(size_t)> filter);
 
+    void remove_named_filter(std::string_view name);
     void keep_non_key_frames();
     void drop_non_key_frames();
 
