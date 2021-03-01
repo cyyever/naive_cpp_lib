@@ -58,6 +58,7 @@ inline void define_video_extension(py::module_ &m) {
       .def("get_frame_rate", &ffmpeg_video_reader::get_frame_rate)
       .def("next_frame", &ffmpeg_video_reader::next_frame)
       .def("drop_non_key_frames", &ffmpeg_video_reader::drop_non_key_frames)
+      .def("add_named_filter", &ffmpeg_video_reader::add_named_filter)
       .def("keep_non_key_frames", &ffmpeg_video_reader::keep_non_key_frames)
       .def("seek_frame", &ffmpeg_video_reader::seek_frame);
   using ffmpeg_video_writer = cyy::naive_lib::video::ffmpeg_writer;

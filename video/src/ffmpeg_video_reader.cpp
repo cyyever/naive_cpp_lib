@@ -42,6 +42,8 @@ namespace cyy::naive_lib::video {
 
   void ffmpeg_reader::keep_non_key_frames() { pimpl->keep_non_key_frames(); }
   void ffmpeg_reader::drop_non_key_frames() { pimpl->drop_non_key_frames(); }
+  void ffmpeg_reader::add_named_filter(std::string_view name,
+                                       std::function<bool(size_t)> filter) {}
   void ffmpeg_reader::close() { pimpl->close(); }
   bool ffmpeg_reader::seek_frame(size_t frame_seq) {
     return pimpl->seek_frame(frame_seq);
