@@ -347,13 +347,15 @@ namespace cyy::naive_lib::video {
     }
 
     void drop_non_key_frames() {
-      frame_filters.emplace(
-          "key_frame", [](auto const &frame) { return is_key_frame(frame); });
+      frame_filters.emplace("key_frame", [](uint64_t seq, auto const &frame) {
+        return is_key_frame(frame);
+      });
     }
     void add_named_filter(std::string_view name,
                           std::function<bool(uint64_t)> filter) {
-      frame_filters.emplace(
-          name, [&filter](auto const &frame) { return filter(frame.seq); });
+      frame_filters.emplace(name, [&filter](uint64_t seq, auto const &frame) {
+        return filter(seq);
+      });
     }
     void remove_named_filter(std::string_view name) {
       frame_filters.erase(std::string(name));
@@ -491,7 +493,7 @@ namespace cyy::naive_lib::video {
           }
           bool pass_filters = true;
           for (auto const &[name, filter] : frame_filters) {
-            if (!filter(*avframe)) {
+            if (!filter(next_frame_seq, *avframe)) {
               pass_filters = false;
               break;
             }
@@ -591,7 +593,8 @@ namespace cyy::naive_lib::video {
 
     std::unordered_map<size_t, int64_t> key_frame_timestamps;
 
-    std::unordered_map<std::string, std::function<bool(const AVFrame &)>>
+    std::unordered_map<std::string,
+                       std::function<bool(uint64_t, const AVFrame &)>>
         frame_filters;
     std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
