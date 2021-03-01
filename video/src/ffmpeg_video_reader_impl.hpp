@@ -351,14 +351,14 @@ namespace cyy::naive_lib::video {
         return is_key_frame(frame);
       });
     }
-    void add_named_filter(std::string_view name,
+    void add_named_filter(std::string name,
                           std::function<bool(uint64_t)> filter) {
       frame_filters.emplace(name, [&filter](uint64_t seq, auto const &frame) {
         return filter(seq);
       });
     }
-    void remove_named_filter(std::string_view name) {
-      frame_filters.erase(std::string(name));
+    void remove_named_filter(std::string name) {
+      frame_filters.erase(name);
     }
 
     void keep_non_key_frames() { remove_named_filter("key_frame"); }

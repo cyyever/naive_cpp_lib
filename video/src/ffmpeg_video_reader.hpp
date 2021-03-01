@@ -8,7 +8,6 @@
 
 #include <functional>
 #include <memory>
-#include <string_view>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -45,10 +44,10 @@ namespace cyy::naive_lib::video {
     //! \note 如果无法获取视频帧率，則返回空
     std::optional<std::array<size_t, 2>> get_frame_rate() override;
 
-    void add_named_filter(std::string_view name,
+    void add_named_filter(std::string name,
                           std::function<bool(size_t)> filter);
 
-    void remove_named_filter(std::string_view name);
+    void remove_named_filter(std::string name);
     void keep_non_key_frames();
     void drop_non_key_frames();
 
