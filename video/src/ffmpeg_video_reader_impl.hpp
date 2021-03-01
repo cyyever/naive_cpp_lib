@@ -355,8 +355,8 @@ namespace cyy::naive_lib::video {
       frame_filters.emplace(
           name, [&filter](auto const &frame) { return filter(frame.seq); });
     }
-    void remove_named_filter(std::string_view name, ) {
-      frame_filters.erase(name);
+    void remove_named_filter(std::string_view name) {
+      frame_filters.erase(std::string(name));
     }
 
     void keep_non_key_frames() { remove_named_filter("key_frame"); }
