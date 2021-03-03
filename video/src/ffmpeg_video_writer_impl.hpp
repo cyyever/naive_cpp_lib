@@ -6,9 +6,7 @@
  * \author Yue Wu,cyy
  */
 #pragma once
-#include <iostream>
 #include <memory>
-#include <mutex>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -21,7 +19,6 @@ extern "C" {
 
 #include "cv/mat.hpp"
 #include "ffmpeg_base.hpp"
-#include "ffmpeg_video_writer.hpp"
 #include "log/log.hpp"
 
 namespace cyy::naive_lib::video {
