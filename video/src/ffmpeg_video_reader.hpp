@@ -44,8 +44,7 @@ namespace cyy::naive_lib::video {
     //! \note 如果无法获取视频帧率，則返回空
     std::optional<std::array<size_t, 2>> get_frame_rate() override;
 
-    void add_named_filter(std::string name,
-                          std::function<bool(size_t)> filter);
+    void add_named_filter(std::string name, std::function<bool(size_t)> filter);
 
     void remove_named_filter(std::string name);
     void keep_non_key_frames();

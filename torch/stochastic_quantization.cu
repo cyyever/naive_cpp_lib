@@ -2,6 +2,7 @@
 
 #include <ATen/TensorIterator.h>
 #include <ATen/native/cuda/Loops.cuh>
+#include <ATen/native/cpu/Loops.h>
 
 #include "stochastic_quantization.hpp"
 
@@ -17,12 +18,22 @@ namespace cyy::naive_lib::pytorch {
                     .add_input(src)
                     .build();
 
-    at::native::gpu_kernel(
-        iter, [=] GPU_LAMBDA(const scalar_t src_val) -> float {
-          uint64_t slot = static_cast<uint64_t>(static_cast<float>(src_val) *
-                                                quantization_level);
-          return slot;
-        });
+    if (src.is_cuda()) {
+      at::native::gpu_kernel(
+          iter, [quantization_level] GPU_LAMBDA(const scalar_t src_val) -> float {
+            uint64_t slot = static_cast<uint64_t>(static_cast<float>(src_val) *
+                                                  quantization_level);
+            return slot;
+          });
+    } else {
+      at::native::cpu_kernel(
+          iter, [quantization_level](const scalar_t src_val) -> float {
+            uint64_t slot = static_cast<uint64_t>(static_cast<float>(src_val) *
+                                                  quantization_level);
+            return slot;
+          });
+
+    }
   }
 
   torch::Tensor stochastic_quantization(torch::Tensor normalized_abs_tensor,
