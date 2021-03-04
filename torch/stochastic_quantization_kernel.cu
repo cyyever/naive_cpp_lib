@@ -3,7 +3,6 @@
 
 namespace cyy::naive_lib::pytorch {
 
-  /* template <typename scalar_t> */
   void stochastic_quantization_gpu(at::Tensor &slot_ret, const at::Tensor &src,
                                    uint64_t quantization_level) {
     auto iter = at::TensorIteratorConfig()
