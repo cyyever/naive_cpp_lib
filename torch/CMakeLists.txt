@@ -1,5 +1,8 @@
-file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-     ${CMAKE_CURRENT_SOURCE_DIR}/*.cu)
+file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+if(HAS_CUDA)
+  file(GLOB CUDA_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cu)
+  list(APPEND SOURCE ${CUDA_SOURCE})
+endif()
 
 find_package(Python3 REQUIRED)
 if(Python3_FOUND)
@@ -27,7 +30,9 @@ target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::hardware)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::data_structure)
 target_link_directories(cyy_naive_lib_torch PUBLIC ${pytorch_path}/lib)
 target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES} torch_cuda)
-target_compile_definitions(cyy_naive_lib_torch PRIVATE __CUDA_NO_HALF_OPERATORS__ CUDA_HAS_FP16=1 __CUDA_NO_HALF_CONVERSIONS__)
+target_compile_definitions(
+  cyy_naive_lib_torch PRIVATE __CUDA_NO_HALF_OPERATORS__ CUDA_HAS_FP16=1
+                              __CUDA_NO_HALF_CONVERSIONS__)
 
 add_subdirectory(test)
 if(BUILD_FUZZING)

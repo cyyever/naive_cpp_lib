@@ -1,8 +1,6 @@
 #include "stochastic_quantization.hpp"
 
 #include <stdexcept>
-/* #include "stochastic_quantization_kernel.hpp" */
-/* #include "stochastic_quantization_kernel.cuh" */
 
 namespace cyy::naive_lib::pytorch {
 
@@ -13,15 +11,15 @@ namespace cyy::naive_lib::pytorch {
     }
     torch::Tensor slot_ret = normalized_abs_tensor.clone();
     if (normalized_abs_tensor.is_cuda()) {
+#ifdef HAS_CUDA
       stochastic_quantization_gpu(slot_ret, normalized_abs_tensor,
                                   quantization_level);
-
+#else
+      throw std::runtime_error("No CUDA support");
+#endif
     } else {
       stochastic_quantization_cpu(slot_ret, normalized_abs_tensor,
                                   quantization_level);
-      /* stochastic_quantization_cpu_kernel<float>(slot_ret,
-       * normalized_abs_tensor, */
-      /*     quantization_level); */
     }
     return slot_ret;
   }
