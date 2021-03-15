@@ -178,12 +178,12 @@ namespace cyy::naive_lib::opencv {
         cv::cuda::add(gpu_mat, scalar, gpu_mat, cv::noArray(), -1,
                       get_stream());
         location = storage_location::gpu;
-      } else
-#endif
-      {
-        cv::add(cpu_mat, scalar, cpu_mat, cv::noArray(), -1);
-        location = storage_location::cpu;
+        return *this;
       }
+#endif
+      download();
+      cv::add(cpu_mat, scalar, cpu_mat, cv::noArray(), -1);
+      location = storage_location::cpu;
       return *this;
     }
 
@@ -284,6 +284,8 @@ namespace cyy::naive_lib::opencv {
     }
 
     mat_impl &operator/=(float scalar) {
+      _divide(scalar, true);
+      return *this;
 #ifdef HAVE_GPU_MAT
       upload();
       if (location != storage_location::cpu) {
@@ -414,16 +416,17 @@ namespace cyy::naive_lib::opencv {
     }
 
     mat_impl transpose() const {
-      /*
 #ifdef HAVE_GPU_MAT
-      upload();
-      if (location != storage_location::cpu) {
-        cv::cuda::GpuMat tmp;
-        cv::cuda::transpose(gpu_mat, tmp, get_stream());
-        return {tmp};
+      if (elem_size() == 1 || elem_size() == 4 || elem_size() == 8) {
+
+        upload();
+        if (location != storage_location::cpu) {
+          cv::cuda::GpuMat tmp;
+          cv::cuda::transpose(gpu_mat, tmp, get_stream());
+          return {tmp};
+        }
       }
 #endif
-*/
       cv::Mat tmp;
       cv::transpose(cpu_mat, tmp);
       return {tmp};
@@ -548,6 +551,55 @@ namespace cyy::naive_lib::opencv {
     }
 
   private:
+    template <typename SRC2_TYPE>
+    mat_impl _divide(SRC2_TYPE src2, bool self_as_result) {
+      auto result_mat = get_result_mat(self_as_result);
+#ifdef HAVE_GPU_MAT
+      upload();
+      result_mat.upload();
+      if constexpr (std::is_same_v<SRC2_TYPE, float>) {
+        cv::Scalar scalar(src2);
+        if (channels() == 3) {
+          scalar = cv::Scalar(src2, src2, src2);
+        }
+        if (location != storage_location::cpu) {
+          cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
+                           get_stream());
+          result_mat.location = storage_location::gpu;
+          return result_mat;
+        }
+      } else {
+        if (location != storage_location::cpu) {
+          cv::cuda::divide(gpu_mat, src2, result_mat.gpu_mat, 1, -1,
+                           get_stream());
+          result_mat.location = storage_location::gpu;
+          return result_mat;
+        }
+      }
+#endif
+      download();
+      result_mat.download();
+      if constexpr (std::is_same_v<SRC2_TYPE, float>) {
+        cv::Scalar scalar(src2);
+        if (channels() == 3) {
+          scalar = cv::Scalar(src2, src2, src2);
+        }
+        cv::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1);
+        result_mat.location = storage_location::gpu;
+        return result_mat;
+      }
+      cv::divide(gpu_mat, src2, result_mat.gpu_mat, 1, -1);
+      result_mat.location = storage_location::gpu;
+      return result_mat;
+    }
+    mat_impl get_result_mat(bool self_as_result) {
+      if (self_as_result) {
+        return *this;
+      }
+      mat_impl tmp_impl;
+      tmp_impl.can_use_gpu = this->can_use_gpu;
+      return tmp_impl;
+    }
     //! \brief 同步mat_impl到GPU
     void upload() const {
       if (!can_use_gpu) {
@@ -604,7 +656,7 @@ namespace cyy::naive_lib::opencv {
     static inline std::shared_ptr<cv::cuda::Stream> stream_ptr;
     static inline std::mutex stream_mutex;
 #endif
-    mutable storage_location location{storage_location::synced};
+    mutable storage_location location{storage_location::cpu};
   };
 
   mat::mat() : pimpl{std::make_unique<mat_impl>()} {}

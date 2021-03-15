@@ -128,5 +128,6 @@ TEST_CASE("mat") {
       CHECK_EQ(image_mat2.width(), 10);
       CHECK_EQ(image_mat2.height(), 20);
     }
+    SUBCASE("MSSIM") { image_mat.MSSIM(image_mat); }
   }
 }

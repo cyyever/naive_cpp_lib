@@ -82,6 +82,7 @@ namespace cyy::naive_lib::opencv {
     mat convert_to(int rtype, double alpha = 1, double beta = 0) const;
 
     void cvt_color(int code);
+    cv::Scalar MSSIM(const mat &i2) const;
 
     mat copy_make_border(int top, int bottom, int left, int right,
                          const ::cv::Scalar &value) const;
