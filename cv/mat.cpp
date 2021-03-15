@@ -152,7 +152,7 @@ namespace cyy::naive_lib::opencv {
 
     ~mat_impl() = default;
 
-    bool operator==(const mat_impl &rhs) const {
+    bool equal(const mat_impl &rhs) const {
       download();
       rhs.download();
 
@@ -551,9 +551,7 @@ namespace cyy::naive_lib::opencv {
     return *this;
   }
 
-  bool mat::operator==(const mat &rhs) const {
-    return (*pimpl) == (*rhs.pimpl);
-  }
+  bool mat::equal(const mat &rhs) const { return pimpl->equal(*rhs.pimpl); }
 
   const mat &mat::use_gpu(bool use) const {
     pimpl->use_gpu(use);

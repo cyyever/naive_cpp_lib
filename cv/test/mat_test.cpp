@@ -111,16 +111,16 @@ TEST_CASE("mat") {
       auto channels = image_mat.split();
       auto new_channels = new_image_mat.split();
 
-      CHECK_EQ(channels.at(0), new_channels.at(2));
-      CHECK_EQ(channels.at(1), new_channels.at(1));
-      CHECK_EQ(channels.at(2), new_channels.at(0));
+      CHECK(channels.at(0).equal(new_channels.at(2)));
+      CHECK(channels.at(1).equal(new_channels.at(1)));
+      CHECK(channels.at(2).equal(new_channels.at(0)));
     }
 
     SUBCASE("elem_size") { CHECK(image_mat.elem_size() > 0); }
 
     SUBCASE("transpose") {
       auto image_mat2 = image_mat.transpose().transpose();
-      CHECK(image_mat == image_mat2);
+      CHECK(image_mat.equal(image_mat2));
     }
     SUBCASE("split") { CHECK(image_mat.split().size() == 3); }
     SUBCASE("resize") {

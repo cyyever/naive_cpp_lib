@@ -41,7 +41,7 @@ namespace cyy::naive_lib::opencv {
 
     mat operator()(const cv::Rect &roi) const;
 
-    bool operator==(const mat &rhs) const;
+    bool equal(const mat &rhs) const;
 
     //! \brief 使用GPU
     const mat &use_gpu(bool use) const;
