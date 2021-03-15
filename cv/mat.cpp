@@ -9,11 +9,10 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
-
 #ifdef HAVE_GPU_MAT
 #include <cuda_runtime.h>
-#include <shared_mutex>
 #include <utility>
 
 #include <cuda_buddy/pool.hpp>
