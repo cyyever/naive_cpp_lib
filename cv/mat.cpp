@@ -25,7 +25,6 @@
 #include <opencv2/cudawarping.hpp>
 #include <opencv2/cudev/common.hpp>
 
-#include "hardware/cuda.hpp"
 #include "hardware/hardware.hpp"
 #endif
 #include "log/log.hpp"
@@ -179,7 +178,7 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         cv::cuda::add(gpu_mat, scalar, gpu_mat, cv::noArray(), -1,
-                      get_thread_stream());
+                      get_stream());
         location = storage_location::gpu;
       } else
 #endif
@@ -199,11 +198,10 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         if (channels() == 1) {
-          cv::cuda::divide(gpu_mat, scalar, gpu_mat, 1, -1,
-                           get_thread_stream());
+          cv::cuda::divide(gpu_mat, scalar, gpu_mat, 1, -1, get_stream());
         } else {
           cv::cuda::divide(gpu_mat, cv::Scalar(scalar, scalar, scalar), gpu_mat,
-                           1, -1, get_thread_stream());
+                           1, -1, get_stream());
         }
         location = storage_location::gpu;
       } else
@@ -269,10 +267,7 @@ namespace cyy::naive_lib::opencv {
       if (location == storage_location::cpu) {
         throw std::runtime_error("no GPU support");
       }
-
-      // wait for current compution
-      cudaSafeCall(cudaStreamSynchronize(
-          cv::cuda::StreamAccessor::getStream(get_thread_stream())));
+      auto &stream = get_stream();
 
       //参考opencv-3.2.0/modules/core/src/cuda/gpu_mat.cu
       // cv::cuda::GpuMat::copyTo
@@ -280,9 +275,8 @@ namespace cyy::naive_lib::opencv {
           buf, gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.data, gpu_mat.step,
           gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.rows,
           cudaMemcpyDeviceToDevice,
-          cv::cuda::StreamAccessor::getStream(get_thread_stream())));
-      cudaSafeCall(cudaStreamSynchronize(
-          cv::cuda::StreamAccessor::getStream(get_thread_stream())));
+          cv::cuda::StreamAccessor::getStream(stream)));
+      stream.waitForCompletion();
     }
 #endif
 
@@ -335,7 +329,7 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         cv::cuda::GpuMat tmp;
-        cv::cuda::transpose(gpu_mat, tmp, get_thread_stream());
+        cv::cuda::transpose(gpu_mat, tmp, get_stream());
         return {tmp};
       }
 #endif
@@ -353,7 +347,7 @@ namespace cyy::naive_lib::opencv {
       if (location != storage_location::cpu) {
         cv::cuda::GpuMat tmp;
         cv::cuda::resize(gpu_mat, tmp, cv::Size(new_width, new_height), 0, 0,
-                         interpolation,get_thread_stream());
+                         interpolation,get_stream());
         return {tmp};
       }
   #endif
@@ -377,8 +371,7 @@ namespace cyy::naive_lib::opencv {
         cv::cuda::GpuMat tmp(gpu_mat.rows + top + bottom,
                              gpu_mat.cols + left + right, gpu_mat.type());
         cv::cuda::copyMakeBorder(gpu_mat, tmp, top, bottom, left, right,
-                                 cv::BORDER_CONSTANT, value,
-                                 get_thread_stream());
+                                 cv::BORDER_CONSTANT, value, get_stream());
         return {tmp};
       }
 #endif
@@ -404,7 +397,7 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         cv::cuda::GpuMat tmp;
-        gpu_mat.convertTo(tmp, rtype, alpha, beta, get_thread_stream());
+        gpu_mat.convertTo(tmp, rtype, alpha, beta, get_stream());
         return {tmp};
       }
 #endif
@@ -416,7 +409,7 @@ namespace cyy::naive_lib::opencv {
     void cvt_color(int code) {
 #ifdef HAVE_GPU_MAT
       if (location != storage_location::cpu) {
-        cv::cuda::cvtColor(gpu_mat, gpu_mat, code, 0, get_thread_stream());
+        cv::cuda::cvtColor(gpu_mat, gpu_mat, code, 0, get_stream());
         location = storage_location::gpu;
         return;
       }
@@ -433,7 +426,7 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         std::vector<cv::cuda::GpuMat> output_channels;
-        cv::cuda::split(gpu_mat, output_channels, get_thread_stream());
+        cv::cuda::split(gpu_mat, output_channels, get_stream());
         for (auto &channel : output_channels) {
           res.emplace_back(channel);
         }
@@ -455,7 +448,7 @@ namespace cyy::naive_lib::opencv {
       upload();
       if (location != storage_location::cpu) {
         cv::cuda::GpuMat tmp;
-        cv::cuda::flip(gpu_mat, tmp, flip_code, get_thread_stream());
+        cv::cuda::flip(gpu_mat, tmp, flip_code, get_stream());
         return {tmp};
       }
 #endif
@@ -479,9 +472,8 @@ namespace cyy::naive_lib::opencv {
 
 #ifdef HAVE_GPU_MAT
       if (initer.has_nvidia_driver) {
-        gpu_mat.upload(cpu_mat, get_host_to_device_stream());
-        cudaSafeCall(cudaStreamSynchronize(
-            cv::cuda::StreamAccessor::getStream(get_host_to_device_stream())));
+        auto &stream = get_stream();
+        gpu_mat.upload(cpu_mat, stream);
         location = storage_location::synced;
       }
 #endif
@@ -491,40 +483,25 @@ namespace cyy::naive_lib::opencv {
     void download() const {
 #ifdef HAVE_GPU_MAT
       if (location == storage_location::gpu) {
-        cudaSafeCall(cudaStreamSynchronize(
-            cv::cuda::StreamAccessor::getStream(get_thread_stream())));
-        gpu_mat.download(cpu_mat, get_device_to_host_stream());
-        cudaSafeCall(cudaStreamSynchronize(
-            cv::cuda::StreamAccessor::getStream(get_device_to_host_stream())));
+        auto &stream = get_stream();
+        gpu_mat.download(cpu_mat, stream);
+        stream.waitForCompletion();
         location = storage_location::synced;
       }
 #endif
     }
 
 #ifdef HAVE_GPU_MAT
-    static cv::cuda::Stream &get_thread_stream() {
-      static std::shared_ptr<cv::cuda::Stream> thread_stream =
-          std::make_shared<cv::cuda::Stream>(
-              cv::cuda::StreamAccessor::wrapStream(cudaStreamPerThread));
-      return *thread_stream;
-    }
-
-    static cv::cuda::Stream &get_host_to_device_stream() {
-      static std::shared_ptr<cv::cuda::Stream> to_device_stream =
-          std::make_shared<cv::cuda::Stream>(
-              cv::cuda::StreamAccessor::wrapStream(
-                  cyy::naive_lib::hardware::cuda::get_copy_to_device_stream()
-                      .value()));
-      return *to_device_stream;
-    }
-
-    static cv::cuda::Stream &get_device_to_host_stream() {
-      static std::shared_ptr<cv::cuda::Stream> to_host_stream =
-          std::make_shared<cv::cuda::Stream>(
-              cv::cuda::StreamAccessor::wrapStream(
-                  cyy::naive_lib::hardware::cuda::get_copy_to_host_stream()
-                      .value()));
-      return *to_host_stream;
+    static cv::cuda::Stream &get_stream() {
+      std::lock_guard lock(stream_mutex);
+      if (!stream_ptr) {
+        cudaStream_t pStream{};
+        cudaSafeCall(
+            cudaStreamCreateWithFlags(&pStream, cudaStreamNonBlocking));
+        stream_ptr = std::make_shared<cv::cuda::Stream>(
+            cv::cuda::StreamAccessor::wrapStream(pStream));
+      }
+      return *stream_ptr;
     }
 #endif
 
@@ -534,7 +511,8 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
     mutable cv::cuda::GpuMat gpu_mat{};
     //为了在不支持CUDA的机器上运行，我们必须延迟初始化stream，构造构造函数会抛出异常
-    // mutable std::shared_ptr<cv::cuda::Stream> stream;
+    static inline std::shared_ptr<cv::cuda::Stream> stream_ptr;
+    static inline std::mutex stream_mutex;
 #endif
     mutable storage_location location{storage_location::synced};
   };
