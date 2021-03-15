@@ -9,7 +9,7 @@ target_link_libraries(cyy_naive_lib_cv PRIVATE CyyNaiveLib::hardware)
 find_package(
   OpenCV REQUIRED
   COMPONENTS core imgproc imgcodecs
-  OPTIONAL_COMPONENTS cudaarithm cudaimgproc)
+  OPTIONAL_COMPONENTS cudaarithm cudaimgproc cudafilters)
 
 target_include_directories(cyy_naive_lib_cv PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(cyy_naive_lib_cv PRIVATE ${OpenCV_LIBRARIES})

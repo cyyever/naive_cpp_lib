@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+
 #ifdef HAVE_GPU_MAT
 #include <cuda_runtime.h>
 #include <utility>
@@ -17,6 +18,7 @@
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/cuda/common.hpp>
 #include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/cudawarping.hpp>
 #include <opencv2/cudev/common.hpp>
@@ -184,6 +186,98 @@ namespace cyy::naive_lib::opencv {
       }
       return *this;
     }
+
+#ifdef HAVE_GPU_MAT
+    // changed from samples/cpp/tutorial_code/gpu/gpu-basics-similarity
+    cv::Scalar MSSIM(const mat_impl &i2) const {
+      const float C1 = 6.5025f, C2 = 58.5225f;
+      auto &stream = get_stream();
+      /***************************** INITS **********************************/
+      upload();
+      i2.upload();
+      auto vI1 = convert_to(CV_32F).split();
+      auto vI2 = i2.convert_to(CV_32F).split();
+
+      cv::cuda::GpuMat gI1, gI2, gs1, tmp1, tmp2;
+
+      /* gI1.upload(i1); */
+      /* gI2.upload(i2); */
+
+      /* gI1.convertTo(tmp1, CV_MAKE_TYPE(CV_32F, gI1.channels())); */
+      /* gI2.convertTo(tmp2, CV_MAKE_TYPE(CV_32F, gI2.channels())); */
+
+      /* vector<cuda::GpuMat> vI1, vI2; */
+      /* cuda::split(tmp1, vI1); */
+      /* cuda::split(tmp2, vI2); */
+      cv::Scalar mssim;
+
+      auto gauss = cv::cuda::createGaussianFilter(vI2[0].type(), -1,
+                                                  cv::Size(11, 11), 1.5);
+
+      cv::cuda::GpuMat I2_2, I1_2, I1_I2;
+      std::vector<cv::cuda::GpuMat> results;
+      for (int i = 0; i < channels(); ++i) {
+
+        cv::cuda::sqr(vI1[i].get_cv_gpu_mat(), I1_2, stream); // I1^2
+        cv::cuda::sqr(vI2[i].get_cv_gpu_mat(), I2_2, stream); // I2^2
+        cv::cuda::multiply(vI1[i].get_cv_gpu_mat(), vI2[i].get_cv_gpu_mat(),
+                           I1_I2, 1, -1,
+                           stream); // I1 * I2
+
+        /*************************** END INITS
+         * **********************************/
+        cv::cuda::GpuMat mu1, mu2; // PRELIMINARY COMPUTING
+        gauss->apply(vI1[i].get_cv_gpu_mat(), mu1, stream);
+        gauss->apply(vI2[i].get_cv_gpu_mat(), mu2, stream);
+
+        cv::cuda::GpuMat mu1_2, mu2_2, mu1_mu2;
+        cv::cuda::sqr(mu1, mu1_2, stream);
+        cv::cuda::sqr(mu2, mu2_2, stream);
+        cv::cuda::multiply(mu1, mu2, mu1_mu2, 1, -1, stream);
+
+        cv::cuda::GpuMat sigma1_2, sigma2_2, sigma12;
+
+        gauss->apply(I1_2, sigma1_2, stream);
+        cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
+                           stream); // sigma1_2 -= mu1_2;
+
+        gauss->apply(I2_2, sigma2_2, stream);
+        cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
+                           stream); // sigma2_2 -= mu2_2;
+
+        gauss->apply(I1_I2, sigma12, stream);
+        cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
+                           stream); // sigma12 -= mu1_mu2;
+
+        ///////////////////////////////// FORMULA
+        ///////////////////////////////////
+        cv::cuda::GpuMat t1, t2, t3;
+
+        mu1_mu2.convertTo(mu1_mu2, -1, 2, C1, stream); // t1 = 2 * mu1_mu2 + C1;
+        sigma12.convertTo(sigma12, -1, 2, C2, stream); // t2 = 2 * sigma12 + C2;
+        cv::cuda::multiply(mu1_mu2, sigma12, t3, 1, -1,
+                           stream); // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
+
+        cv::cuda::addWeighted(mu1_2, 1.0, mu2_2, 1.0, C1, t1, -1,
+                              stream); // t1 = mu1_2 + mu2_2 + C1;
+        cv::cuda::addWeighted(sigma1_2, 1.0, sigma2_2, 1.0, C2, t2, -1,
+                              stream); // t2 = sigma1_2 + sigma2_2 + C2;
+        cv::cuda::multiply(
+            t1, t2, t1, 1, -1,
+            stream); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
+
+        cv::cuda::divide(t3, t1, t3, 1, -1, stream); // ssim_map = t3./t1;
+        results.emplace_back(std::move(t3));
+      }
+      stream.waitForCompletion();
+      for (int i = 0; i < channels(); ++i) {
+        auto s = cv::cuda::sum(results[i]);
+        mssim.val[i] = s.val[0] / (results[i].rows * results[i].cols);
+        std::cout << "value is" << mssim.val[i] << std::endl;
+      }
+      return mssim;
+    }
+#endif
 
     mat_impl &operator+=(float scalar) {
       return operator+=(cv::Scalar::all(scalar));
@@ -612,6 +706,7 @@ namespace cyy::naive_lib::opencv {
     }
     return res;
   }
+  cv::Scalar mat::MSSIM(const mat &i2) const { return pimpl->MSSIM(*i2.pimpl); }
 
   mat mat::flip(int flip_code) const { return pimpl->flip(flip_code); }
 
