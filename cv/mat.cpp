@@ -245,61 +245,92 @@ namespace cyy::naive_lib::opencv {
       auto gauss = cv::cuda::createGaussianFilter(vI2[0].type(), -1,
                                                   cv::Size(11, 11), 1.5);
 
-      /* cv::cuda::GpuMat I2_2, I1_2, I1_I2; */
-      std::vector<cv::cuda::GpuMat> results;
+      std::vector<mat_impl> I1_2;
+      I1_2.resize(channels());
+      std::vector<mat_impl> I2_2;
+      I2_2.resize(channels());
+      std::vector<mat_impl> I1_I2;
+      I1_I2.resize(channels());
+      std::vector<cv::cuda::GpuMat> mu1;
+      mu1.resize(channels());
+      std::vector<cv::cuda::GpuMat> mu2;
+      mu2.resize(channels());
+      std::vector<cv::cuda::GpuMat> mu1_2;
+      mu1_2.resize(channels());
+      std::vector<cv::cuda::GpuMat> mu2_2;
+      mu2_2.resize(channels());
+      std::vector<cv::cuda::GpuMat> mu1_mu2;
+      mu1_mu2.resize(channels());
+      std::vector<cv::cuda::GpuMat> sigma1_2;
+      sigma1_2.resize(channels());
+      std::vector<cv::cuda::GpuMat> sigma2_2;
+      sigma2_2.resize(channels());
+      std::vector<cv::cuda::GpuMat> sigma12;
+      sigma12.resize(channels());
+      std::vector<cv::cuda::GpuMat> t3;
+      t3.resize(channels());
+
       for (int i = 0; i < channels(); ++i) {
-        auto I1_2 = vI1[i].sqr(false); // I1^2 */
-        auto I2_2 = vI2[i].sqr(false); // I2^2 */
+        gauss->apply(vI1[i].get_cv_gpu_mat(), mu1[i], stream);
+        gauss->apply(vI2[i].get_cv_gpu_mat(), mu2[i], stream);
 
-        auto I1_I2 = vI1[i].multiply(vI2[i], false); // I1 * I2
+        cv::cuda::sqr(mu1[i], mu1_2[i], stream);
+        cv::cuda::sqr(mu2[i], mu2_2[i], stream);
+        cv::cuda::multiply(mu1[i], mu2[i], mu1_mu2[i], 1, -1, stream);
 
-        /*************************** END INITS
-         * **********************************/
-        cv::cuda::GpuMat mu1, mu2; // PRELIMINARY COMPUTING
-        gauss->apply(vI1[i].get_cv_gpu_mat(), mu1, stream);
-        gauss->apply(vI2[i].get_cv_gpu_mat(), mu2, stream);
-
-        cv::cuda::GpuMat mu1_2, mu2_2, mu1_mu2;
-        cv::cuda::sqr(mu1, mu1_2, stream);
-        cv::cuda::sqr(mu2, mu2_2, stream);
-        cv::cuda::multiply(mu1, mu2, mu1_mu2, 1, -1, stream);
-
-        cv::cuda::GpuMat sigma1_2, sigma2_2, sigma12;
-
-        gauss->apply(I1_2.get_cv_gpu_mat(), sigma1_2, stream);
-        cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
+        I1_2[i]=vI1[i].sqr(false);
+        puts("aaaaaaaaa");
+        gauss->apply(I1_2[i].get_cv_gpu_mat(), sigma1_2[i], stream);
+        cv::cuda::subtract(sigma1_2[i], mu1_2[i], sigma1_2[i], cv::noArray(),
+                           -1,
                            stream); // sigma1_2 -= mu1_2;
 
-        gauss->apply(I2_2.get_cv_gpu_mat(), sigma2_2, stream);
-        cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
+        puts("aaaaaaaaa");
+        I2_2[i]=vI2[i].sqr(false);
+        gauss->apply(I2_2[i].get_cv_gpu_mat(), sigma2_2[i], stream);
+        cv::cuda::subtract(sigma2_2[i], mu2_2[i], sigma2_2[i], cv::noArray(),
+                           -1,
                            stream); // sigma2_2 -= mu2_2;
 
-        gauss->apply(I1_I2.get_cv_gpu_mat(), sigma12, stream);
-        cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
+        puts("aaaaaaaaa");
+        I1_I2[i]=vI1[i].multiply(vI2[i], false);
+        gauss->apply(I1_I2[i].get_cv_gpu_mat(),
+                     sigma12[i], stream);
+        cv::cuda::subtract(sigma12[i], mu1_mu2[i], sigma12[i], cv::noArray(),
+                           -1,
                            stream); // sigma12 -= mu1_mu2;
+        puts("aaaaaaaaa");
 
         ///////////////////////////////// FORMULA
         ///////////////////////////////////
-        cv::cuda::GpuMat t1, t2, t3;
 
-        mu1_mu2.convertTo(mu1_mu2, -1, 2, C1, stream); // t1 = 2 * mu1_mu2 + C1;
-        sigma12.convertTo(sigma12, -1, 2, C2, stream); // t2 = 2 * sigma12 + C2;
-        cv::cuda::multiply(mu1_mu2, sigma12, t3, 1, -1,
+        mu1_mu2[i].convertTo(mu1_mu2[i], -1, 2, C1,
+                             stream); // t1 = 2 * mu1_mu2 + C1;
+        sigma12[i].convertTo(sigma12[i], -1, 2, C2,
+                             stream); // t2 = 2 * sigma12 + C2;
+        cv::cuda::multiply(mu1_mu2[i], sigma12[i], t3[i], 1, -1,
                            stream); // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
+        puts("111111111");
 
-        cv::cuda::addWeighted(mu1_2, 1.0, mu2_2, 1.0, C1, t1, -1,
+        cv::cuda::addWeighted(mu1_2[i], 1.0, mu2_2[i], 1.0, C1, mu1_mu2[i], -1,
                               stream); // t1 = mu1_2 + mu2_2 + C1;
-        cv::cuda::addWeighted(sigma1_2, 1.0, sigma2_2, 1.0, C2, t2, -1,
+        cv::cuda::addWeighted(sigma1_2[i], 1.0, sigma2_2[i], 1.0, C2, sigma12[i],
+                              -1,
                               stream); // t2 = sigma1_2 + sigma2_2 + C2;
+        puts("aaaaaaaaa");
         cv::cuda::multiply(
-            t1, t2, t1, 1, -1,
+            mu1_mu2[i], sigma12[i], mu1_mu2[i], 1, -1,
             stream); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
 
-        cv::cuda::divide(t3, t1, t3, 1, -1, stream); // ssim_map = t3./t1;
-        results.emplace_back(std::move(t3));
+        puts("aaaaaaaaa");
+        cv::cuda::divide(t3[i], mu1_mu2[i], t3[i], 1, -1,
+                         stream); // ssim_map = t3./t1;
+        puts("aaaaaaaaa");
+        results.emplace_back(std::move(t3[i]));
       }
       stream.waitForCompletion();
       for (int i = 0; i < channels(); ++i) {
+        puts("22222222");
         auto s = cv::cuda::sum(results[i]);
         mssim.val[i] = s.val[0] / (results[i].rows * results[i].cols);
         std::cout << "value is" << mssim.val[i] << std::endl;
