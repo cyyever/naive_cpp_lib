@@ -4,10 +4,7 @@
  * \brief cv::Mat的cpu/gpu操作
  * \author cyy
  */
-#include <array>
 #include <cassert>
-#include <cstring>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -84,7 +81,7 @@ namespace {
     cuda_buddy::pool &get_pool() {
       auto device_id = get_device_id();
 
-      if (!pools.count(device_id)) {
+      if (!pools.contains(device_id)) {
         pools.emplace(device_id, device_id);
       }
       auto it = pools.find(device_id);
@@ -94,7 +91,7 @@ namespace {
     size_t get_texture_pitch_alignment() {
       auto device_id = get_device_id();
 
-      if (!texture_pitch_alignments.count(device_id)) {
+      if (!texture_pitch_alignments.contains(device_id)) {
         cudaDeviceProp props{};
         cudaSafeCall(cudaGetDeviceProperties(&props, 0));
         texture_pitch_alignments[device_id] = props.texturePitchAlignment;
