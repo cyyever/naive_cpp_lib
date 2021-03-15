@@ -155,6 +155,49 @@ namespace cyy::naive_lib::opencv {
 
     ~mat_impl() = default;
 
+    size_t elem_size() const {
+      return
+#ifdef HAVE_GPU_MAT
+          location == data_location::gpu ? gpu_mat.elemSize() :
+
+#endif
+                                         cpu_mat.elemSize();
+    }
+
+    int width() const {
+      return
+#ifdef HAVE_GPU_MAT
+          location == data_location::gpu ? gpu_mat.cols :
+#endif
+                                         cpu_mat.cols;
+    }
+
+    int height() const {
+      return
+#ifdef HAVE_GPU_MAT
+          location == data_location::gpu ? gpu_mat.rows :
+#endif
+                                         cpu_mat.rows;
+    }
+
+    int channels() const {
+      return
+#ifdef HAVE_GPU_MAT
+          location == data_location::gpu ? gpu_mat.channels() :
+
+#endif
+                                         cpu_mat.channels();
+    }
+
+    int type() const {
+      return
+#ifdef HAVE_GPU_MAT
+          location == data_location::gpu ? gpu_mat.type() :
+
+#endif
+                                         cpu_mat.type();
+    }
+
     bool equal(const mat_impl &rhs) const {
       download();
       rhs.download();
@@ -173,18 +216,16 @@ namespace cyy::naive_lib::opencv {
     }
 
     mat_impl &operator+=(const cv::Scalar &scalar) {
-#ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        cv::cuda::add(gpu_mat, scalar, gpu_mat, cv::noArray(), -1,
-                      get_stream());
-        location = data_location::gpu;
-        return *this;
-      }
-#endif
-      download();
-      cv::add(cpu_mat, scalar, cpu_mat, cv::noArray(), -1);
-      location = data_location::cpu;
+      unary_operation(
+          [=, this, &scalar](mat_impl &result_mat) {
+            cv::add(cpu_mat, scalar, result_mat.cpu_mat, cv::noArray(), -1);
+          },
+
+          [=, this, &scalar](mat_impl &result_mat) {
+            cv::cuda::add(gpu_mat, scalar, result_mat.gpu_mat, cv::noArray(),
+                          -1, get_stream());
+          },
+          true);
       return *this;
     }
 
@@ -194,36 +235,23 @@ namespace cyy::naive_lib::opencv {
       const float C1 = 6.5025f, C2 = 58.5225f;
       auto &stream = get_stream();
       /***************************** INITS **********************************/
-      upload();
-      i2.upload();
       auto vI1 = convert_to(CV_32F).split();
       auto vI2 = i2.convert_to(CV_32F).split();
 
       cv::cuda::GpuMat gI1, gI2, gs1, tmp1, tmp2;
 
-      /* gI1.upload(i1); */
-      /* gI2.upload(i2); */
-
-      /* gI1.convertTo(tmp1, CV_MAKE_TYPE(CV_32F, gI1.channels())); */
-      /* gI2.convertTo(tmp2, CV_MAKE_TYPE(CV_32F, gI2.channels())); */
-
-      /* vector<cuda::GpuMat> vI1, vI2; */
-      /* cuda::split(tmp1, vI1); */
-      /* cuda::split(tmp2, vI2); */
       cv::Scalar mssim;
 
       auto gauss = cv::cuda::createGaussianFilter(vI2[0].type(), -1,
                                                   cv::Size(11, 11), 1.5);
 
-      cv::cuda::GpuMat I2_2, I1_2, I1_I2;
+      /* cv::cuda::GpuMat I2_2, I1_2, I1_I2; */
       std::vector<cv::cuda::GpuMat> results;
       for (int i = 0; i < channels(); ++i) {
+        auto I1_2 = vI1[i].sqr(false); // I1^2 */
+        auto I2_2 = vI2[i].sqr(false); // I2^2 */
 
-        cv::cuda::sqr(vI1[i].get_cv_gpu_mat(), I1_2, stream); // I1^2
-        cv::cuda::sqr(vI2[i].get_cv_gpu_mat(), I2_2, stream); // I2^2
-        cv::cuda::multiply(vI1[i].get_cv_gpu_mat(), vI2[i].get_cv_gpu_mat(),
-                           I1_I2, 1, -1,
-                           stream); // I1 * I2
+        auto I1_I2 = vI1[i].multiply(vI2[i], false); // I1 * I2
 
         /*************************** END INITS
          * **********************************/
@@ -238,15 +266,15 @@ namespace cyy::naive_lib::opencv {
 
         cv::cuda::GpuMat sigma1_2, sigma2_2, sigma12;
 
-        gauss->apply(I1_2, sigma1_2, stream);
+        gauss->apply(I1_2.get_cv_gpu_mat(), sigma1_2, stream);
         cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
                            stream); // sigma1_2 -= mu1_2;
 
-        gauss->apply(I2_2, sigma2_2, stream);
+        gauss->apply(I2_2.get_cv_gpu_mat(), sigma2_2, stream);
         cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
                            stream); // sigma2_2 -= mu2_2;
 
-        gauss->apply(I1_I2, sigma12, stream);
+        gauss->apply(I1_I2.get_cv_gpu_mat(), sigma12, stream);
         cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
                            stream); // sigma12 -= mu1_mu2;
 
@@ -284,30 +312,60 @@ namespace cyy::naive_lib::opencv {
       return operator+=(cv::Scalar::all(scalar));
     }
 
+    mat_impl divide(float src2, bool self_as_result) {
+      auto scalar = cv::Scalar::all(src2);
+      return unary_operation(
+          [=, this](mat_impl &result_mat) {
+            cv::divide(cpu_mat, scalar, result_mat.cpu_mat, 1, -1);
+          },
+
+          [=, this](mat_impl &result_mat) {
+            cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
+                             get_stream());
+          },
+          self_as_result);
+    }
+
+    mat_impl multiply(mat_impl src2, bool self_as_result) {
+      return unary_operation(
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::multiply(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
+          },
+
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::cuda::multiply(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
+                               get_stream());
+          },
+          self_as_result);
+    }
+    mat_impl sqr(bool self_as_result) {
+      return unary_operation(
+          [=, this](mat_impl &result_mat) {
+            throw std::runtime_error("unsupported operation");
+            /* cv::sqr(cpu_mat,  result_mat.cpu_mat); */
+          },
+
+          [=, this](mat_impl &result_mat) {
+            cv::cuda::sqr(gpu_mat, result_mat.gpu_mat, get_stream());
+          },
+          self_as_result);
+    }
+
+    mat_impl divide(mat_impl src2, bool self_as_result) {
+      return unary_operation(
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::divide(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
+          },
+
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::cuda::divide(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
+                             get_stream());
+          },
+          self_as_result);
+    }
+
     mat_impl &operator/=(float scalar) {
-      _divide(scalar, true);
-      return *this;
-#ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        if (channels() == 1) {
-          cv::cuda::divide(gpu_mat, scalar, gpu_mat, 1, -1, get_stream());
-        } else {
-          cv::cuda::divide(gpu_mat, cv::Scalar(scalar, scalar, scalar), gpu_mat,
-                           1, -1, get_stream());
-        }
-        location = data_location::gpu;
-      } else
-#endif
-      {
-        if (channels() == 1) {
-          cv::divide(cpu_mat, scalar, cpu_mat, 1, -1);
-        } else {
-          cv::divide(cpu_mat, cv::Scalar(scalar, scalar, scalar), cpu_mat, 1,
-                     -1);
-        }
-        location = data_location::cpu;
-      }
+      divide(scalar, true);
       return *this;
     }
 
@@ -372,49 +430,6 @@ namespace cyy::naive_lib::opencv {
       stream.waitForCompletion();
     }
 #endif
-
-    int width() const {
-      return
-#ifdef HAVE_GPU_MAT
-          location == data_location::gpu ? gpu_mat.cols :
-#endif
-                                         cpu_mat.cols;
-    }
-
-    int height() const {
-      return
-#ifdef HAVE_GPU_MAT
-          location == data_location::gpu ? gpu_mat.rows :
-#endif
-                                         cpu_mat.rows;
-    }
-
-    int channels() const {
-      return
-#ifdef HAVE_GPU_MAT
-          location == data_location::gpu ? gpu_mat.channels() :
-
-#endif
-                                         cpu_mat.channels();
-    }
-
-    int type() const {
-      return
-#ifdef HAVE_GPU_MAT
-          location == data_location::gpu ? gpu_mat.type() :
-
-#endif
-                                         cpu_mat.type();
-    }
-
-    size_t elem_size() const {
-      return
-#ifdef HAVE_GPU_MAT
-          location == data_location::gpu ? gpu_mat.elemSize() :
-
-#endif
-                                         cpu_mat.elemSize();
-    }
 
     mat_impl transpose() const {
 #ifdef HAVE_GPU_MAT
@@ -537,7 +552,7 @@ namespace cyy::naive_lib::opencv {
       return res;
     }
 
-    mat_impl flip(int flip_code) const {
+    [[deprecated]] mat_impl flip(int flip_code) const {
 #ifdef HAVE_GPU_MAT
       upload();
       if (location != data_location::cpu) {
@@ -574,35 +589,6 @@ namespace cyy::naive_lib::opencv {
       return result_mat;
     }
 
-    mat_impl _divide(float src2, bool self_as_result) {
-      cv::Scalar scalar(src2);
-      if (channels() == 3) {
-        scalar = cv::Scalar(src2, src2, src2);
-      }
-      return unary_operation(
-          [=, this](mat_impl &result_mat) {
-            cv::divide(cpu_mat, scalar, result_mat.cpu_mat, 1, -1);
-          },
-
-          [=, this](mat_impl &result_mat) {
-            cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
-                             get_stream());
-          },
-          self_as_result);
-    }
-
-    mat_impl _divide(mat_impl src2, bool self_as_result) {
-      return unary_operation(
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::divide(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
-          },
-
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::cuda::divide(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
-                             get_stream());
-          },
-          self_as_result);
-    }
     mat_impl get_result_mat(bool self_as_result) {
       if (self_as_result) {
         return *this;
