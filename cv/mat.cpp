@@ -378,7 +378,7 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
           location == data_location::gpu ? gpu_mat.cols :
 #endif
-                                            cpu_mat.cols;
+                                         cpu_mat.cols;
     }
 
     int height() const {
@@ -386,7 +386,7 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
           location == data_location::gpu ? gpu_mat.rows :
 #endif
-                                            cpu_mat.rows;
+                                         cpu_mat.rows;
     }
 
     int channels() const {
@@ -395,7 +395,7 @@ namespace cyy::naive_lib::opencv {
           location == data_location::gpu ? gpu_mat.channels() :
 
 #endif
-                                            cpu_mat.channels();
+                                         cpu_mat.channels();
     }
 
     int type() const {
@@ -404,7 +404,7 @@ namespace cyy::naive_lib::opencv {
           location == data_location::gpu ? gpu_mat.type() :
 
 #endif
-                                            cpu_mat.type();
+                                         cpu_mat.type();
     }
 
     size_t elem_size() const {
@@ -413,7 +413,7 @@ namespace cyy::naive_lib::opencv {
           location == data_location::gpu ? gpu_mat.elemSize() :
 
 #endif
-                                            cpu_mat.elemSize();
+                                         cpu_mat.elemSize();
     }
 
     mat_impl transpose() const {
@@ -574,46 +574,34 @@ namespace cyy::naive_lib::opencv {
       return result_mat;
     }
 
-    template <typename SRC2_TYPE>
-    mat_impl _divide(SRC2_TYPE src2, bool self_as_result) {
-      auto result_mat = get_result_mat(self_as_result);
-#ifdef HAVE_GPU_MAT
-      upload();
-      result_mat.upload();
-      if constexpr (std::is_same_v<SRC2_TYPE, float>) {
-        cv::Scalar scalar(src2);
-        if (channels() == 3) {
-          scalar = cv::Scalar(src2, src2, src2);
-        }
-        if (location != data_location::cpu) {
-          cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
-                           get_stream());
-          result_mat.location = data_location::gpu;
-          return result_mat;
-        }
-      } else {
-        if (location != data_location::cpu) {
-          cv::cuda::divide(gpu_mat, src2, result_mat.gpu_mat, 1, -1,
-                           get_stream());
-          result_mat.location = data_location::gpu;
-          return result_mat;
-        }
+    mat_impl _divide(float src2, bool self_as_result) {
+      cv::Scalar scalar(src2);
+      if (channels() == 3) {
+        scalar = cv::Scalar(src2, src2, src2);
       }
-#endif
-      download();
-      result_mat.download();
-      if constexpr (std::is_same_v<SRC2_TYPE, float>) {
-        cv::Scalar scalar(src2);
-        if (channels() == 3) {
-          scalar = cv::Scalar(src2, src2, src2);
-        }
-        cv::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1);
-        result_mat.location = data_location::gpu;
-        return result_mat;
-      }
-      cv::divide(gpu_mat, src2, result_mat.gpu_mat, 1, -1);
-      result_mat.location = data_location::gpu;
-      return result_mat;
+      return unary_operation(
+          [=, this](mat_impl &result_mat) {
+            cv::divide(cpu_mat, scalar, result_mat.cpu_mat, 1, -1);
+          },
+
+          [=, this](mat_impl &result_mat) {
+            cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
+                             get_stream());
+          },
+          self_as_result);
+    }
+
+    mat_impl _divide(mat_impl src2, bool self_as_result) {
+      return unary_operation(
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::divide(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
+          },
+
+          [=, this, &src2](mat_impl &result_mat) {
+            cv::cuda::divide(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
+                             get_stream());
+          },
+          self_as_result);
     }
     mat_impl get_result_mat(bool self_as_result) {
       if (self_as_result) {
