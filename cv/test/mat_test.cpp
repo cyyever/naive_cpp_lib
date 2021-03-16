@@ -129,9 +129,10 @@ TEST_CASE("mat") {
       CHECK_EQ(image_mat2.height(), 20);
     }
     SUBCASE("MSSIM") {
-      image_mat.MSSIM(image_mat);
-      image_mat.MSSIM(image_mat.flip(0));
-      image_mat.MSSIM(image_mat.flip(1));
+      auto uint8_mat = image_mat.convert_to(CV_8UC3);
+      uint8_mat.MSSIM(uint8_mat);
+      uint8_mat.MSSIM(uint8_mat.flip(0));
+      uint8_mat.MSSIM(uint8_mat.flip(1));
     }
   }
 }
