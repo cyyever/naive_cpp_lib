@@ -10,6 +10,41 @@
 
 #include "cv/mat.hpp"
 namespace py = pybind11;
+
+namespace pybind11 {
+  namespace detail {
+    template <> struct type_caster<cv::Scalar> {
+    public:
+      /**
+       * This macro establishes the name 'inty' in
+       * function signatures and declares a local variable
+       * 'value' of type inty
+       */
+      PYBIND11_TYPE_CASTER(cv::Scalar, _("CVScalar"));
+
+      /**
+       * Conversion part 1 (Python->C++): convert a PyObject into a scalar
+       * instance or return false upon failure. The second argument
+       * indicates whether implicit conversions should be applied.
+       */
+      bool load(handle src, bool) { return false; }
+
+      /**
+       * Conversion part 2 (C++ -> Python): convert an scalar instance into
+       * a Python object. The second and third arguments are used to
+       * indicate the return value policy and parent object (for
+       * ``return_value_policy::reference_internal``) and are generally
+       * ignored by implicit casters.
+       */
+      static handle cast(const cv::Scalar &scalar,
+                         return_value_policy /* policy */,
+                         handle /* parent */) {
+        return py::make_tuple(scalar[0], scalar[1], scalar[2], scalar[3]);
+      }
+    };
+  } // namespace detail
+} // namespace pybind11
+
 inline void define_cv_extension(py::module_ &m) {
   auto sub_m = m.def_submodule("cv", "OpenCV Wrapper");
   py::class_<cv::Mat>(sub_m, "Matrix", py::buffer_protocol())
