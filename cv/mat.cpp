@@ -237,6 +237,7 @@ namespace cyy::naive_lib::opencv {
       /***************************** INITS **********************************/
       auto I1 = convert_to(CV_32F);
       auto I2 = i2.convert_to(CV_32F);
+      std::cout<<"I2 type is "<<(int)I2.type()<<" CV_32F is"<<CV_32F<<std::endl;
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
