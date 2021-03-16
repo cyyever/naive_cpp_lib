@@ -231,13 +231,12 @@ namespace cyy::naive_lib::opencv {
 
 #ifdef HAVE_GPU_MAT
     // changed from samples/cpp/tutorial_code/gpu/gpu-basics-similarity
-    cv::Scalar MSSIM(const mat_impl &i2) const {
+    cv::Scalar MSSIM(mat_impl i2) {
       const float C1 = 6.5025f, C2 = 58.5225f;
       auto &stream = get_stream();
       /***************************** INITS **********************************/
       auto I1 = convert_to(CV_32F);
       auto I2 = i2.convert_to(CV_32F);
-
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
@@ -488,18 +487,17 @@ namespace cyy::naive_lib::opencv {
       return {cpu_mat.clone()};
     }
 
-    mat_impl convert_to(int rtype, double alpha = 1, double beta = 0) const {
-#ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        cv::cuda::GpuMat tmp;
-        gpu_mat.convertTo(tmp, rtype, alpha, beta, get_stream());
-        return {tmp};
-      }
-#endif
-      cv::Mat tmp;
-      cpu_mat.convertTo(tmp, rtype, alpha, beta);
-      return {tmp};
+    mat_impl convert_to(int rtype, double alpha = 1, double beta = 0,
+                        bool self_as_result = false) {
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) {
+            cpu_mat.convertTo(result_cpu_mat, rtype, alpha, beta);
+          },
+
+          [=, this](auto &result_gpu_mat) {
+            gpu_mat.convertTo(result_gpu_mat, rtype, alpha, beta, get_stream());
+          },
+          self_as_result);
     }
 
     void cvt_color(int code) {
@@ -724,8 +722,9 @@ namespace cyy::naive_lib::opencv {
     return pimpl->resize(new_width, new_height, interpolation);
   }
 
-  mat mat::convert_to(int rtype, double alpha, double beta) const {
-    return pimpl->convert_to(rtype, alpha, beta);
+  mat mat::convert_to(int rtype, double alpha, double beta,
+                      bool self_as_result) {
+    return pimpl->convert_to(rtype, alpha, beta, self_as_result);
   }
 
   void mat::cvt_color(int code) { pimpl->cvt_color(code); }
@@ -742,7 +741,7 @@ namespace cyy::naive_lib::opencv {
     }
     return res;
   }
-  cv::Scalar mat::MSSIM(const mat &i2) const { return pimpl->MSSIM(*i2.pimpl); }
+  cv::Scalar mat::MSSIM(mat i2) const { return pimpl->MSSIM(*i2.pimpl); }
 
   mat mat::flip(int flip_code, bool self_as_result) {
     return pimpl->flip(flip_code, self_as_result);

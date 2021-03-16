@@ -79,10 +79,11 @@ namespace cyy::naive_lib::opencv {
     mat resize(int new_width, int new_height,
                int interpolation = cv::INTER_LINEAR) const;
 
-    mat convert_to(int rtype, double alpha = 1, double beta = 0) const;
+    mat convert_to(int rtype, double alpha = 1, double beta = 0,
+                   bool self_as_result = false);
 
     void cvt_color(int code);
-    cv::Scalar MSSIM(const mat &i2) const;
+    cv::Scalar MSSIM(mat i2) const;
 
     mat copy_make_border(int top, int bottom, int left, int right,
                          const ::cv::Scalar &value) const;
