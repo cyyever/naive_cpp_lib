@@ -8,7 +8,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "cv/src/mat.hpp"
+#include "cv/mat.hpp"
 namespace py = pybind11;
 inline void define_cv_extension(py::module_ &m) {
   py::class_<cv::Mat>(m, "Matrix", py::buffer_protocol())
