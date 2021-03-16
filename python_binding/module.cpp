@@ -3,8 +3,8 @@
 #include "cv.hpp"
 #endif
 #ifdef BUILD_VIDEO_PYTHON_BINDING
-#include "ffmpeg.hpp"
 #include "cv.hpp"
+#include "ffmpeg.hpp"
 #endif
 #ifdef BUILD_TORCH_PYTHON_BINDING
 #include "stochastic_quantization.hpp"
