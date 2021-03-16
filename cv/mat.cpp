@@ -139,7 +139,14 @@ namespace cyy::naive_lib::opencv {
     mat_impl() = default;
 
     mat_impl(cv::Mat cv_mat)
-        : cpu_mat(std::move(cv_mat)), location(data_location::cpu) {}
+        : cpu_mat(std::move(cv_mat)), location(data_location::cpu) {
+      can_use_gpu = false;
+#ifdef HAVE_GPU_MAT
+      if (initer.has_nvidia_driver) {
+        can_use_gpu = true;
+      }
+#endif
+    }
 
 #ifdef HAVE_GPU_MAT
     mat_impl(const cv::cuda::GpuMat &cv_mat)
@@ -237,7 +244,8 @@ namespace cyy::naive_lib::opencv {
       /***************************** INITS **********************************/
       auto I1 = convert_to(CV_32F);
       auto I2 = i2.convert_to(CV_32F);
-      std::cout<<"I2 type is "<<(int)I2.type()<<" CV_32F is"<<CV_32F<<std::endl;
+      std::cout << "I2 type is " << (int)I2.type() << " CV_32F is" << CV_32F
+                << std::endl;
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
@@ -245,10 +253,12 @@ namespace cyy::naive_lib::opencv {
       cv::cuda::GpuMat mu1, mu2, mu1_2, mu2_2, mu1_mu2, sigma1_2, sigma2_2,
           sigma12, t3;
 
-      std::cout<<"get i1"<<std::endl;
-      std::cout<<"I1 type is "<<(int)I1.get_cv_gpu_mat().type()<<std::endl;
+      std::cout << "get i1" << std::endl;
+      std::cout << "I1 type is " << (int)I1.get_cv_gpu_mat().type()
+                << std::endl;
       gauss->apply(I1.get_cv_gpu_mat(), mu1, stream);
-      std::cout<<"I2 type is "<<(int)I2.get_cv_gpu_mat().type()<<std::endl;
+      std::cout << "I2 type is " << (int)I2.get_cv_gpu_mat().type()
+                << std::endl;
       gauss->apply(I2.get_cv_gpu_mat(), mu2, stream);
       cv::cuda::sqr(mu1, mu1_2, stream);
       cv::cuda::sqr(mu2, mu2_2, stream);
@@ -589,12 +599,12 @@ namespace cyy::naive_lib::opencv {
       if (!can_use_gpu) {
         download();
         location = data_location::cpu;
-        std::cout<<"can use gpu"<<std::endl;
+        std::cout << "can use gpu" << std::endl;
         return;
       }
 
       if (location != data_location::cpu) {
-        std::cout<<"in gpu"<<std::endl;
+        std::cout << "in gpu" << std::endl;
         return;
       }
 
@@ -602,13 +612,14 @@ namespace cyy::naive_lib::opencv {
       if (initer.has_nvidia_driver) {
         auto &stream = get_stream();
         gpu_mat.upload(cpu_mat, stream);
-        std::cout<<"upload gpu cpu type is"<<(int)cpu_mat.type()<<" gpu type is"<<gpu_mat.type()<<std::endl;
+        std::cout << "upload gpu cpu type is" << (int)cpu_mat.type()
+                  << " gpu type is" << gpu_mat.type() << std::endl;
         location = data_location::synced;
       } else {
-        std::cout<<"no cuda"<<std::endl;
+        std::cout << "no cuda" << std::endl;
       }
 #else
-        std::cout<<"no cuda"<<std::endl;
+      std::cout << "no cuda" << std::endl;
 #endif
     }
 
