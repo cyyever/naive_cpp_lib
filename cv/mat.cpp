@@ -599,6 +599,7 @@ namespace cyy::naive_lib::opencv {
       if (initer.has_nvidia_driver) {
         auto &stream = get_stream();
         gpu_mat.upload(cpu_mat, stream);
+        std::cout<<"upload gpu cpu type is"<<(int)cpu_mat.type()<<" gpu type is"<<gpu_mat.type()<<std::endl;
         location = data_location::synced;
       }
 #endif
