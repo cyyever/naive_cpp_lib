@@ -36,10 +36,8 @@ inline void define_cv_extension(py::module_ &m) {
             {mat.step[0], /* Strides (in bytes) for each index */
              mat.step[1], sizeof(unsigned char)});
       });
-  using mat = cyy::naive_lib::cv::mat;
+  using mat = cyy::naive_lib::opencv::mat;
   py::class_<mat>(sub_m, "Mat")
       .def(py::init<const cv::Mat &>())
-      .def("MSSIM", &mat::MSSIM)
-
-      ;
+      .def("MSSIM", &mat::MSSIM);
 }
