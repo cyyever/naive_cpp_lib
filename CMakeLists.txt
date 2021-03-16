@@ -9,7 +9,7 @@ endif()
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_TORCH "Build torch module" OFF)
 option(BUILD_CV "Build opencv module" OFF)
-option(BUILD_VIDEO "Build video modules" ON)
+option(BUILD_VIDEO "Build video modules" OFF)
 option(BUILD_TORCH_PYTHON_BINDING "Build python bindings for torch" OFF)
 option(BUILD_VIDEO_PYTHON_BINDING "Build python bindings for video" OFF)
 
