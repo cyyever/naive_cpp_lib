@@ -245,7 +245,9 @@ namespace cyy::naive_lib::opencv {
       cv::cuda::GpuMat mu1, mu2, mu1_2, mu2_2, mu1_mu2, sigma1_2, sigma2_2,
           sigma12, t3;
 
+      std::cout<<"I1 type is "<<(int)I1.get_cv_gpu_mat().type()<<std::endl;
       gauss->apply(I1.get_cv_gpu_mat(), mu1, stream);
+      std::cout<<"I2 type is "<<(int)I2.get_cv_gpu_mat().type()<<std::endl;
       gauss->apply(I2.get_cv_gpu_mat(), mu2, stream);
       cv::cuda::sqr(mu1, mu1_2, stream);
       cv::cuda::sqr(mu2, mu2_2, stream);
