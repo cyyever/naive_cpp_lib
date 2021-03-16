@@ -16,5 +16,5 @@ def test_ffpmeg_video_reader_dict():
         "1.jpg",
     )
     img = cv2.imread(image_file)
-    mat = cyy_naive_cpp_extension.cv.Mat(img)
+    mat = cyy_naive_cpp_extension.cv.Mat(cyy_naive_cpp_extension.cv.Matrix(img))
     print(mat.MSSIM(mat))
