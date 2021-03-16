@@ -217,13 +217,13 @@ namespace cyy::naive_lib::opencv {
 
     mat_impl &operator+=(const cv::Scalar &scalar) {
       unary_operation(
-          [=, this, &scalar](mat_impl &result_mat) {
-            cv::add(cpu_mat, scalar, result_mat.cpu_mat, cv::noArray(), -1);
+          [=, this, &scalar](auto &result_cpu_mat) {
+            cv::add(cpu_mat, scalar, result_cpu_mat, cv::noArray(), -1);
           },
 
-          [=, this, &scalar](mat_impl &result_mat) {
-            cv::cuda::add(gpu_mat, scalar, result_mat.gpu_mat, cv::noArray(),
-                          -1, get_stream());
+          [=, this, &scalar](auto &result_gpu_mat) {
+            cv::cuda::add(gpu_mat, scalar, result_gpu_mat, cv::noArray(), -1,
+                          get_stream());
           },
           true);
       return *this;
@@ -235,92 +235,61 @@ namespace cyy::naive_lib::opencv {
       const float C1 = 6.5025f, C2 = 58.5225f;
       auto &stream = get_stream();
       /***************************** INITS **********************************/
-      auto vI1 = convert_to(CV_32F).split();
-      auto vI2 = i2.convert_to(CV_32F).split();
+      auto I1 = convert_to(CV_32F);
+      auto I2 = i2.convert_to(CV_32F);
 
-      cv::Scalar mssim;
+      auto gauss =
+          cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
-      auto gauss = cv::cuda::createGaussianFilter(vI2[0].type(), -1,
-                                                  cv::Size(11, 11), 1.5);
+      mat_impl I1_2, I2_2, I1_I2;
+      cv::cuda::GpuMat mu1, mu2, mu1_2, mu2_2, mu1_mu2, sigma1_2, sigma2_2,
+          sigma12, t3;
 
-      std::vector<mat_impl> I1_2;
-      I1_2.resize(channels());
-      std::vector<mat_impl> I2_2;
-      I2_2.resize(channels());
-      std::vector<mat_impl> I1_I2;
-      I1_I2.resize(channels());
-      std::vector<cv::cuda::GpuMat> mu1;
-      mu1.resize(channels());
-      std::vector<cv::cuda::GpuMat> mu2;
-      mu2.resize(channels());
-      std::vector<cv::cuda::GpuMat> mu1_2;
-      mu1_2.resize(channels());
-      std::vector<cv::cuda::GpuMat> mu2_2;
-      mu2_2.resize(channels());
-      std::vector<cv::cuda::GpuMat> mu1_mu2;
-      mu1_mu2.resize(channels());
-      std::vector<cv::cuda::GpuMat> sigma1_2;
-      sigma1_2.resize(channels());
-      std::vector<cv::cuda::GpuMat> sigma2_2;
-      sigma2_2.resize(channels());
-      std::vector<cv::cuda::GpuMat> sigma12;
-      sigma12.resize(channels());
-      std::vector<cv::cuda::GpuMat> t3;
-      t3.resize(channels());
+      gauss->apply(I1.get_cv_gpu_mat(), mu1, stream);
+      gauss->apply(I2.get_cv_gpu_mat(), mu2, stream);
+      cv::cuda::sqr(mu1, mu1_2, stream);
+      cv::cuda::sqr(mu2, mu2_2, stream);
+      cv::cuda::multiply(mu1, mu2, mu1_mu2, 1, -1, stream);
+      I1_2 = I1.sqr(false);
+      gauss->apply(I1_2.get_cv_gpu_mat(), sigma1_2, stream);
+      cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
+                         stream); // sigma1_2 -= mu1_2;
+      I2_2 = I2.sqr(false);
+      gauss->apply(I2_2.get_cv_gpu_mat(), sigma2_2, stream);
+      cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
+                         stream); // sigma2_2 -= mu2_2;
+      I1_I2 = I1.multiply(I2, false);
+      gauss->apply(I1_I2.get_cv_gpu_mat(), sigma12, stream);
+      cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
+                         stream); // sigma12 -= mu1_mu2;
 
-      for (int i = 0; i < channels(); ++i) {
-        gauss->apply(vI1[i].get_cv_gpu_mat(), mu1[i], stream);
-        gauss->apply(vI2[i].get_cv_gpu_mat(), mu2[i], stream);
+      ///////////////////////////////// FORMULA
+      ///////////////////////////////////
 
-        cv::cuda::sqr(mu1[i], mu1_2[i], stream);
-        cv::cuda::sqr(mu2[i], mu2_2[i], stream);
-        cv::cuda::multiply(mu1[i], mu2[i], mu1_mu2[i], 1, -1, stream);
+      mu1_mu2.convertTo(mu1_mu2, -1, 2, C1,
+                        stream); // t1 = 2 * mu1_mu2 + C1;
+      sigma12.convertTo(sigma12, -1, 2, C2,
+                        stream); // t2 = 2 * sigma12 + C2;
+      cv::cuda::multiply(mu1_mu2, sigma12, t3, 1, -1,
+                         stream); // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
 
-        I1_2[i] = vI1[i].sqr(false);
-        gauss->apply(I1_2[i].get_cv_gpu_mat(), sigma1_2[i], stream);
-        cv::cuda::subtract(sigma1_2[i], mu1_2[i], sigma1_2[i], cv::noArray(),
-                           -1,
-                           stream); // sigma1_2 -= mu1_2;
+      cv::cuda::addWeighted(mu1_2, 1.0, mu2_2, 1.0, C1, mu1_mu2, -1,
+                            stream); // t1 = mu1_2 + mu2_2 + C1;
+      cv::cuda::addWeighted(sigma1_2, 1.0, sigma2_2, 1.0, C2, sigma12, -1,
+                            stream); // t2 = sigma1_2 + sigma2_2 + C2;
+      cv::cuda::multiply(
+          mu1_mu2, sigma12, mu1_mu2, 1, -1,
+          stream); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
 
-        I2_2[i] = vI2[i].sqr(false);
-        gauss->apply(I2_2[i].get_cv_gpu_mat(), sigma2_2[i], stream);
-        cv::cuda::subtract(sigma2_2[i], mu2_2[i], sigma2_2[i], cv::noArray(),
-                           -1,
-                           stream); // sigma2_2 -= mu2_2;
-
-        I1_I2[i] = vI1[i].multiply(vI2[i], false);
-        gauss->apply(I1_I2[i].get_cv_gpu_mat(), sigma12[i], stream);
-        cv::cuda::subtract(sigma12[i], mu1_mu2[i], sigma12[i], cv::noArray(),
-                           -1,
-                           stream); // sigma12 -= mu1_mu2;
-
-        ///////////////////////////////// FORMULA
-        ///////////////////////////////////
-
-        mu1_mu2[i].convertTo(mu1_mu2[i], -1, 2, C1,
-                             stream); // t1 = 2 * mu1_mu2 + C1;
-        sigma12[i].convertTo(sigma12[i], -1, 2, C2,
-                             stream); // t2 = 2 * sigma12 + C2;
-        cv::cuda::multiply(mu1_mu2[i], sigma12[i], t3[i], 1, -1,
-                           stream); // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
-
-        cv::cuda::addWeighted(mu1_2[i], 1.0, mu2_2[i], 1.0, C1, mu1_mu2[i], -1,
-                              stream); // t1 = mu1_2 + mu2_2 + C1;
-        cv::cuda::addWeighted(sigma1_2[i], 1.0, sigma2_2[i], 1.0, C2,
-                              sigma12[i], -1,
-                              stream); // t2 = sigma1_2 + sigma2_2 + C2;
-        cv::cuda::multiply(
-            mu1_mu2[i], sigma12[i], mu1_mu2[i], 1, -1,
-            stream); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
-
-        cv::cuda::divide(t3[i], mu1_mu2[i], t3[i], 1, -1,
-                         stream); // ssim_map = t3./t1;
-      }
+      cv::cuda::divide(t3, mu1_mu2, t3, 1, -1,
+                       stream); // ssim_map = t3./t1;
       stream.waitForCompletion();
-      for (int i = 0; i < channels(); ++i) {
-        auto s = cv::cuda::sum(t3[i]);
-        mssim.val[i] = s.val[0] / (t3[i].rows *t3[i].cols);
-        std::cout << "value is" << mssim.val[i] << std::endl;
+      auto t3_mat_impl = mat_impl(t3);
+      auto mssim = cv::mean(t3_mat_impl.get_cv_mat());
+      for (size_t i = 0; i < 3; i++) {
+        /* auto s = cv::cuda::sum(t3[0]); */
+        /* mssim.val[i] = s.val[0] / (t3[i].rows *t3[i].cols); */
+        std::cout << "value is" << mssim[i] << std::endl;
       }
       return mssim;
     }
@@ -333,12 +302,12 @@ namespace cyy::naive_lib::opencv {
     mat_impl divide(float src2, bool self_as_result) {
       auto scalar = cv::Scalar::all(src2);
       return unary_operation(
-          [=, this](mat_impl &result_mat) {
-            cv::divide(cpu_mat, scalar, result_mat.cpu_mat, 1, -1);
+          [=, this](auto &result_cpu_mat) {
+            cv::divide(cpu_mat, scalar, result_cpu_mat, 1, -1);
           },
 
-          [=, this](mat_impl &result_mat) {
-            cv::cuda::divide(gpu_mat, scalar, result_mat.gpu_mat, 1, -1,
+          [=, this](auto &result_gpu_mat) {
+            cv::cuda::divide(gpu_mat, scalar, result_gpu_mat, 1, -1,
                              get_stream());
           },
           self_as_result);
@@ -346,37 +315,37 @@ namespace cyy::naive_lib::opencv {
 
     mat_impl multiply(mat_impl src2, bool self_as_result) {
       return unary_operation(
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::multiply(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
+          [=, this, &src2](auto &result_cpu_mat) {
+            cv::multiply(cpu_mat, src2.cpu_mat, result_cpu_mat, 1, -1);
           },
 
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::cuda::multiply(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
+          [=, this, &src2](auto &result_gpu_mat) {
+            cv::cuda::multiply(gpu_mat, src2.gpu_mat, result_gpu_mat, 1, -1,
                                get_stream());
           },
           self_as_result);
     }
     mat_impl sqr(bool self_as_result) {
       return unary_operation(
-          [=, this](mat_impl &result_mat) {
+          [=, this](auto &result_cpu_mat) {
             throw std::runtime_error("unsupported operation");
             /* cv::sqr(cpu_mat,  result_mat.cpu_mat); */
           },
 
-          [=, this](mat_impl &result_mat) {
-            cv::cuda::sqr(gpu_mat, result_mat.gpu_mat, get_stream());
+          [=, this](auto &result_gpu_mat) {
+            cv::cuda::sqr(gpu_mat, result_gpu_mat, get_stream());
           },
           self_as_result);
     }
 
     mat_impl divide(mat_impl src2, bool self_as_result) {
       return unary_operation(
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::divide(cpu_mat, src2.cpu_mat, result_mat.cpu_mat, 1, -1);
+          [=, this, &src2](auto &result_cpu_mat) {
+            cv::divide(cpu_mat, src2.cpu_mat, result_cpu_mat, 1, -1);
           },
 
-          [=, this, &src2](mat_impl &result_mat) {
-            cv::cuda::divide(gpu_mat, src2.gpu_mat, result_mat.gpu_mat, 1, -1,
+          [=, this, &src2](auto &result_gpu_mat) {
+            cv::cuda::divide(gpu_mat, src2.gpu_mat, result_gpu_mat, 1, -1,
                              get_stream());
           },
           self_as_result);
@@ -570,36 +539,36 @@ namespace cyy::naive_lib::opencv {
       return res;
     }
 
-    [[deprecated]] mat_impl flip(int flip_code) const {
-#ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        cv::cuda::GpuMat tmp;
-        cv::cuda::flip(gpu_mat, tmp, flip_code, get_stream());
-        return {tmp};
-      }
-#endif
-      cv::Mat tmp;
-      cv::flip(cpu_mat, tmp, flip_code);
-      return {tmp};
+    mat_impl flip(int flip_code, bool self_as_result) {
+
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) {
+            cv::flip(cpu_mat, result_cpu_mat, flip_code);
+          },
+
+          [=, this](auto &result_gpu_mat) {
+            cv::cuda::flip(gpu_mat, result_gpu_mat, flip_code, get_stream());
+          },
+          self_as_result);
     }
 
   private:
-    mat_impl unary_operation(std::function<void(mat_impl &)> cpu_operation,
-                             std::function<void(mat_impl &)> gpu_operation,
-                             bool self_as_result) {
+    mat_impl
+    unary_operation(std::function<void(cv::Mat &)> cpu_operation,
+                    std::function<void(cv::cuda::GpuMat &)> gpu_operation,
+                    bool self_as_result) {
       auto result_mat = get_result_mat(self_as_result);
       upload();
       result_mat.upload();
       if (location != data_location::cpu) {
-        gpu_operation(result_mat);
+        gpu_operation(result_mat.gpu_mat);
         result_mat.location = data_location::gpu;
         if (self_as_result) {
           location = data_location::gpu;
         }
         return result_mat;
       }
-      cpu_operation(result_mat);
+      cpu_operation(result_mat.cpu_mat);
       result_mat.location = data_location::cpu;
       if (self_as_result) {
         location = data_location::cpu;
@@ -775,7 +744,9 @@ namespace cyy::naive_lib::opencv {
   }
   cv::Scalar mat::MSSIM(const mat &i2) const { return pimpl->MSSIM(*i2.pimpl); }
 
-  mat mat::flip(int flip_code) const { return pimpl->flip(flip_code); }
+  mat mat::flip(int flip_code, bool self_as_result) {
+    return pimpl->flip(flip_code, self_as_result);
+  }
 
   std::optional<mat> mat::load(const std::filesystem::path &image_path) {
     auto res = ::cyy::naive_lib::io::get_file_content(image_path);

@@ -89,7 +89,7 @@ namespace cyy::naive_lib::opencv {
 
     std::vector<mat> split() const;
 
-    mat flip(int flip_code) const;
+    mat flip(int flip_code, bool self_as_result = false);
 
     //! \brief 加载指定路径的图片
     //! \return 如果不成功，返回空，否則返回讀取到的Mat
