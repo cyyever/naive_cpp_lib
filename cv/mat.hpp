@@ -72,7 +72,7 @@ namespace cyy::naive_lib::opencv {
 
     size_t elem_size() const;
 
-    mat clone() const;
+    mat clone();
 
     mat transpose() const;
 

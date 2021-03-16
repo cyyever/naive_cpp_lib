@@ -286,8 +286,6 @@ namespace cyy::naive_lib::opencv {
       auto t3_mat_impl = mat_impl(t3);
       auto mssim = cv::mean(t3_mat_impl.get_cv_mat());
       for (size_t i = 0; i < 3; i++) {
-        /* auto s = cv::cuda::sum(t3[0]); */
-        /* mssim.val[i] = s.val[0] / (t3[i].rows *t3[i].cols); */
         std::cout << "value is" << mssim[i] << std::endl;
       }
       return mssim;
@@ -477,14 +475,12 @@ namespace cyy::naive_lib::opencv {
       return {tmp};
     }
 
-    mat_impl clone() const {
-#ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        return {gpu_mat.clone()};
-      }
-#endif
-      return {cpu_mat.clone()};
+    mat_impl clone() {
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) { result_cpu_mat = cpu_mat.clone(); },
+
+          [=, this](auto &result_gpu_mat) { result_gpu_mat = gpu_mat.clone(); },
+          false);
     }
 
     mat_impl convert_to(int rtype, double alpha = 1, double beta = 0,
@@ -557,7 +553,9 @@ namespace cyy::naive_lib::opencv {
                     bool self_as_result) {
       auto result_mat = get_result_mat(self_as_result);
       upload();
-      result_mat.upload();
+      if (!self_as_result) {
+        result_mat.upload();
+      }
       if (location != data_location::cpu) {
         gpu_operation(result_mat.gpu_mat);
         result_mat.location = data_location::gpu;
@@ -714,7 +712,7 @@ namespace cyy::naive_lib::opencv {
 
   size_t mat::elem_size() const { return pimpl->elem_size(); }
 
-  mat mat::clone() const { return pimpl->clone(); }
+  mat mat::clone() { return pimpl->clone(); }
 
   mat mat::transpose() const { return pimpl->transpose(); }
 
