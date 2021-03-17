@@ -232,6 +232,19 @@ namespace cyy::naive_lib::opencv {
           self_as_result);
     }
 
+    mat_impl subtract(const mat_impl &src2, bool self_as_result) {
+      return unary_operation(
+          [=, this, &src2](auto &result_cpu_mat) {
+            cv::subtract(cpu_mat, src2, result_cpu_mat, cv::noArray(), -1);
+          },
+
+          [=, this, &src2](auto &result_gpu_mat) {
+            cv::cuda::subtract(gpu_mat, src2, result_gpu_mat, cv::noArray(), -1,
+                               get_stream());
+          },
+          self_as_result);
+    }
+
 #ifdef HAVE_GPU_MAT
     // changed from samples/cpp/tutorial_code/gpu/gpu-basics-similarity
     cv::Scalar MSSIM(mat_impl i2) {
@@ -243,7 +256,6 @@ namespace cyy::naive_lib::opencv {
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
-      mat_impl I1_2, I2_2, I1_I2;
       cv::cuda::GpuMat mu1, mu2, mu1_2, mu2_2, mu1_mu2, sigma1_2, sigma2_2,
           sigma12, t3;
 
@@ -252,15 +264,15 @@ namespace cyy::naive_lib::opencv {
       cv::cuda::sqr(mu1, mu1_2, stream);
       cv::cuda::sqr(mu2, mu2_2, stream);
       cv::cuda::multiply(mu1, mu2, mu1_mu2, 1, -1, stream);
-      I1_2 = I1.sqr(false);
+      auto I1_2 = I1.sqr(false);
       gauss->apply(I1_2.get_cv_gpu_mat(), sigma1_2, stream);
       cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
                          stream); // sigma1_2 -= mu1_2;
-      I2_2 = I2.sqr(false);
+      auto I2_2 = I2.sqr(false);
       gauss->apply(I2_2.get_cv_gpu_mat(), sigma2_2, stream);
       cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
                          stream); // sigma2_2 -= mu2_2;
-      I1_I2 = I1.multiply(I2, false);
+      auto I1_I2 = I1.multiply(I2, false);
       gauss->apply(I1_I2.get_cv_gpu_mat(), sigma12, stream);
       cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
                          stream); // sigma12 -= mu1_mu2;
