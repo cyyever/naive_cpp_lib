@@ -129,7 +129,10 @@ TEST_CASE("mat") {
     }
     SUBCASE("MSSIM") {
       auto uint8_mat = image_mat.convert_to(CV_8UC3);
-      uint8_mat.MSSIM(uint8_mat);
+      auto scalar = uint8_mat.MSSIM(uint8_mat);
+      CHECK_EQ(scalar[0], 1);
+      CHECK_EQ(scalar[1], 1);
+      CHECK_EQ(scalar[2], 1);
       uint8_mat.MSSIM(uint8_mat.flip(0));
       uint8_mat.MSSIM(uint8_mat.flip(1));
     }

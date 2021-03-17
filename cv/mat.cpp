@@ -235,12 +235,13 @@ namespace cyy::naive_lib::opencv {
     mat_impl subtract(const mat_impl &src2, bool self_as_result) {
       return unary_operation(
           [=, this, &src2](auto &result_cpu_mat) {
-            cv::subtract(cpu_mat, src2, result_cpu_mat, cv::noArray(), -1);
+            cv::subtract(cpu_mat, src2.get_cv_mat(), result_cpu_mat,
+                         cv::noArray(), -1);
           },
 
           [=, this, &src2](auto &result_gpu_mat) {
-            cv::cuda::subtract(gpu_mat, src2, result_gpu_mat, cv::noArray(), -1,
-                               get_stream());
+            cv::cuda::subtract(gpu_mat, src2.get_cv_gpu_mat(), result_gpu_mat,
+                               cv::noArray(), -1, get_stream());
           },
           self_as_result);
     }
