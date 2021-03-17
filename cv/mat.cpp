@@ -139,18 +139,11 @@ namespace cyy::naive_lib::opencv {
     mat_impl() = default;
 
     mat_impl(cv::Mat cv_mat)
-        : cpu_mat(std::move(cv_mat)), location(data_location::cpu) {
-      can_use_gpu = false;
-#ifdef HAVE_GPU_MAT
-      if (initer.has_nvidia_driver) {
-        can_use_gpu = true;
-      }
-#endif
-    }
+        : cpu_mat(std::move(cv_mat)), location(data_location::cpu) {}
 
 #ifdef HAVE_GPU_MAT
     mat_impl(const cv::cuda::GpuMat &cv_mat)
-        : can_use_gpu(true), gpu_mat(cv_mat), location(data_location::gpu) {}
+        : gpu_mat(cv_mat), location(data_location::gpu) {}
 #endif
 
     mat_impl(const mat_impl &) = default;
@@ -223,7 +216,11 @@ namespace cyy::naive_lib::opencv {
     }
 
     mat_impl &operator+=(const cv::Scalar &scalar) {
-      unary_operation(
+      add(scalar, true);
+      return *this;
+    }
+    mat_impl add(const cv::Scalar &scalar, bool self_as_result) {
+      return unary_operation(
           [=, this, &scalar](auto &result_cpu_mat) {
             cv::add(cpu_mat, scalar, result_cpu_mat, cv::noArray(), -1);
           },
@@ -232,8 +229,7 @@ namespace cyy::naive_lib::opencv {
             cv::cuda::add(gpu_mat, scalar, result_gpu_mat, cv::noArray(), -1,
                           get_stream());
           },
-          true);
-      return *this;
+          self_as_result);
     }
 
 #ifdef HAVE_GPU_MAT
@@ -500,17 +496,16 @@ namespace cyy::naive_lib::opencv {
           self_as_result);
     }
 
-    void cvt_color(int code) {
-#ifdef HAVE_GPU_MAT
-      if (location != data_location::cpu) {
-        cv::cuda::cvtColor(gpu_mat, gpu_mat, code, 0, get_stream());
-        location = data_location::gpu;
-        return;
-      }
-#endif
-      cv::cvtColor(cpu_mat, cpu_mat, code);
-      location = data_location::cpu;
-      return;
+    mat_impl cvt_color(int code, bool self_as_result = false) {
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) {
+            cv::cvtColor(cpu_mat, result_cpu_mat, code);
+          },
+
+          [=, this](auto &result_gpu_mat) {
+            cv::cuda::cvtColor(gpu_mat, result_gpu_mat, code, 0, get_stream());
+          },
+          self_as_result);
     }
 
     std::vector<mat_impl> split() const {
@@ -522,23 +517,21 @@ namespace cyy::naive_lib::opencv {
         std::vector<cv::cuda::GpuMat> output_channels;
         cv::cuda::split(gpu_mat, output_channels, get_stream());
         for (auto &channel : output_channels) {
-          res.emplace_back(channel);
+          res.emplace_back(std::move(channel));
         }
-      } else
+        return res;
+      }
 #endif
-      {
-        std::vector<cv::Mat> output_channels;
-        cv::split(cpu_mat, output_channels);
+      std::vector<cv::Mat> output_channels;
+      cv::split(cpu_mat, output_channels);
 
-        for (auto &channel : output_channels) {
-          res.emplace_back(channel);
-        }
+      for (auto &channel : output_channels) {
+        res.emplace_back(std::move(channel));
       }
       return res;
     }
 
     mat_impl flip(int flip_code, bool self_as_result) {
-
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
             cv::flip(cpu_mat, result_cpu_mat, flip_code);
@@ -588,7 +581,6 @@ namespace cyy::naive_lib::opencv {
     void upload() const {
       if (!can_use_gpu) {
         download();
-        location = data_location::cpu;
         return;
       }
 
@@ -612,9 +604,9 @@ namespace cyy::naive_lib::opencv {
         auto &stream = get_stream();
         gpu_mat.download(cpu_mat, stream);
         stream.waitForCompletion();
-        location = data_location::synced;
       }
 #endif
+      location = data_location::synced;
     }
 
 #ifdef HAVE_GPU_MAT
@@ -633,7 +625,7 @@ namespace cyy::naive_lib::opencv {
 
   private:
     mutable cv::Mat cpu_mat{};
-    mutable bool can_use_gpu{false};
+    mutable bool can_use_gpu{true};
 #ifdef HAVE_GPU_MAT
     mutable cv::cuda::GpuMat gpu_mat{};
     //为了在不支持CUDA的机器上运行，我们必须延迟初始化stream，构造构造函数会抛出异常
@@ -729,7 +721,7 @@ namespace cyy::naive_lib::opencv {
     return pimpl->convert_to(rtype, alpha, beta, self_as_result);
   }
 
-  void mat::cvt_color(int code) { pimpl->cvt_color(code); }
+  mat mat::cvt_color(int code) { return pimpl->cvt_color(code); }
 
   mat mat::copy_make_border(int top, int bottom, int left, int right,
                             const ::cv::Scalar &value) const {
