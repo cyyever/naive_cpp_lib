@@ -225,10 +225,12 @@ namespace cyy::naive_lib::opencv {
             cv::add(cpu_mat, scalar, result_cpu_mat, cv::noArray(), -1);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this, &scalar](auto &result_gpu_mat) {
             cv::cuda::add(gpu_mat, scalar, result_gpu_mat, cv::noArray(), -1,
                           get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -239,16 +241,18 @@ namespace cyy::naive_lib::opencv {
                          cv::noArray(), -1);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this, &src2](auto &result_gpu_mat) {
             cv::cuda::subtract(gpu_mat, src2.get_cv_gpu_mat(), result_gpu_mat,
                                cv::noArray(), -1, get_stream());
           },
+#endif
           self_as_result);
     }
 
-#ifdef HAVE_GPU_MAT
     // changed from samples/cpp/tutorial_code/gpu/gpu-basics-similarity
     cv::Scalar MSSIM(mat_impl i2) {
+#ifdef HAVE_GPU_MAT
       const float C1 = 6.5025f, C2 = 58.5225f;
       auto &stream = get_stream();
       /***************************** INITS **********************************/
@@ -302,8 +306,10 @@ namespace cyy::naive_lib::opencv {
       auto t3_mat_impl = mat_impl(t3);
       auto mssim = cv::mean(t3_mat_impl.get_cv_mat());
       return mssim;
-    }
+#else
+      throw std::runtime_error("need CUDA");
 #endif
+    }
 
     mat_impl &operator+=(float scalar) {
       return operator+=(cv::Scalar::all(scalar));
@@ -316,10 +322,12 @@ namespace cyy::naive_lib::opencv {
             cv::divide(cpu_mat, scalar, result_cpu_mat, 1, -1);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) {
             cv::cuda::divide(gpu_mat, scalar, result_gpu_mat, 1, -1,
                              get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -329,10 +337,12 @@ namespace cyy::naive_lib::opencv {
             cv::multiply(cpu_mat, src2.cpu_mat, result_cpu_mat, 1, -1);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this, &src2](auto &result_gpu_mat) {
             cv::cuda::multiply(gpu_mat, src2.gpu_mat, result_gpu_mat, 1, -1,
                                get_stream());
           },
+#endif
           self_as_result);
     }
     mat_impl sqr(bool self_as_result) {
@@ -342,9 +352,11 @@ namespace cyy::naive_lib::opencv {
             /* cv::sqr(cpu_mat,  result_mat.cpu_mat); */
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) {
             cv::cuda::sqr(gpu_mat, result_gpu_mat, get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -354,10 +366,12 @@ namespace cyy::naive_lib::opencv {
             cv::divide(cpu_mat, src2.cpu_mat, result_cpu_mat, 1, -1);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this, &src2](auto &result_gpu_mat) {
             cv::cuda::divide(gpu_mat, src2.gpu_mat, result_gpu_mat, 1, -1,
                              get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -492,7 +506,9 @@ namespace cyy::naive_lib::opencv {
       return unary_operation(
           [=, this](auto &result_cpu_mat) { result_cpu_mat = cpu_mat.clone(); },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) { result_gpu_mat = gpu_mat.clone(); },
+#endif
           false);
     }
 
@@ -503,9 +519,11 @@ namespace cyy::naive_lib::opencv {
             cpu_mat.convertTo(result_cpu_mat, rtype, alpha, beta);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) {
             gpu_mat.convertTo(result_gpu_mat, rtype, alpha, beta, get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -515,9 +533,11 @@ namespace cyy::naive_lib::opencv {
             cv::cvtColor(cpu_mat, result_cpu_mat, code);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) {
             cv::cuda::cvtColor(gpu_mat, result_gpu_mat, code, 0, get_stream());
           },
+#endif
           self_as_result);
     }
 
@@ -550,16 +570,20 @@ namespace cyy::naive_lib::opencv {
             cv::flip(cpu_mat, result_cpu_mat, flip_code);
           },
 
+#ifdef HAVE_GPU_MAT
           [=, this](auto &result_gpu_mat) {
             cv::cuda::flip(gpu_mat, result_gpu_mat, flip_code, get_stream());
           },
+#endif
           self_as_result);
     }
 
   private:
     mat_impl
     unary_operation(std::function<void(cv::Mat &)> cpu_operation,
+#ifdef HAVE_GPU_MAT
                     std::function<void(cv::cuda::GpuMat &)> gpu_operation,
+#endif
                     bool self_as_result) {
       auto result_mat = get_result_mat(self_as_result);
 #ifdef HAVE_GPU_MAT
