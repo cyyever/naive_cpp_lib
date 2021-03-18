@@ -1,4 +1,4 @@
-file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(cyy_naive_lib_video ${SOURCE})
 add_library(CyyNaiveLib::video ALIAS cyy_naive_lib_video)

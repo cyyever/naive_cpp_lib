@@ -6,7 +6,7 @@
 
 #include <doctest/doctest.h>
 
-#include "../src/ffmpeg_video_reader.hpp"
+#include "../ffmpeg_video_reader.hpp"
 
 #define STR_H(x) #x
 #define STR_HELPER(x) STR_H(x)

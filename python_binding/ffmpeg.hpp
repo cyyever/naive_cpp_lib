@@ -10,8 +10,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "video/src/ffmpeg_video_reader.hpp"
-#include "video/src/ffmpeg_video_writer.hpp"
+#include "video/ffmpeg_video_reader.hpp"
+#include "video/ffmpeg_video_writer.hpp"
 namespace py = pybind11;
 inline void define_video_extension(py::module_ &m) {
   auto sub_m = m.def_submodule("video", "Contains video decoding");

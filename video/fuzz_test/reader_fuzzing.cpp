@@ -4,16 +4,15 @@
  * \brief 测试reader函数
  */
 
-#include "../src/ffmpeg_reader.hpp"
+#include "../ffmpeg_video_reader.hpp"
 #include <fstream>
-#include <iostream>
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   if (Size == 0) {
     return 0;
   }
-  cyy::naive_lib::video::ffmpeg::reader reader;
   try {
+    cyy::naive_lib::video::ffmpeg_reader reader;
     std::ofstream of("test.mp4", std::ios::binary | std::ios::trunc);
     of.write(reinterpret_cast<const char *>(Data), Size);
     reader.open("test.mp4");

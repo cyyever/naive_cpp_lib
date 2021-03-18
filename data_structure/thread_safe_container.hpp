@@ -14,6 +14,7 @@
 #include <memory>
 #include <optional>
 #include <shared_mutex>
+#include <vector>
 #include <type_traits>
 
 namespace cyy::naive_lib {
