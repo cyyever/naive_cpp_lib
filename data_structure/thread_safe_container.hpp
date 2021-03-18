@@ -8,13 +8,8 @@
 
 #pragma once
 
-#include <algorithm>
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <deque>
-#include <forward_list>
-#include <list>
 #include <map>
 #include <memory>
 #include <optional>
@@ -33,8 +28,8 @@ namespace cyy::naive_lib {
     thread_safe_container() = default;
     ~thread_safe_container() = default;
 
-    thread_safe_container(const thread_safe_container &) =default;
-    thread_safe_container &operator=(const thread_safe_container &) =default;
+    thread_safe_container(const thread_safe_container &) = default;
+    thread_safe_container &operator=(const thread_safe_container &) = default;
 
     thread_safe_container(thread_safe_container &&) noexcept = default;
     thread_safe_container &
@@ -111,7 +106,7 @@ namespace cyy::naive_lib {
     template <typename T> void push_back(T &&value) {
       {
         std::lock_guard lock(container_mutex);
-        container.push_back(std::forward<T>(value));
+        container.insert(container.end(), std::forward<T>(value));
       }
       new_element_cv.notify_all();
     }
@@ -183,16 +178,7 @@ namespace cyy::naive_lib {
       return res;
     }
 
-    void pop_front_wrapper() {
-      if constexpr (std::is_same_v<std::list<value_type>, container_type> ||
-                    std::is_same_v<std::deque<value_type>, container_type> ||
-                    std::is_same_v<std::forward_list<value_type>,
-                                   container_type>) {
-        container.pop_front();
-      } else {
-        container.erase(container.begin());
-      }
-    }
+    void pop_front_wrapper() { container.erase(container.begin()); }
 
     void recycle_cv(std::shared_ptr<std::condition_variable_any> &ptr) const {
       cv_pool.emplace_back(std::move(ptr));
@@ -242,7 +228,6 @@ namespace cyy::naive_lib {
   public:
     using key_type = typename ContainerType::key_type;
     using mapped_type = typename ContainerType::mapped_type;
-    using typename thread_safe_container<ContainerType>::mutex_type;
     using thread_safe_container<ContainerType>::container;
     using thread_safe_container<ContainerType>::container_mutex;
 
