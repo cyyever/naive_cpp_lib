@@ -562,6 +562,7 @@ namespace cyy::naive_lib::opencv {
                     std::function<void(cv::cuda::GpuMat &)> gpu_operation,
                     bool self_as_result) {
       auto result_mat = get_result_mat(self_as_result);
+#ifdef HAVE_GPU_MAT
       upload();
       if (!self_as_result) {
         result_mat.upload();
@@ -574,6 +575,7 @@ namespace cyy::naive_lib::opencv {
         }
         return result_mat;
       }
+#endif
       cpu_operation(result_mat.cpu_mat);
       result_mat.location = data_location::cpu;
       if (self_as_result) {
