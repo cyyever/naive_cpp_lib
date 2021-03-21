@@ -234,6 +234,23 @@ namespace cyy::naive_lib::opencv {
           self_as_result);
     }
 
+#ifdef HAVE_GPU_MAT
+    mat_impl apply_cuda_filter(const cv::Ptr<cv::cuda::Filter> &filter,
+                               bool self_as_result = false) {
+      upload();
+
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) {
+            throw std::runtime_error("no CUDA support");
+          },
+
+          [=, this, &filter](auto &result_gpu_mat) {
+            filter->apply(gpu_mat, result_gpu_mat, get_stream());
+          },
+          self_as_result);
+    }
+#endif
+
     mat_impl subtract(const mat_impl &src2, bool self_as_result) {
       return unary_operation(
           [=, this, &src2](auto &result_cpu_mat) {
@@ -261,50 +278,40 @@ namespace cyy::naive_lib::opencv {
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
 
-      cv::cuda::GpuMat mu1, mu2, mu1_2, mu2_2, mu1_mu2, sigma1_2, sigma2_2,
-          sigma12, t3;
-
-      gauss->apply(I1.get_cv_gpu_mat(), mu1, stream);
-      gauss->apply(I2.get_cv_gpu_mat(), mu2, stream);
-      cv::cuda::sqr(mu1, mu1_2, stream);
-      cv::cuda::sqr(mu2, mu2_2, stream);
-      cv::cuda::multiply(mu1, mu2, mu1_mu2, 1, -1, stream);
+      auto mu1 = I1.apply_cuda_filter(gauss);
+      auto mu2 = I2.apply_cuda_filter(gauss);
+      auto mu1_2 = mu1.sqr(false);
+      auto mu2_2 = mu2.sqr(false);
+      auto mu1_mu2 = mu1.multiply(mu2, false);
       auto I1_2 = I1.sqr(false);
-      gauss->apply(I1_2.get_cv_gpu_mat(), sigma1_2, stream);
-      cv::cuda::subtract(sigma1_2, mu1_2, sigma1_2, cv::noArray(), -1,
-                         stream); // sigma1_2 -= mu1_2;
+      auto sigma1_2 = I1_2.apply_cuda_filter(gauss);
+      sigma1_2.subtract(mu1_2, true);
       auto I2_2 = I2.sqr(false);
-      gauss->apply(I2_2.get_cv_gpu_mat(), sigma2_2, stream);
-      cv::cuda::subtract(sigma2_2, mu2_2, sigma2_2, cv::noArray(), -1,
-                         stream); // sigma2_2 -= mu2_2;
+      auto sigma2_2 = I2_2.apply_cuda_filter(gauss);
+      sigma2_2.subtract(mu2_2, true);
       auto I1_I2 = I1.multiply(I2, false);
-      gauss->apply(I1_I2.get_cv_gpu_mat(), sigma12, stream);
-      cv::cuda::subtract(sigma12, mu1_mu2, sigma12, cv::noArray(), -1,
-                         stream); // sigma12 -= mu1_mu2;
+      auto sigma12 = I1_I2.apply_cuda_filter(gauss);
+      sigma12.subtract(mu1_mu2, true); // sigma12 -= mu1_mu2;
 
       ///////////////////////////////// FORMULA
       ///////////////////////////////////
 
-      mu1_mu2.convertTo(mu1_mu2, -1, 2, C1,
-                        stream); // t1 = 2 * mu1_mu2 + C1;
-      sigma12.convertTo(sigma12, -1, 2, C2,
-                        stream); // t2 = 2 * sigma12 + C2;
-      cv::cuda::multiply(mu1_mu2, sigma12, t3, 1, -1,
-                         stream); // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
+      auto t1 = mu1_mu2.convert_to(-1, 2, C1, false); // t1 = 2 * mu1_mu2 + C1;
+      auto t2 = sigma12.convert_to(-1, 2, C2, false); // t2 = 2 * sigma12 + C2;
+      auto t3 = t1.multiply(t2, false);               // t3 = t1*t2
 
-      cv::cuda::addWeighted(mu1_2, 1.0, mu2_2, 1.0, C1, mu1_mu2, -1,
+      cv::cuda::addWeighted(mu1_2.gpu_mat, 1.0, mu2_2.gpu_mat, 1.0, C1,
+                            t1.gpu_mat, -1,
                             stream); // t1 = mu1_2 + mu2_2 + C1;
-      cv::cuda::addWeighted(sigma1_2, 1.0, sigma2_2, 1.0, C2, sigma12, -1,
+      cv::cuda::addWeighted(sigma1_2.gpu_mat, 1.0, sigma2_2.gpu_mat, 1.0, C2,
+                            t2.gpu_mat, -1,
                             stream); // t2 = sigma1_2 + sigma2_2 + C2;
-      cv::cuda::multiply(
-          mu1_mu2, sigma12, mu1_mu2, 1, -1,
-          stream); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
+      t1.multiply(
+          t2,
+          true); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
 
-      cv::cuda::divide(t3, mu1_mu2, t3, 1, -1,
-                       stream); // ssim_map = t3./t1;
-      stream.waitForCompletion();
-      auto t3_mat_impl = mat_impl(t3);
-      auto mssim = cv::mean(t3_mat_impl.get_cv_mat());
+      t3.divide(t1, true); // ssim_map = t3./t1;
+      auto mssim = cv::mean(t3.get_cv_mat());
       return mssim;
 #else
       throw std::runtime_error("need CUDA");
