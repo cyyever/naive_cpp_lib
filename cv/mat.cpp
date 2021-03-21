@@ -461,26 +461,11 @@ namespace cyy::naive_lib::opencv {
 
     mat_impl resize(int new_width, int new_height, int interpolation) const {
       //由於gpu的resize實現和cpu的不一致,我們目前只使用cpu實現
-      /*
-  #ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        cv::cuda::GpuMat tmp;
-        cv::cuda::resize(gpu_mat, tmp, cv::Size(new_width, new_height), 0, 0,
-                         interpolation,get_stream());
-        return {tmp};
-      }
-  #endif
-      */
-      {
-        download();
-        cv::Mat tmp;
-        cv::resize(cpu_mat, tmp, cv::Size(new_width, new_height), 0, 0,
+      return cpu_unary_operation(
+          [=, this](auto &result_cpu_mat) {
+          cv::resize(cpu_mat,result_cpu_mat, cv::Size(new_width, new_height), 0, 0,
                    interpolation);
-        mat_impl tmp_impl(tmp);
-        tmp_impl.can_use_gpu = this->can_use_gpu;
-        return tmp_impl;
-      }
+          });
     }
 
     mat_impl copy_make_border(int top, int bottom, int left, int right,
@@ -600,6 +585,17 @@ namespace cyy::naive_lib::opencv {
         return result_mat;
       }
 #endif
+      cpu_operation(result_mat.cpu_mat);
+      result_mat.location = data_location::cpu;
+      if (self_as_result) {
+        location = data_location::cpu;
+      }
+      return result_mat;
+    }
+
+    mat_impl cpu_unary_operation(std::function<void(cv::Mat &)> cpu_operation,
+                                 bool self_as_result) {
+      auto result_mat = get_result_mat(self_as_result);
       cpu_operation(result_mat.cpu_mat);
       result_mat.location = data_location::cpu;
       if (self_as_result) {
