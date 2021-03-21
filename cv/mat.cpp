@@ -15,7 +15,6 @@
 #include <utility>
 
 #include <cuda_buddy/pool.hpp>
-#include <opencv2/core/core_c.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/cuda/common.hpp>
 #include <opencv2/cudaarithm.hpp>
@@ -138,11 +137,11 @@ namespace cyy::naive_lib::opencv {
   public:
     mat_impl() = default;
 
-    mat_impl(cv::Mat cv_mat)
+    explicit mat_impl(cv::Mat cv_mat)
         : cpu_mat(std::move(cv_mat)), location(data_location::cpu) {}
 
 #ifdef HAVE_GPU_MAT
-    mat_impl(const cv::cuda::GpuMat &cv_mat)
+    explicit mat_impl(const cv::cuda::GpuMat &cv_mat)
         : gpu_mat(cv_mat), location(data_location::gpu) {}
 #endif
 
@@ -390,10 +389,10 @@ namespace cyy::naive_lib::opencv {
     mat_impl operator()(const cv::Rect &roi) const {
 #ifdef HAVE_GPU_MAT
       if (location != data_location::cpu) {
-        return {gpu_mat(roi)};
+        return mat_impl{gpu_mat(roi)};
       }
 #endif
-      return {cpu_mat(roi)};
+      return mat_impl{cpu_mat(roi)};
     }
 
     //! \brief 获取封装的cv::Mat
@@ -457,13 +456,13 @@ namespace cyy::naive_lib::opencv {
         if (location != data_location::cpu) {
           cv::cuda::GpuMat tmp;
           cv::cuda::transpose(gpu_mat, tmp, get_stream());
-          return {tmp};
+          return mat_impl{tmp};
         }
       }
 #endif
       cv::Mat tmp;
       cv::transpose(cpu_mat, tmp);
-      return {tmp};
+      return mat_impl{tmp};
     }
 
     mat_impl resize(int new_width, int new_height, int interpolation,
@@ -478,22 +477,28 @@ namespace cyy::naive_lib::opencv {
     }
 
     mat_impl copy_make_border(int top, int bottom, int left, int right,
-                              const ::cv::Scalar &value) const {
+                              const ::cv::Scalar &value) {
+
+      return unary_operation(
+          [=, this](auto &result_cpu_mat) {
+            result_cpu_mat =
+                cv::Mat(cpu_mat.rows + top + bottom,
+                        cpu_mat.cols + left + right, cpu_mat.type());
+            copyMakeBorder(cpu_mat, result_cpu_mat, top, bottom, left, right,
+                           cv::BORDER_CONSTANT, value);
+          },
+
 #ifdef HAVE_GPU_MAT
-      upload();
-      if (location != data_location::cpu) {
-        cv::cuda::GpuMat tmp(gpu_mat.rows + top + bottom,
-                             gpu_mat.cols + left + right, gpu_mat.type());
-        cv::cuda::copyMakeBorder(gpu_mat, tmp, top, bottom, left, right,
-                                 cv::BORDER_CONSTANT, value, get_stream());
-        return {tmp};
-      }
+          [=, this](auto &result_gpu_mat) {
+            result_gpu_mat =
+                cv::cuda::GpuMat(gpu_mat.rows + top + bottom,
+                                 gpu_mat.cols + left + right, gpu_mat.type());
+            cv::cuda::copyMakeBorder(gpu_mat, result_gpu_mat, top, bottom, left,
+                                     right, cv::BORDER_CONSTANT, value,
+                                     get_stream());
+          },
 #endif
-      cv::Mat tmp(cpu_mat.rows + top + bottom, cpu_mat.cols + left + right,
-                  cpu_mat.type());
-      copyMakeBorder(cpu_mat, tmp, top, bottom, left, right,
-                     cv::BORDER_CONSTANT, value);
-      return {tmp};
+          false);
     }
 
     mat_impl clone() {
@@ -769,7 +774,7 @@ namespace cyy::naive_lib::opencv {
   mat mat::cvt_color(int code) { return pimpl->cvt_color(code); }
 
   mat mat::copy_make_border(int top, int bottom, int left, int right,
-                            const ::cv::Scalar &value) const {
+                            const ::cv::Scalar &value) {
     return pimpl->copy_make_border(top, bottom, left, right, value);
   }
 

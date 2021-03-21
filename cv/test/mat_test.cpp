@@ -133,11 +133,10 @@ TEST_CASE("mat") {
       CHECK_EQ(scalar[0], 1);
       CHECK_EQ(scalar[1], 1);
       CHECK_EQ(scalar[2], 1);
-      scalar=uint8_mat.MSSIM(uint8_mat.flip(0));
+      scalar = uint8_mat.MSSIM(uint8_mat.flip(0));
       CHECK_EQ(scalar[0], doctest::Approx(0.457195));
       CHECK_EQ(scalar[1], doctest::Approx(0.493516));
       CHECK_EQ(scalar[2], doctest::Approx(0.456676));
-
     }
   }
 }

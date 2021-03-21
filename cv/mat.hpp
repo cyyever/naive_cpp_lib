@@ -87,7 +87,7 @@ namespace cyy::naive_lib::opencv {
     cv::Scalar MSSIM(mat i2) const;
 
     mat copy_make_border(int top, int bottom, int left, int right,
-                         const ::cv::Scalar &value) const;
+                         const ::cv::Scalar &value);
 
     std::vector<mat> split() const;
 
