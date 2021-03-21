@@ -466,13 +466,15 @@ namespace cyy::naive_lib::opencv {
       return {tmp};
     }
 
-    mat_impl resize(int new_width, int new_height, int interpolation) const {
+    mat_impl resize(int new_width, int new_height, int interpolation,
+                    bool self_as_result = false) {
       //由於gpu的resize實現和cpu的不一致,我們目前只使用cpu實現
       return cpu_unary_operation(
           [=, this](auto &result_cpu_mat) {
-          cv::resize(cpu_mat,result_cpu_mat, cv::Size(new_width, new_height), 0, 0,
-                   interpolation);
-          });
+            cv::resize(cpu_mat, result_cpu_mat, cv::Size(new_width, new_height),
+                       0, 0, interpolation);
+          },
+          false);
     }
 
     mat_impl copy_make_border(int top, int bottom, int left, int right,
@@ -754,8 +756,9 @@ namespace cyy::naive_lib::opencv {
 
   mat mat::transpose() const { return pimpl->transpose(); }
 
-  mat mat::resize(int new_width, int new_height, int interpolation) const {
-    return pimpl->resize(new_width, new_height, interpolation);
+  mat mat::resize(int new_width, int new_height, int interpolation,
+                  bool self_as_result) {
+    return pimpl->resize(new_width, new_height, interpolation, self_as_result);
   }
 
   mat mat::convert_to(int rtype, double alpha, double beta,

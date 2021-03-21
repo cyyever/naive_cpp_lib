@@ -77,7 +77,8 @@ namespace cyy::naive_lib::opencv {
     mat transpose() const;
 
     mat resize(int new_width, int new_height,
-               int interpolation = cv::INTER_LINEAR) const;
+               int interpolation = cv::INTER_LINEAR,
+               bool self_as_result = false);
 
     mat convert_to(int rtype, double alpha = 1, double beta = 0,
                    bool self_as_result = false);
