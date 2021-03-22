@@ -33,6 +33,7 @@ namespace cyy::naive_lib::video {
   class ffmpeg_reader_impl : private cyy::naive_lib::runnable,
                              public ffmpeg_base {
   public:
+    ~ffmpeg_reader_impl() override { close(); }
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
