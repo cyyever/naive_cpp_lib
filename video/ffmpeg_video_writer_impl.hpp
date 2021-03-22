@@ -27,6 +27,7 @@ namespace cyy::naive_lib::video {
   class ffmpeg_writer_impl : public ffmpeg_base {
   public:
     ffmpeg_writer_impl() = default;
+    ~ffmpeg_writer_impl() override { close(); }
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
