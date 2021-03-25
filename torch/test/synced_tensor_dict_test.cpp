@@ -53,8 +53,10 @@ TEST_CASE("synced_tensor_dict") {
   CHECK(dict.contains("0"));
 
   dict.prefetch(keys);
-  CHECK_THROWS(dict.get("100000"));
-  CHECK_THROWS(dict.erase("10000"));
+
+  CHECK(!dict.contains("100000"));
+  CHECK(!dict.get("100000").has_value());
+  dict.erase("10000");
 
   for (int i = 0; i < 10; i++) {
     thds.emplace_back([i, &dict]() {

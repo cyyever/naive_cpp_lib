@@ -24,7 +24,8 @@ TEST_CASE("synced_sparse_tensor_dict") {
   // save sparse tensor
   dict.emplace("sparse_tensor", sparse_tensor);
   auto sparse_tensor2 = dict.get("sparse_tensor");
-  CHECK(torch::equal(sparse_tensor, sparse_tensor2));
+  CHECK(sparse_tensor2.has_value());
+  CHECK(torch::equal(sparse_tensor, sparse_tensor2.value()));
   CHECK_EQ(dict.size(), 1);
   CHECK_EQ(dict.keys().size(), 1);
   dict.erase("sparse_tensor");

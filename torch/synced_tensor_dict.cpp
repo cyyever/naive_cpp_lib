@@ -85,15 +85,15 @@ namespace cyy::naive_lib::pytorch {
     }
   }
 
-  torch::Tensor synced_tensor_dict::get(const std::string &key) {
+  std::optional<torch::Tensor> synced_tensor_dict::get(const std::string &key) {
     while (true) {
       std::unique_lock lk(data_mutex);
       auto [result, value_opt] = prefetch(key, false);
-      if (!result) {
-        throw std::out_of_range(key);
+      if (result < 0) {
+        throw std::runtime_error(key);
       }
-      if (value_opt.has_value()) {
-        return value_opt.value();
+      if (result > 0) {
+        return value_opt;
       }
       LOG_DEBUG("wait data {}, fetch_request_queue size is {}", key,
                 fetch_request_queue.size());
@@ -152,7 +152,7 @@ namespace cyy::naive_lib::pytorch {
   void synced_tensor_dict::erase(const std::string &key) {
     std::lock_guard lk(data_mutex);
     if (!data_info.erase(key)) {
-      throw std::out_of_range(key);
+      return;
     }
     data.erase(key);
     saving_data.erase(key);
@@ -286,7 +286,7 @@ namespace cyy::naive_lib::pytorch {
     return storage_dir / std::filesystem::path(key);
   }
 
-  std::pair<bool, std::optional<torch::Tensor>>
+  std::pair<int, std::optional<torch::Tensor>>
   synced_tensor_dict::prefetch(const std::string &key, bool with_lock) {
     {
       std::unique_lock lk(data_mutex, std::defer_lock);
@@ -295,32 +295,32 @@ namespace cyy::naive_lib::pytorch {
       }
       auto it = data_info.find(key);
       if (it == data_info.end()) {
-        return {false, {}};
+        return {1, {}};
       }
       if (it->second == data_state::PRE_SAVING ||
           it->second == data_state::SAVING) {
         auto node = saving_data.extract(key);
         data.emplace(key, node.mapped());
         it->second = data_state::IN_MEMORY_NEW_DATA;
-        return {true, std::move(node.mapped())};
+        return {1, std::move(node.mapped())};
       }
       if (it->second == data_state::IN_MEMORY ||
           it->second == data_state::IN_MEMORY_NEW_DATA) {
-        return {true, *data.find(key)};
+        return {1, *data.find(key)};
       }
       if (it->second == data_state::LOAD_FAILED) {
-        return {false, {}};
+        return {-1, {}};
       }
 
       if (it->second == data_state::LOADING) {
-        return {true, {}};
+        return {0, {}};
       }
       it->second = data_state::PRE_LOAD;
     }
     auto file_path = get_tensor_file_path(key);
     // jump to queue front
     fetch_request_queue.emplace_front(fetch_task{key, file_path});
-    return {true, {}};
+    return {0, {}};
   }
 
   void synced_tensor_dict::prefetch(const std::vector<std::string> &keys) {

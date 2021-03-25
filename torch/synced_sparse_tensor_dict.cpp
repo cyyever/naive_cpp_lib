@@ -27,8 +27,13 @@ namespace cyy::naive_lib::pytorch {
     auto sparse_value = value.sparse_mask(mask)._values();
     synced_tensor_dict::emplace(key, sparse_value);
   }
-  torch::Tensor synced_sparse_tensor_dict::get(const std::string &key) {
+  std::optional<torch::Tensor>
+  synced_sparse_tensor_dict::get(const std::string &key) {
     auto value = synced_tensor_dict::get(key);
-    return sparse_coo_tensor(mask._indices(), value, tensor_shape).to_dense();
+    if (!value.has_value()) {
+      return value;
+    }
+    return sparse_coo_tensor(mask._indices(), value.value(), tensor_shape)
+        .to_dense();
   }
 } // namespace cyy::naive_lib::pytorch

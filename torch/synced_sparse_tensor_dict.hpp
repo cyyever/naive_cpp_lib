@@ -10,7 +10,7 @@ namespace cyy::naive_lib::pytorch {
                               const std::string &storage_dir_);
     ~synced_sparse_tensor_dict();
     void emplace(const std::string &key, const torch::Tensor &value);
-    torch::Tensor get(const std::string &key);
+    std::optional<torch::Tensor> get(const std::string &key);
 
   private:
     torch::Tensor mask;

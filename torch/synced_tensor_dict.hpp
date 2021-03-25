@@ -24,7 +24,7 @@ namespace cyy::naive_lib::pytorch {
     ~synced_tensor_dict();
     void release();
     void emplace(const std::string &key, const torch::Tensor &value);
-    torch::Tensor get(const std::string &key);
+    std::optional<torch::Tensor> get(const std::string &key);
     size_t size() const;
     void erase(const std::string &key);
     bool contains(const std::string &key) const;
@@ -64,7 +64,7 @@ namespace cyy::naive_lib::pytorch {
                       data_state new_state);
     std::filesystem::path get_tensor_file_path(const std::string &key) const;
 
-    std::pair<bool, std::optional<torch::Tensor>>
+    std::pair<int, std::optional<torch::Tensor>>
     prefetch(const std::string &key, bool with_lock = true);
     using save_task = std::tuple<std::string, std::filesystem::path>;
     std::list<save_task> pop_expired_data(size_t max_number);
