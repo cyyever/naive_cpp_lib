@@ -168,6 +168,7 @@ namespace cyy::naive_lib::pytorch {
     saving_data.clear();
     if (!storage_dir.empty() && std::filesystem::exists(storage_dir)) {
       std::filesystem::remove_all(storage_dir);
+      std::filesystem::create_directories(storage_dir);
     }
   }
 
