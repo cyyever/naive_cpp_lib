@@ -36,6 +36,12 @@ int main(int argc, char **argv) {
   }
   end_ms = now_ms();
   std::cout << "remove and insertion used " << end_ms - begin_ms << " ms" << std::endl;
+  begin_ms = now_ms();
+  for (int i = 0; i < 1024; i++) {
+    torch::save(tensor, tensor_dir / (std::to_string(i) + ".tensor"));
+  }
+  end_ms = now_ms();
+  std::cout << "overwrite used " << end_ms - begin_ms << " ms" << std::endl;
   std::filesystem::remove_all(tensor_dir);
   return 0;
 }
