@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     torch::save(tensor, tensor_dir / (std::to_string(i) + ".tensor"));
   }
   end_ms = now_ms();
-  std::cout << "insertion used " << end_ms - begin_ms << " ms" << std::endl;
+  std::cout << "remove and insertion used " << end_ms - begin_ms << " ms" << std::endl;
   std::filesystem::remove_all(tensor_dir);
   return 0;
 }

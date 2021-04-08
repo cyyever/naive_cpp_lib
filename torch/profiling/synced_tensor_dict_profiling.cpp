@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   begin_ms = cyy::naive_lib::time::now_ms<std::chrono::steady_clock>();
   dict2.prefetch(dict2.keys());
   for (int i = 0; i < 1024; i++) {
-    tensor = dict2.get(std::to_string(i));
+    dict2.get(std::to_string(i));
   }
   end_ms = cyy::naive_lib::time::now_ms<std::chrono::steady_clock>();
   std::cout << "read used " << end_ms - begin_ms << " ms" << std::endl;
