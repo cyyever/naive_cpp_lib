@@ -29,13 +29,16 @@ target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::util)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::hardware)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::data_structure)
 target_link_directories(cyy_naive_lib_torch PUBLIC ${pytorch_path}/lib)
-target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES} torch_cuda)
-target_compile_definitions(
-  cyy_naive_lib_torch PRIVATE __CUDA_NO_HALF_OPERATORS__ CUDA_HAS_FP16=1
-                              __CUDA_NO_HALF_CONVERSIONS__)
+if(HAS_CUDA)
+  target_link_libraries(cyy_naive_lib_torch PUBLIC ${TORCH_LIBRARIES}
+                                                   torch_cuda)
+  target_compile_definitions(
+    cyy_naive_lib_torch PRIVATE __CUDA_NO_HALF_OPERATORS__ CUDA_HAS_FP16=1
+                                __CUDA_NO_HALF_CONVERSIONS__)
+endif()
 
 add_subdirectory(test)
 if(BUILD_FUZZING)
   add_subdirectory(fuzz_test)
 endif()
-# add_subdirectory(profiling)
+add_subdirectory(profiling)
