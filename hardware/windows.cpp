@@ -7,27 +7,17 @@
  */
 
 #ifdef _WIN32
-#include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <cassert>
 #include <cerrno>
-#include <comdef.h>
-#include <iostream>
 #include <iphlpapi.h>
-#include <locale>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <ws2tcpip.h>
 
-#pragma comment(lib, "wbemuuid.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
-#pragma comment(lib, "Ws2_32.lib")
 
 #include "hardware.hpp"
 #include "log/log.hpp"
-#include "util/error.hpp"
-#include "util/string.hpp"
 
 namespace cyy::naive_lib::hardware {
 
@@ -152,22 +142,6 @@ namespace cyy::naive_lib::hardware {
     }
     return res;
   }
-
-  namespace {
-    class COM_initer final {
-    public:
-      COM_initer() {
-        if (CoInitializeEx(0, COINIT_MULTITHREADED) != S_OK) {
-          throw std::runtime_error("CoInitializeEx failed");
-        }
-      }
-      ~COM_initer() { CoUninitialize(); }
-    };
-
-    // std::mutex windows_hardware_mutex;
-  } // namespace
-
-
 
   std::string get_mac_address_by_ipv4(const std::string &ipv4_addr) {
 
