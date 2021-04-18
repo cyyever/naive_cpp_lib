@@ -37,11 +37,3 @@ TEST_CASE("ip and mac") {
 }
 
 #endif
-
-#ifdef _WIN32
-TEST_CASE("UUID") { CHECK(!cyy::naive_lib::hardware::UUID().empty()); }
-
-TEST_CASE("disk_serial_number") {
-  CHECK(!cyy::naive_lib::hardware::disk_serial_number().empty());
-}
-#endif

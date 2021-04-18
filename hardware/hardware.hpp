@@ -57,12 +57,5 @@ namespace cyy::naive_lib::hardware {
   //! \brief 获取所有ipv4地址
   std::set<std::string> ipv4_address() noexcept(false);
 
-#ifdef _WIN32
-  //! \brief 获取主板UUID
-  std::string UUID() noexcept(false);
-
-  //! \brief 获取硬盘序列号
-  std::string disk_serial_number() noexcept(false);
-#endif
 
 } // namespace cyy::naive_lib::hardware
