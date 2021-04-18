@@ -293,14 +293,12 @@ namespace cyy::naive_lib::opencv {
       auto mu1 = I1.apply_cuda_filter(gauss);
       auto mu2 = I2.apply_cuda_filter(gauss);
 #else
-      mat_impl mu1;
-      cv::GaussianBlur(I1.get_cv_mat(), mu1.get_cv_mat(), cv::Size(11, 11),
+      mat_impl mu1(cv::Mat{});
+      cv::GaussianBlur(I1.get_cv_mat(), mu1.get_mutable_cv_mat(), cv::Size(11, 11),
                        1.5);
-      mu1.location = data_location::cpu;
-      mat_impl mu2;
-      cv::GaussianBlur(I2.get_cv_mat(), mu2.get_cv_mat(), cv::Size(11, 11),
+      mat_impl mu2(cv::Mat{});
+      cv::GaussianBlur(I2.get_cv_mat(), mu2.get_mutable_cv_mat(), cv::Size(11, 11),
                        1.5);
-      mu2.location = data_location::cpu;
 #endif
       auto mu1_2 = mu1.sqr(false);
       auto mu2_2 = mu2.sqr(false);
@@ -309,20 +307,18 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
       auto sigma1_2 = I1_2.apply_cuda_filter(gauss);
 #else
-      mat_impl sigma1_2;
-      cv::GaussianBlur(I1_2.get_cv_mat(), sigma1_2.get_cv_mat(),
+      mat_impl sigma1_2(cv::Mat{});
+      cv::GaussianBlur(I1_2.get_cv_mat(), sigma1_2.get_mutable_cv_mat(),
                        cv::Size(11, 11), 1.5);
-      sigma1_2.location = data_location::cpu;
 #endif
       sigma1_2.subtract(mu1_2, true);
       auto I2_2 = I2.sqr(false);
 #ifdef HAVE_GPU_MAT
       auto sigma2_2 = I2_2.apply_cuda_filter(gauss);
 #else
-      mat_impl sigma2_2;
-      cv::GaussianBlur(I2_2.get_cv_mat(), sigma2_2.get_cv_mat(),
+      mat_impl sigma2_2(cv::Mat{});
+      cv::GaussianBlur(I2_2.get_cv_mat(), sigma2_2.get_mutable_cv_mat(),
                        cv::Size(11, 11), 1.5);
-      sigma2_2.location = data_location::cpu;
 #endif
 
       sigma2_2.subtract(mu2_2, true);
@@ -331,10 +327,9 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
       auto sigma12 = I1_I2.apply_cuda_filter(gauss);
 #else
-      mat_impl sigma12;
-      cv::GaussianBlur(I1_I2.get_cv_mat(), sigma12.get_cv_mat(),
+      mat_impl sigma12(cv::Mat{});
+      cv::GaussianBlur(I1_I2.get_cv_mat(), sigma12.get_mutable_cv_mat(),
                        cv::Size(11, 11), 1.5);
-      sigma12.location = data_location::cpu;
 #endif
 
       sigma12.subtract(mu1_mu2, true); // sigma12 -= mu1_mu2;
@@ -392,8 +387,17 @@ namespace cyy::naive_lib::opencv {
     mat_impl sqr(bool self_as_result) {
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
-            throw std::runtime_error("unsupported operation");
-            /* cv::sqr(cpu_mat,  result_mat.cpu_mat); */
+
+          if(self_as_result) {
+
+          auto tmp= cpu_mat.clone();
+            
+            cv::multiply(tmp,tmp, result_cpu_mat);
+            return;
+
+          } 
+            cv::multiply(cpu_mat, cpu_mat, result_cpu_mat);
+
           },
 
 #ifdef HAVE_GPU_MAT
@@ -616,6 +620,13 @@ namespace cyy::naive_lib::opencv {
     }
 
   private:
+
+    cv::Mat &get_mutable_cv_mat() const {
+      download();
+      location = data_location::cpu;
+      return cpu_mat;
+    }
+
     mat_impl
     unary_operation(std::function<void(cv::Mat &)> cpu_operation,
 #ifdef HAVE_GPU_MAT
