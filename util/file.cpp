@@ -7,6 +7,7 @@
  */
 #ifdef WIN32
 #define NOMINMAX
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #include <fcntl.h>
