@@ -233,6 +233,22 @@ namespace cyy::naive_lib::opencv {
           self_as_result);
     }
 
+    mat_impl add(const mat_impl &src2, bool self_as_result) {
+      return unary_operation(
+          [=, this, &src2](auto &result_cpu_mat) {
+            cv::add(cpu_mat, src2.get_cv_mat(), result_cpu_mat, cv::noArray(),
+                    -1);
+          },
+
+#ifdef HAVE_GPU_MAT
+          [=, this, &src2](auto &result_gpu_mat) {
+            cv::cuda::add(gpu_mat, src2.get_cv_gpu_mat(), result_gpu_mat,
+                          cv::noArray(), -1, get_stream());
+          },
+#endif
+          self_as_result);
+    }
+
 #ifdef HAVE_GPU_MAT
     mat_impl apply_cuda_filter(const cv::Ptr<cv::cuda::Filter> &filter,
                                bool self_as_result = false) {
@@ -271,7 +287,6 @@ namespace cyy::naive_lib::opencv {
 #ifdef HAVE_GPU_MAT
       const float C1 = 6.5025f, C2 = 58.5225f;
       auto &stream = get_stream();
-      /***************************** INITS **********************************/
       auto I1 = convert_to(CV_32F);
       auto I2 = i2.convert_to(CV_32F);
       auto gauss =
@@ -292,23 +307,17 @@ namespace cyy::naive_lib::opencv {
       auto sigma12 = I1_I2.apply_cuda_filter(gauss);
       sigma12.subtract(mu1_mu2, true); // sigma12 -= mu1_mu2;
 
-      ///////////////////////////////// FORMULA
-      ///////////////////////////////////
-
       auto t1 = mu1_mu2.convert_to(-1, 2, C1, false); // t1 = 2 * mu1_mu2 + C1;
       auto t2 = sigma12.convert_to(-1, 2, C2, false); // t2 = 2 * sigma12 + C2;
       auto t3 = t1.multiply(t2, false);               // t3 = t1*t2
+      t1 = mu1_2.add(mu2_2, false);
+      t1.add(C1, true); // t1 = mu1_2 + mu2_2 + C1;
 
-      cv::cuda::addWeighted(mu1_2.gpu_mat, 1.0, mu2_2.gpu_mat, 1.0, C1,
-                            t1.gpu_mat, -1,
-                            stream); // t1 = mu1_2 + mu2_2 + C1;
-      cv::cuda::addWeighted(sigma1_2.gpu_mat, 1.0, sigma2_2.gpu_mat, 1.0, C2,
-                            t2.gpu_mat, -1,
-                            stream); // t2 = sigma1_2 + sigma2_2 + C2;
+      t2 = sigma1_2.add(sigma2_2, false);
+      t2.add(C2, true); // t2 = sigma1_2 + sigma2_2 + C2;
       t1.multiply(
           t2,
           true); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
-
       t3.divide(t1, true); // ssim_map = t3./t1;
       auto mssim = cv::mean(t3.get_cv_mat());
       return mssim;
