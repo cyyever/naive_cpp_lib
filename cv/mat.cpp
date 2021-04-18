@@ -294,11 +294,11 @@ namespace cyy::naive_lib::opencv {
       auto mu2 = I2.apply_cuda_filter(gauss);
 #else
       mat_impl mu1(cv::Mat{});
-      cv::GaussianBlur(I1.get_cv_mat(), mu1.get_mutable_cv_mat(), cv::Size(11, 11),
-                       1.5);
+      cv::GaussianBlur(I1.get_cv_mat(), mu1.get_mutable_cv_mat(),
+                       cv::Size(11, 11), 1.5);
       mat_impl mu2(cv::Mat{});
-      cv::GaussianBlur(I2.get_cv_mat(), mu2.get_mutable_cv_mat(), cv::Size(11, 11),
-                       1.5);
+      cv::GaussianBlur(I2.get_cv_mat(), mu2.get_mutable_cv_mat(),
+                       cv::Size(11, 11), 1.5);
 #endif
       auto mu1_2 = mu1.sqr(false);
       auto mu2_2 = mu2.sqr(false);
@@ -338,10 +338,11 @@ namespace cyy::naive_lib::opencv {
       auto t2 = sigma12.convert_to(-1, 2, C2, false); // t2 = 2 * sigma12 + C2;
       auto t3 = t1.multiply(t2, false);               // t3 = t1*t2
       t1 = mu1_2.add(mu2_2, false);
-      t1.add(C1, true); // t1 = mu1_2 + mu2_2 + C1;
+      t1.add(cv::Scalar::all(C1), true); // t1 = mu1_2 + mu2_2 + C1;
 
       t2 = sigma1_2.add(sigma2_2, false);
-      t2.add(C2, true); // t2 = sigma1_2 + sigma2_2 + C2;
+      t2.add(cv::Scalar::all(C2), true); // t2 = sigma1_2 + sigma2_2 + C2;
+
       t1.multiply(
           t2,
           true); // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
@@ -387,17 +388,14 @@ namespace cyy::naive_lib::opencv {
     mat_impl sqr(bool self_as_result) {
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
+            if (self_as_result) {
 
-          if(self_as_result) {
+              auto tmp = cpu_mat.clone();
 
-          auto tmp= cpu_mat.clone();
-            
-            cv::multiply(tmp,tmp, result_cpu_mat);
-            return;
-
-          } 
+              cv::multiply(tmp, tmp, result_cpu_mat);
+              return;
+            }
             cv::multiply(cpu_mat, cpu_mat, result_cpu_mat);
-
           },
 
 #ifdef HAVE_GPU_MAT
@@ -620,7 +618,6 @@ namespace cyy::naive_lib::opencv {
     }
 
   private:
-
     cv::Mat &get_mutable_cv_mat() const {
       download();
       location = data_location::cpu;
