@@ -253,7 +253,6 @@ namespace cyy::naive_lib::opencv {
     mat_impl apply_cuda_filter(const cv::Ptr<cv::cuda::Filter> &filter,
                                bool self_as_result = false) {
       upload();
-
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
             throw std::runtime_error("no CUDA support");
@@ -389,9 +388,7 @@ namespace cyy::naive_lib::opencv {
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
             if (self_as_result) {
-
               auto tmp = cpu_mat.clone();
-
               cv::multiply(tmp, tmp, result_cpu_mat);
               return;
             }
@@ -701,7 +698,11 @@ namespace cyy::naive_lib::opencv {
         stream.waitForCompletion();
       }
 #endif
-      location = data_location::synced;
+      if (can_use_gpu) {
+        location = data_location::synced;
+      } else {
+        location = data_location::cpu;
+      }
     }
 
 #ifdef HAVE_GPU_MAT
