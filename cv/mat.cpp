@@ -284,27 +284,59 @@ namespace cyy::naive_lib::opencv {
 
     // changed from samples/cpp/tutorial_code/gpu/gpu-basics-similarity
     cv::Scalar MSSIM(mat_impl i2) {
-#ifdef HAVE_GPU_MAT
       const float C1 = 6.5025f, C2 = 58.5225f;
-      auto &stream = get_stream();
       auto I1 = convert_to(CV_32F);
       auto I2 = i2.convert_to(CV_32F);
+#ifdef HAVE_GPU_MAT
       auto gauss =
           cv::cuda::createGaussianFilter(I2.type(), -1, cv::Size(11, 11), 1.5);
-
       auto mu1 = I1.apply_cuda_filter(gauss);
       auto mu2 = I2.apply_cuda_filter(gauss);
+#else
+      mat_impl mu1;
+      cv::GaussianBlur(I1.get_cv_mat(), mu1.get_cv_mat(), cv::Size(11, 11),
+                       1.5);
+      mu1.location = data_location::cpu;
+      mat_impl mu2;
+      cv::GaussianBlur(I2.get_cv_mat(), mu2.get_cv_mat(), cv::Size(11, 11),
+                       1.5);
+      mu2.location = data_location::cpu;
+#endif
       auto mu1_2 = mu1.sqr(false);
       auto mu2_2 = mu2.sqr(false);
       auto mu1_mu2 = mu1.multiply(mu2, false);
       auto I1_2 = I1.sqr(false);
+#ifdef HAVE_GPU_MAT
       auto sigma1_2 = I1_2.apply_cuda_filter(gauss);
+#else
+      mat_impl sigma1_2;
+      cv::GaussianBlur(I1_2.get_cv_mat(), sigma1_2.get_cv_mat(),
+                       cv::Size(11, 11), 1.5);
+      sigma1_2.location = data_location::cpu;
+#endif
       sigma1_2.subtract(mu1_2, true);
       auto I2_2 = I2.sqr(false);
+#ifdef HAVE_GPU_MAT
       auto sigma2_2 = I2_2.apply_cuda_filter(gauss);
+#else
+      mat_impl sigma2_2;
+      cv::GaussianBlur(I2_2.get_cv_mat(), sigma2_2.get_cv_mat(),
+                       cv::Size(11, 11), 1.5);
+      sigma2_2.location = data_location::cpu;
+#endif
+
       sigma2_2.subtract(mu2_2, true);
       auto I1_I2 = I1.multiply(I2, false);
+
+#ifdef HAVE_GPU_MAT
       auto sigma12 = I1_I2.apply_cuda_filter(gauss);
+#else
+      mat_impl sigma12;
+      cv::GaussianBlur(I1_I2.get_cv_mat(), sigma12.get_cv_mat(),
+                       cv::Size(11, 11), 1.5);
+      sigma12.location = data_location::cpu;
+#endif
+
       sigma12.subtract(mu1_mu2, true); // sigma12 -= mu1_mu2;
 
       auto t1 = mu1_mu2.convert_to(-1, 2, C1, false); // t1 = 2 * mu1_mu2 + C1;
@@ -321,9 +353,6 @@ namespace cyy::naive_lib::opencv {
       t3.divide(t1, true); // ssim_map = t3./t1;
       auto mssim = cv::mean(t3.get_cv_mat());
       return mssim;
-#else
-      throw std::runtime_error("need CUDA");
-#endif
     }
 
     mat_impl &operator+=(float scalar) {
