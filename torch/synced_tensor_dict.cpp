@@ -52,9 +52,11 @@ namespace cyy::naive_lib::pytorch {
     for (auto &t : fetch_threads) {
       t.start();
     }
+  }
 
-  } // namespace cyy::naive_lib::pytorch
-
+  synced_tensor_dict::synced_tensor_dict(const synced_tensor_dict &rhs) {
+    LOG_WARN("stub function");
+  }
   synced_tensor_dict::~synced_tensor_dict() { release(); }
 
   void synced_tensor_dict::release() {

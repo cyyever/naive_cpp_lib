@@ -46,6 +46,11 @@ inline void define_torch_data_structure_extension(py::module_ &m) {
       .def("in_memory_keys", &synced_tensor_dict::in_memory_keys)
       .def("release", &synced_tensor_dict::release)
       .def("clear", &synced_tensor_dict::clear)
+      .def("__copy__", [](const synced_tensor_dict &self) { return self; })
+      .def(
+          "__deepcopy__",
+          [](const synced_sparse_tensor_dict &self, py::dict) { return self; },
+          py::arg("memo"))
       .def("flush_all", &synced_tensor_dict::flush_all,
            "flush all in-memory data to the disk", py::arg("wait") = true)
       .def("flush", static_cast<void (synced_tensor_dict::*)(size_t)>(

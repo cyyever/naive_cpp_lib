@@ -15,8 +15,8 @@ namespace cyy::naive_lib::pytorch {
   public:
     explicit synced_tensor_dict(const std::string &storage_dir_);
 
-    synced_tensor_dict(const synced_tensor_dict &) = delete;
-    synced_tensor_dict &operator=(const synced_tensor_dict &) = delete;
+    synced_tensor_dict(const synced_tensor_dict &);
+    synced_tensor_dict &operator=(const synced_tensor_dict &) = default;
 
     synced_tensor_dict(synced_tensor_dict &&) noexcept = delete;
     synced_tensor_dict &operator=(synced_tensor_dict &&) noexcept = delete;
