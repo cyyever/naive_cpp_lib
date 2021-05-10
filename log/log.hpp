@@ -12,7 +12,7 @@
 
 #include <spdlog/spdlog.h>
 
-#if __has_include(<source_location>)
+#if defined(__cpp_lib_source_location) and __cpp_lib_source_location >= 201907L
 #include <source_location>
 #else
 // copy from <experimental/source_location> and modify some code to make clang
