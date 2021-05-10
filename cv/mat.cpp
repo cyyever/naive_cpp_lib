@@ -385,13 +385,14 @@ namespace cyy::naive_lib::opencv {
           self_as_result);
     }
     mat_impl sqr(bool self_as_result) {
+      /* return multiply(*this, self_as_result); */
       return unary_operation(
           [=, this](auto &result_cpu_mat) {
-            if (self_as_result) {
-              auto tmp = cpu_mat.clone();
-              cv::multiply(tmp, tmp, result_cpu_mat);
-              return;
-            }
+            /* if (self_as_result) { */
+            /*   auto tmp = cpu_mat.clone(); */
+            /*   cv::multiply(tmp, tmp, result_cpu_mat); */
+            /*   return; */
+            /* } */
             cv::multiply(cpu_mat, cpu_mat, result_cpu_mat);
           },
 

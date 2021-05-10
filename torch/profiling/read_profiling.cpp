@@ -5,10 +5,12 @@
  * \author cyy
  */
 
-#include "util/file.hpp"
 #include <chrono>
 #include <filesystem>
+
 #include <torch/serialize.h>
+
+#include "util/file.hpp"
 
 uint64_t now_ms() {
   return static_cast<uint64_t>(
@@ -37,8 +39,8 @@ int main(int argc, char **argv) {
 
   begin_ms = now_ms();
   for (int i = 0; i < 1024; i++) {
-    cyy::naive_lib::io::read_only_mmaped_file f(tensor_dir /
-                                              (std::to_string(i) + ".tensor"));
+    cyy::naive_lib::io::read_only_mmaped_file f(
+        tensor_dir / (std::to_string(i) + ".tensor"));
     torch::load(value, reinterpret_cast<const char *>(f.data()), f.size());
   }
   end_ms = now_ms();
