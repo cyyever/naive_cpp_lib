@@ -27,4 +27,5 @@ namespace cyy::naive_lib::video {
   }
 
   void ffmpeg_writer::close() { pimpl->close(); }
+  const std::string &ffmpeg_writer::get_url() const { return pimpl->get_url(); }
 } // namespace cyy::naive_lib::video

@@ -38,6 +38,6 @@ namespace cyy::naive_lib::video {
 
     //! \brief 關閉视频
     virtual void close() = 0;
-    virtual const std::string get_url() const=0;
+    virtual const std::string & get_url() const=0;
   };
 } // namespace cyy::naive_lib::video

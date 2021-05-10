@@ -30,7 +30,8 @@ namespace cyy::naive_lib::video {
     av_log_set_level(AV_LOG_VERBOSE);
 #endif
   }
-  bool ffmpeg_base::open(const std::string &url) {
+  bool ffmpeg_base::open(const std::string &url_) {
+    url = url_;
     this->close();
 
     std::regex scheme_regex("([a-z][a-z0-9+-.]+)://",
