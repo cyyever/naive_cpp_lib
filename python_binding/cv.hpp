@@ -39,7 +39,8 @@ namespace pybind11 {
       static handle cast(const cv::Scalar &scalar,
                          return_value_policy /* policy */,
                          handle /* parent */) {
-        return py::make_tuple(scalar[0], scalar[1], scalar[2], scalar[3]).release();
+        return py::make_tuple(scalar[0], scalar[1], scalar[2], scalar[3])
+            .release();
       }
     };
   } // namespace detail
