@@ -10,9 +10,8 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#ifdef __cpp_lib_jthread
 #include <thread>
-#else
+#ifndef __cpp_lib_jthread
 #include "jthread.hpp"
 #include "stop_token.hpp"
 #endif
