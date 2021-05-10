@@ -28,7 +28,6 @@ inline void define_video_extension(py::module_ &m) {
       .def(py::init<>())
       .def("open", &ffmpeg_video_reader::open)
       .def("close", &ffmpeg_video_reader::close)
-      .def("get_url", &ffmpeg_video_reader::get_url)
       .def("set_play_frame_rate", &ffmpeg_video_reader::set_play_frame_rate)
       .def("get_video_height", &ffmpeg_video_reader::get_video_height)
       .def("get_video_width", &ffmpeg_video_reader::get_video_width)
