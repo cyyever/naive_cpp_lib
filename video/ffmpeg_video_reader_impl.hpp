@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <stdlib.h>
 #include <thread>
 
 extern "C" {
@@ -106,9 +107,10 @@ namespace cyy::naive_lib::video {
       AVCodec *codec = nullptr;
 
       /* //尝试用nvidia解码 */
-      /* if (video_stream->codecpar->codec_id == AV_CODEC_ID_H264) { */
-      /*   codec = avcodec_find_decoder_by_name("h264_cuvid"); */
-      /* } */
+      if (getenv("use_cuvid") != nullptr &&
+          video_stream->codecpar->codec_id == AV_CODEC_ID_H264) {
+        codec = avcodec_find_decoder_by_name("h264_cuvid");
+      }
       if (!codec) {
         codec = avcodec_find_decoder(video_stream->codecpar->codec_id);
       }
