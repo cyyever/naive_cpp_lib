@@ -6,8 +6,8 @@
  */
 #pragma once
 
-#include <optional>
 #include <memory>
+#include <optional>
 
 #include "frame.hpp"
 #include "writer.hpp"
@@ -26,7 +26,8 @@ namespace cyy::naive_lib::video {
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url, const std::string &format_name,
-              int video_width, int video_height,std::optional<std::pair<int,int>> frame_rate={}) override;
+              int video_width, int video_height,
+              std::optional<std::pair<int, int>> frame_rate = {}) override;
 
     //! \brief 寫入一幀
     bool write_frame(const cv::Mat &frame_mat) override;

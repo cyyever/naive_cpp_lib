@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 
 #include "frame.hpp"
 
@@ -31,7 +32,7 @@ namespace cyy::naive_lib::video {
     //! \note 如果是指定本地文件，则加上file://
     //! \note 先关闭之前打开的视频再打开此视频
     virtual bool open(const std::string &url, const std::string &format_name,
-                      int video_width, int video_height) = 0;
+                      int video_width, int video_height,std::optional<std::pair<int, int>> frame_rate = {}) = 0;
 
     //! \brief 寫入一幀
     virtual bool write_frame(const cv::Mat &mat) = 0;

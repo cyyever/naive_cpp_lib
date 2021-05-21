@@ -18,11 +18,9 @@ namespace cyy::naive_lib::video {
 
   bool ffmpeg_writer::open(const std::string &url,
                            const std::string &format_name, int video_width,
-                           int video_height
-
-,std::optional<std::pair<int,int>> frame_rate
-                           ) {
-    return pimpl->open(url, format_name, video_width, video_height,frame_rate);
+                           int video_height,
+                           std::optional<std::pair<int, int>> frame_rate) {
+    return pimpl->open(url, format_name, video_width, video_height, frame_rate);
   }
 
   bool ffmpeg_writer::write_frame(const cv::Mat &frame_mat) {
