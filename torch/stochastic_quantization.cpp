@@ -7,7 +7,7 @@ namespace cyy::naive_lib::pytorch {
   torch::Tensor stochastic_quantization(torch::Tensor normalized_abs_tensor,
                                         uint64_t quantization_level) {
     if (quantization_level == 0) {
-      throw std::invalid_argument("quantization_level must >0");
+      throw std::invalid_argument("quantization_level must be positive");
     }
     torch::Tensor slot_ret = normalized_abs_tensor.clone();
     if (normalized_abs_tensor.is_cuda()) {
