@@ -9,18 +9,18 @@ namespace cyy::naive_lib::pytorch {
     if (quantization_level == 0) {
       throw std::invalid_argument("quantization_level must >0");
     }
-    torch::Tensor prob_tensor = normalized_abs_tensor.clone();
+    torch::Tensor slot_ret = normalized_abs_tensor.clone();
     if (normalized_abs_tensor.is_cuda()) {
 #ifdef HAS_CUDA
-      stochastic_quantization_gpu(prob_tensor, normalized_abs_tensor,
+      stochastic_quantization_gpu(slot_ret, normalized_abs_tensor,
                                   quantization_level);
 #else
       throw std::runtime_error("No CUDA support");
 #endif
     } else {
-      stochastic_quantization_cpu(prob_tensor, normalized_abs_tensor,
+      stochastic_quantization_cpu(slot_ret, normalized_abs_tensor,
                                   quantization_level);
     }
-    return prob_tensor;
+    return slot_ret;
   }
 } // namespace cyy::naive_lib::pytorch
