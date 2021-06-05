@@ -351,8 +351,10 @@ namespace cyy::naive_lib::pytorch {
     }
 
     std::unique_lock lk(data_mutex);
-    if (saving_thread_num_ < saving_thread_num) {
-      throw std::runtime_error("can't shrink threads");
+    while (saving_thread_num > saving_thread_num_) {
+      saving_threads.back().stop();
+      saving_threads.pop_back();
+      saving_thread_num--;
     }
     for (size_t i = saving_thread_num; i < saving_thread_num_; i++) {
       saving_threads.emplace_back(*this, i);
@@ -367,8 +369,10 @@ namespace cyy::naive_lib::pytorch {
       throw std::runtime_error("fetch_thread_num_ is 0");
     }
     std::unique_lock lk(data_mutex);
-    if (fetch_thread_num_ < fetch_thread_num) {
-      throw std::runtime_error("can't shrink threads");
+    while (fetch_thread_num > fetch_thread_num_) {
+      fetch_threads.back().stop();
+      fetch_threads.pop_back();
+      fetch_thread_num--;
     }
     for (size_t i = 0; i < fetch_thread_num_ - fetch_thread_num; i++) {
       fetch_threads.emplace_back(*this);
