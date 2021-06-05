@@ -1,6 +1,6 @@
-import torch
-
 import cyy_naive_cpp_extension
+
+import torch
 
 
 def test_synced_sparse_tensor_dict():
@@ -17,3 +17,4 @@ def test_synced_sparse_tensor_dict():
     assert str(0) in tensor_dict
     for i in tensor_dict.keys():
         assert torch.sum(torch.eq(tensor_dict[i], tensor) == False) == 0
+    tensor_dict.release()

@@ -14,3 +14,4 @@ def test_synced_tensor_dict():
     assert str(0) in tensor_dict
     for i in tensor_dict.keys():
         assert tensor_dict[i] == torch.Tensor([int(i)])
+    tensor_dict.release()
