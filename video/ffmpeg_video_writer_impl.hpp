@@ -34,7 +34,7 @@ namespace cyy::naive_lib::video {
     //! \note 先关闭之前打开的视频再打开此url对应的视频
     bool open(const std::string &url_, const std::string &format_name,
               int video_width, int video_height,
-              std::optional<std::pair<int, int>> frame_rate_={}) {
+              std::optional<std::pair<int, int>> frame_rate_ = {}) {
       if (!ffmpeg_base::open(url_)) {
         LOG_ERROR("ffmpeg_base failed");
         return false;
@@ -45,8 +45,7 @@ namespace cyy::naive_lib::video {
       } else {
         frame_rate = AVRational{25, 1};
       }
-      LOG_WARN("use frame rate {} {}", frame_rate.num,
-               frame_rate.den);
+      LOG_WARN("use frame rate {} {}", frame_rate.num, frame_rate.den);
 
       int ret = 0;
       ret = avformat_alloc_output_context2(&output_ctx, nullptr,
