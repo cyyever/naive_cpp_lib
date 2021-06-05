@@ -122,7 +122,6 @@ namespace cyy::naive_lib::pytorch {
         save_request_queue.wait_for_less_size(old_in_memory_number,
                                               std::chrono::seconds(1));
       }
-      lk.lock();
     }
   }
   size_t synced_tensor_dict::size() const {
