@@ -19,7 +19,7 @@ namespace cyy::naive_lib::pytorch {
     void run() override {
       LOG_DEBUG("run save_thread id {}", id);
       std::optional<std::optional<synced_tensor_dict::save_task>> value_opt;
-      while (true) {
+      while (!needs_stop()) {
         if (id == 0) {
           value_opt =
               dict.save_request_queue.pop_front(std::chrono::milliseconds(500));

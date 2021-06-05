@@ -352,8 +352,7 @@ namespace cyy::naive_lib::pytorch {
 
     std::unique_lock lk(data_mutex);
     while (saving_thread_num > saving_thread_num_) {
-      saving_threads.back().stop();
-      saving_threads.pop_back();
+      save_request_queue.emplace_back();
       saving_thread_num--;
     }
     for (size_t i = saving_thread_num; i < saving_thread_num_; i++) {
@@ -370,8 +369,7 @@ namespace cyy::naive_lib::pytorch {
     }
     std::unique_lock lk(data_mutex);
     while (fetch_thread_num > fetch_thread_num_) {
-      fetch_threads.back().stop();
-      fetch_threads.pop_back();
+      fetch_request_queue.emplace_back();
       fetch_thread_num--;
     }
     for (size_t i = 0; i < fetch_thread_num_ - fetch_thread_num; i++) {
