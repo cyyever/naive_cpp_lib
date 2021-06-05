@@ -45,8 +45,8 @@ namespace cyy::naive_lib::video {
       } else {
         frame_rate = AVRational{25, 1};
       }
-      LOG_WARN("use frame rate {} {}", frame_rate.first,
-               frame_rate.second);
+      LOG_WARN("use frame rate {} {}", frame_rate.num,
+               frame_rate.den);
 
       int ret = 0;
       ret = avformat_alloc_output_context2(&output_ctx, nullptr,
