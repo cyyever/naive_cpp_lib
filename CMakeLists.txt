@@ -71,9 +71,6 @@ foreach(submodule_name IN LISTS submodule_names)
     find_package(GoogleSanitizer REQUIRED)
     target_link_libraries(${lib_name} PUBLIC GoogleSanitizer::address)
   endif()
-  if(MSVC)
-    target_link_libraries(${lib_name} INTERFACE Microsoft::STL)
-  endif()
   target_include_directories(
     ${lib_name} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                           $<INSTALL_INTERFACE:include/cyy/naive_lib>)
