@@ -49,7 +49,7 @@ namespace cyy::naive_lib::video {
   void ffmpeg_reader::remove_named_filter(std::string name) {
     pimpl->remove_named_filter(name);
   }
-  void ffmpeg_reader::close() { pimpl->close(); }
+  void ffmpeg_reader::close() noexcept { pimpl->close(); }
   bool ffmpeg_reader::seek_frame(size_t frame_seq) {
     return pimpl->seek_frame(frame_seq);
   }

@@ -35,7 +35,7 @@ public:
   virtual bool open(const std::string &url) = 0;
 
   //! \brief 關閉视频
-  virtual void close() = 0;
+  virtual void close() noexcept = 0;
 
   //! \brief 获取视频帧率
   //! \note 如果无法获取视频帧率，則返回空

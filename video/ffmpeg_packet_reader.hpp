@@ -31,7 +31,7 @@ namespace cyy::naive_lib::video {
     bool open(const std::string &url);
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close();
+    void close() noexcept;
 
     //! \brief 获取视频帧率
     //! \note 如果无法获取视频帧率，則返回空

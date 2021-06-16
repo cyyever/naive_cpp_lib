@@ -38,7 +38,7 @@ namespace cyy::naive_lib::video {
     virtual bool write_frame(const cv::Mat &mat) = 0;
 
     //! \brief 關閉视频
-    virtual void close() = 0;
+    virtual void close() noexcept = 0;
     virtual const std::string & get_url() const=0;
   };
 } // namespace cyy::naive_lib::video
