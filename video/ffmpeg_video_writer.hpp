@@ -33,7 +33,7 @@ namespace cyy::naive_lib::video {
     bool write_frame(const cv::Mat &frame_mat) override;
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() override;
+    void close() noexcept override;
 
     const std::string &get_url() const override;
 
