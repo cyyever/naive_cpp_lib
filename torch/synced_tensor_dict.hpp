@@ -39,7 +39,7 @@ namespace cyy::naive_lib::pytorch {
     size_t get_in_memory_number() const;
     void set_storage_dir(std::string storage_dir_);
     std::string get_storage_dir() const;
-    void set_wait_flush_ratio(size_t wait_flush_ratio_);
+    void set_wait_flush_ratio(float wait_flush_ratio_);
     void set_saving_thread_number(size_t saving_thread_number_);
     void set_fetch_thread_number(size_t fetch_thread_number_);
 

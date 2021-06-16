@@ -251,7 +251,7 @@ namespace cyy::naive_lib::pytorch {
     return storage_dir.string();
   }
 
-  void synced_tensor_dict::set_wait_flush_ratio(size_t wait_flush_ratio_) {
+  void synced_tensor_dict::set_wait_flush_ratio(float wait_flush_ratio_) {
     std::lock_guard lk(data_mutex);
     wait_flush_ratio = wait_flush_ratio_;
   }
