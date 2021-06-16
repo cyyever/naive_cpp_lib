@@ -22,7 +22,7 @@ namespace cyy::naive_lib::video {
     return pimpl->get_frame_rate();
   }
 
-  void ffmpeg_packet_reader::close() { pimpl->close(); }
+  void ffmpeg_packet_reader::close() noexcept { pimpl->close(); }
 
   void ffmpeg_packet_reader::set_play_frame_rate(
       const std::array<size_t, 2> &frame_rate) {
