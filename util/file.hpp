@@ -38,12 +38,12 @@ namespace cyy::naive_lib::io {
   //! \brief 读取文件，最多讀取max_read_size個字節
   //! \return 是否失败
   bool read(int fd, std::vector<std::byte> &buf,
-            std::optional<size_t> max_read_size_opt = {});
+            const std::optional<size_t> &max_read_size_opt = {});
 
   //! \brief 读取文件，最多讀取max_read_size個字節
   //! \return 實際讀取到的數據
   std::pair<bool, std::vector<std::byte>>
-  read(int fd, std::optional<size_t> max_read_size_opt = {});
+  read(int fd, const std::optional<size_t> &max_read_size_opt = {});
 
 #ifndef WIN32
   class read_only_mmaped_file final {

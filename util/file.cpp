@@ -134,7 +134,7 @@ namespace cyy::naive_lib::io {
   }
 
   bool read(int fd, std::vector<std::byte> &buf,
-            std::optional<size_t> max_read_size_opt) {
+            const std::optional<size_t> &max_read_size_opt) {
     size_t max_read_size = SIZE_MAX;
     if (max_read_size_opt.has_value()) {
       max_read_size = max_read_size_opt.value();
@@ -182,7 +182,7 @@ namespace cyy::naive_lib::io {
   }
 
   std::pair<bool, std::vector<std::byte>>
-  read(int fd, std::optional<size_t> max_read_size_opt) {
+  read(int fd, const std::optional<size_t> &max_read_size_opt) {
     std::vector<std::byte> buf;
     auto res = read(fd, buf, max_read_size_opt);
     return {res, std::move(buf)};
