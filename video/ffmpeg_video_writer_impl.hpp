@@ -27,7 +27,7 @@ namespace cyy::naive_lib::video {
   class ffmpeg_writer_impl : public ffmpeg_base {
   public:
     ffmpeg_writer_impl() = default;
-    ~ffmpeg_writer_impl() override { close(); }
+    ~ffmpeg_writer_impl() override { ffmpeg_writer_impl::close(); }
 
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
@@ -268,7 +268,7 @@ namespace cyy::naive_lib::video {
     }
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() override {
+    void close() noexcept override {
       if (output_ctx) {
         auto ret = av_write_trailer(output_ctx);
         if (ret != 0) {

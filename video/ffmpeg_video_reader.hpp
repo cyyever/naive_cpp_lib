@@ -30,7 +30,7 @@ namespace cyy::naive_lib::video {
     bool open(const std::string &url) override;
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
-    void close() override;
+    void close() noexcept override;
 
     //! \brief 获取視頻寬
     std::optional<int> get_video_width() const;
