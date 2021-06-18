@@ -69,7 +69,7 @@ foreach(submodule_name IN LISTS submodule_names)
   endif()
   if(WITH_ASAN)
     find_package(GoogleSanitizer REQUIRED)
-    target_link_libraries(${lib_name} PUBLIC GoogleSanitizer::address)
+    target_link_libraries(${lib_name} INTERFACE GoogleSanitizer::address)
   endif()
   target_include_directories(
     ${lib_name} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
