@@ -4,7 +4,6 @@ add_library(cyy_naive_lib_log ${SOURCE})
 
 find_package(spdlog REQUIRED)
 target_link_libraries(cyy_naive_lib_log PUBLIC spdlog::spdlog_header_only)
-set_property(TARGET cyy_naive_lib_log PROPERTY CXX_STANDARD 17)
 
 add_library(CyyNaiveLib::log ALIAS cyy_naive_lib_log)
 add_subdirectory(test)
