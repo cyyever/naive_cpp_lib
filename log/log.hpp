@@ -11,7 +11,7 @@
 #include <string>
 
 #include <spdlog/spdlog.h>
-#include <fmt/format.h>
+#include <spdlog/fmt/fmt.h>
 
 #if __has_include(<source_location>)
 #include <source_location>
