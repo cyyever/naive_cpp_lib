@@ -11,6 +11,7 @@
 #include <string>
 
 #include <spdlog/spdlog.h>
+#include <fmt/format.h>
 
 #if __has_include(<source_location>)
 #include <source_location>
@@ -79,7 +80,7 @@ namespace cyy::naive_lib::log {
                     std::to_string(location.line()) + "] " + std::move(fmt);
 
     spdlog::apply_all([&](auto const &logger) {
-      logger->log(level, real_fmt.c_str(), std::forward<Args>(args)...);
+      logger->log(level, fmt::runtime(real_fmt), std::forward<Args>(args)...);
     });
   }
 
