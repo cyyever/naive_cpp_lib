@@ -6,6 +6,7 @@
 
 #pragma once
 
+#if __has_include(<ranges>)
 #include <list>
 #include <optional>
 #include <ranges>
@@ -49,3 +50,4 @@ namespace cyy::naive_lib::data_structure {
     void add_edge(const edge_type &edge) override { add_directed_edge(edge); }
   };
 } // namespace cyy::naive_lib::data_structure
+#endif

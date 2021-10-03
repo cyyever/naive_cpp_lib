@@ -57,5 +57,4 @@ namespace cyy::naive_lib::hardware {
   //! \brief 获取所有ipv4地址
   std::set<std::string> ipv4_address() noexcept(false);
 
-
 } // namespace cyy::naive_lib::hardware
