@@ -5,17 +5,13 @@
  */
 
 #if __has_include(<ranges>)
+
 #include "graph.hpp"
+
+#include <algorithm>
 
 namespace cyy::naive_lib::data_structure {
 
-  /* std::optional<size_t> graph::get_node_index(node_type node) const { */
-  /*   auto it = node_indices.find(node); */
-  /*   if (it != node_indices.end()) { */
-  /*     return it->second; */
-  /*   } */
-  /*   return {}; */
-  /* } */
   std::pair<graph::node_index_map_type, graph::adjacent_matrix_type>
   graph::get_adjecent_matrix() const {
     node_index_map_type node_indices;
@@ -42,13 +38,24 @@ namespace cyy::naive_lib::data_structure {
     std::swap(reversed_edge.first, reversed_edge.second);
     add_directed_edge(reversed_edge);
   }
+  void graph::remove_edge(const edge_type &edge) {
+    remove_directed_edge(edge);
+    auto reversed_edge = edge;
+    std::swap(reversed_edge.first, reversed_edge.second);
+    remove_directed_edge(reversed_edge);
+  }
   void graph::add_directed_edge(const edge_type &edge) {
-    /* auto [it, has_inserted] = */
-    /*     node_indices.try_emplace(edge.first, adjacent_list.size()); */
-    /* if (has_inserted) { */
-    /*   adjacent_list.emplace_back(); */
-    /* } */
     adjacent_list[edge.first].push_back(edge.second);
+  }
+  void graph::remove_directed_edge(const edge_type &edge) {
+    auto it = adjacent_list.find(edge.first);
+    if (it == adjacent_list.end()) {
+      return;
+    }
+    auto &nodes = it->second;
+    const auto [first, last] = std::ranges::remove_if(
+        nodes, [&edge](auto const &x) { return x == edge.second; });
+    nodes.erase(first, last);
   }
 } // namespace cyy::naive_lib::data_structure
 #endif

@@ -31,23 +31,26 @@ namespace cyy::naive_lib::data_structure {
         add_edge(edge);
       }
     }
-    /* std::optional<size_t> get_node_index(node_type node) const; */
     virtual void add_edge(const edge_type &edge);
+    virtual void remove_edge(const edge_type &edge);
     auto const &get_adjecent_list() const { return adjacent_list; }
     std::pair<node_index_map_type, adjacent_matrix_type>
     get_adjecent_matrix() const;
 
   protected:
     void add_directed_edge(const edge_type &edge);
+    void remove_directed_edge(const edge_type &edge);
 
   private:
-    /* std::unordered_map<node_type, size_t> node_indices; */
     std::unordered_map<node_type, std::list<node_type>> adjacent_list;
   };
   class directed_graph : public graph {
   public:
     using graph::graph;
     void add_edge(const edge_type &edge) override { add_directed_edge(edge); }
+    void remove_edge(const edge_type &edge) override {
+      remove_directed_edge(edge);
+    }
   };
 } // namespace cyy::naive_lib::data_structure
 #endif
