@@ -34,6 +34,9 @@ namespace cyy::naive_lib::data_structure {
     virtual void add_edge(const edge_type &edge);
     virtual void remove_edge(const edge_type &edge);
     auto const &get_adjecent_list() const { return adjacent_list; }
+    auto const &get_adjecent_list(const node_type &node) const {
+      return adjacent_list.at(node);
+    }
     std::pair<node_index_map_type, adjacent_matrix_type>
     get_adjecent_matrix() const;
 
