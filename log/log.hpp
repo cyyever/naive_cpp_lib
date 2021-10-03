@@ -10,8 +10,8 @@
 #include <filesystem>
 #include <string>
 
-#include <spdlog/spdlog.h>
 #include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
 
 #if __has_include(<source_location>)
 #include <source_location>
