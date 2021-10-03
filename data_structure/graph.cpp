@@ -53,8 +53,7 @@ namespace cyy::naive_lib::data_structure {
       return;
     }
     auto &nodes = it->second;
-    const auto [first, last] = std::ranges::remove_if(
-        nodes, [&edge](auto const &x) { return x == edge.second; });
+    const auto [first, last] = std::ranges::remove(nodes, edge.second);
     nodes.erase(first, last);
   }
 } // namespace cyy::naive_lib::data_structure
