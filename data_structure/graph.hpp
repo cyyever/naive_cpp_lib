@@ -36,6 +36,14 @@ namespace cyy::naive_lib::data_structure {
       std::swap(reversed_edge.first, reversed_edge.second);
       add_directed_edge(reversed_edge);
     }
+    void remove_vertex(const vertex_type &vertex) {
+      adjacent_list.erase(vertex);
+      for (auto &[_, to_vertices] : adjacent_list) {
+        const auto [first, last] = std::ranges::remove(to_vertices, vertex);
+        to_vertices.erase(first, last);
+      }
+    }
+
     virtual void remove_edge(const edge_type &edge) {
       remove_directed_edge(edge);
       auto reversed_edge = edge;
