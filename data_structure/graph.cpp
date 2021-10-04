@@ -56,5 +56,15 @@ namespace cyy::naive_lib::data_structure {
     const auto [first, last] = std::ranges::remove(nodes, edge.second);
     nodes.erase(first, last);
   }
+  directed_graph directed_graph::get_transpose() const {
+    directed_graph transpose;
+    for (auto &[from_node, to_nodes] : adjacent_list) {
+      for (auto &to_node : to_nodes) {
+        transpose.add_edge({to_node, from_node});
+      }
+    }
+
+    return transpose;
+  }
 } // namespace cyy::naive_lib::data_structure
 #endif
