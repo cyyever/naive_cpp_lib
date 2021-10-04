@@ -12,25 +12,25 @@
 
 namespace cyy::naive_lib::data_structure {
 
-  std::pair<graph::node_index_map_type, graph::adjacent_matrix_type>
+  std::pair<graph::vertex_index_map_type, graph::adjacent_matrix_type>
   graph::get_adjecent_matrix() const {
-    node_index_map_type node_indices;
+    vertex_index_map_type vertex_indices;
     adjacent_matrix_type adjacent_matrix;
-    node_indices.reserve(adjacent_list.size());
+    vertex_indices.reserve(adjacent_list.size());
     adjacent_matrix.reserve(adjacent_list.size());
 
-    for (auto const &[node, _] : adjacent_list) {
-      node_indices[node] = adjacent_matrix.size();
+    for (auto const &[vertex, _] : adjacent_list) {
+      vertex_indices[vertex] = adjacent_matrix.size();
       adjacent_matrix.emplace_back(adjacent_list.size(), false);
     }
-    for (auto const &[node, adjacent_nodes] : adjacent_list) {
-      auto from_index = node_indices[node];
-      for (auto const &to_node : adjacent_nodes) {
-        auto to_index = node_indices[to_node];
+    for (auto const &[vertex, adjacent_vertices] : adjacent_list) {
+      auto from_index = vertex_indices[vertex];
+      for (auto const &to_vertex : adjacent_vertices) {
+        auto to_index = vertex_indices[to_vertex];
         adjacent_matrix[from_index][to_index] = true;
       }
     }
-    return {std::move(node_indices), std::move(adjacent_matrix)};
+    return {std::move(vertex_indices), std::move(adjacent_matrix)};
   }
   void graph::add_edge(const edge_type &edge) {
     add_directed_edge(edge);
@@ -52,15 +52,15 @@ namespace cyy::naive_lib::data_structure {
     if (it == adjacent_list.end()) {
       return;
     }
-    auto &nodes = it->second;
-    const auto [first, last] = std::ranges::remove(nodes, edge.second);
-    nodes.erase(first, last);
+    auto &vertices = it->second;
+    const auto [first, last] = std::ranges::remove(vertices, edge.second);
+    vertices.erase(first, last);
   }
   directed_graph directed_graph::get_transpose() const {
     directed_graph transpose;
-    for (auto &[from_node, to_nodes] : adjacent_list) {
-      for (auto &to_node : to_nodes) {
-        transpose.add_edge({to_node, from_node});
+    for (auto &[from_vertex, to_vertices] : adjacent_list) {
+      for (auto &to_vertex : to_vertices) {
+        transpose.add_edge({to_vertex, from_vertex});
       }
     }
 
