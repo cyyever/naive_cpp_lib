@@ -25,7 +25,7 @@ namespace cyy::naive_lib::data_structure {
     template <std::ranges::input_range U>
     requires std::same_as<edge_type, std::ranges::range_value_t<U>>
     explicit tree(U edges):graph<vertex_type>(edges) {
-
+//TODO check connectivity
 
     }
   };
