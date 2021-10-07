@@ -1,7 +1,6 @@
 find_package(Threads REQUIRED)
-file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_library(cyy_naive_lib_data_structure ${SOURCE})
+add_library(cyy_naive_lib_data_structure INTERFACE)
 target_include_directories(cyy_naive_lib_data_structure INTERFACE 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
