@@ -8,8 +8,8 @@ namespace cyy::naive_lib::pytorch {
                                    uint64_t quantization_level) {
     auto iter = at::TensorIteratorConfig()
                     .check_all_same_dtype(false)
-                    .add_output(slot_ret)
-                    .add_input(src)
+                    .add_output(at::get_tensor_base(slot_ret))
+                    .add_input(at::get_tensor_base(src))
                     .build();
 
     at::native::cpu_kernel(
