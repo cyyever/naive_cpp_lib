@@ -23,6 +23,7 @@ if(TARGET torch_cuda)
   list(APPEND SOURCE ${CUDA_SOURCE})
 endif()
 
+find_package(Boost REQUIRED)
 find_package(CyyAlgorithmLib REQUIRED)
 
 add_library(cyy_naive_lib_torch ${SOURCE})
