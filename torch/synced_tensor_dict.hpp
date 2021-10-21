@@ -7,7 +7,7 @@
 
 #include <torch/types.h>
 
-#include "data_structure/ordered_dict.hpp"
+#include <cyy/algorithm/dict/ordered_dict.hpp>
 #include "data_structure/thread_safe_container.hpp"
 
 namespace cyy::naive_lib::pytorch {
@@ -72,7 +72,7 @@ namespace cyy::naive_lib::pytorch {
 
     mutable std::recursive_mutex data_mutex;
     std::filesystem::path storage_dir;
-    cyy::naive_lib::ordered_dict<std::string, torch::Tensor> data;
+    cyy::algorithm::ordered_dict<std::string, torch::Tensor> data;
     std::unordered_map<std::string, torch::Tensor> saving_data;
     std::unordered_map<std::string, data_state> data_info;
     size_t in_memory_number{128};
