@@ -8,7 +8,7 @@
 #include <torch/types.h>
 
 #include <cyy/algorithm/dict/ordered_dict.hpp>
-#include "data_structure/thread_safe_container.hpp"
+#include <cyy/algorithm/thread_safe_container.hpp>
 
 namespace cyy::naive_lib::pytorch {
   class synced_tensor_dict {
@@ -79,7 +79,7 @@ namespace cyy::naive_lib::pytorch {
     bool permanent{true};
 
     using save_request_queue_type =
-        cyy::naive_lib::thread_safe_linear_container<
+        cyy::algorithm::thread_safe_linear_container<
             std::list<std::optional<save_task>>>;
     save_request_queue_type save_request_queue;
     size_t saving_thread_num{8};
@@ -87,7 +87,7 @@ namespace cyy::naive_lib::pytorch {
 
     using fetch_task = std::pair<std::string, std::filesystem::path>;
     using fetch_request_queue_type =
-        cyy::naive_lib::thread_safe_linear_container<
+        cyy::algorithm::thread_safe_linear_container<
             std::list<std::optional<fetch_task>>>;
     fetch_request_queue_type fetch_request_queue;
     size_t fetch_thread_num{8};
