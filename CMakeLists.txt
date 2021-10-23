@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(CyyNaiveLib LANGUAGES CXX)
 
-set(submodule_names log util hardware data_structure)
+set(submodule_names log util hardware)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # list(APPEND submodule_names process task)
 endif()
