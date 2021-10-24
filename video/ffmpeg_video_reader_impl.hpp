@@ -21,7 +21,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-#include "data_structure/thread_safe_container.hpp"
+#include <cyy/algorithm/thread_safe_container.hpp>
 #include "ffmpeg_base.hpp"
 #include "ffmpeg_video_reader.hpp"
 #include "log/log.hpp"
@@ -155,12 +155,12 @@ namespace cyy::naive_lib::video {
       if (is_live_stream()) {
         if constexpr (decode_frame) {
           frame_buffer =
-              std::make_unique<cyy::naive_lib::thread_safe_linear_container<
+              std::make_unique<cyy::algorithm::thread_safe_linear_container<
                   std::vector<std::pair<int, frame>>>>();
 
         } else {
           packet_buffer =
-              std::make_unique<cyy::naive_lib::thread_safe_linear_container<
+              std::make_unique<cyy::algorithm::thread_safe_linear_container<
                   std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>();
         }
         start("ffmpeg_reader_impl");
@@ -597,10 +597,10 @@ namespace cyy::naive_lib::video {
     std::unordered_map<std::string,
                        std::function<bool(uint64_t, const AVFrame &)>>
         frame_filters;
-    std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
+    std::unique_ptr<cyy::algorithm::thread_safe_linear_container<
         std::vector<std::pair<int, frame>>>>
         frame_buffer;
-    std::unique_ptr<cyy::naive_lib::thread_safe_linear_container<
+    std::unique_ptr<cyy::algorithm::thread_safe_linear_container<
         std::vector<std::pair<int, std::shared_ptr<AVPacket>>>>>
         packet_buffer;
   };
