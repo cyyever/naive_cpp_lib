@@ -30,10 +30,11 @@ find_package(CyyAlgorithmLib REQUIRED)
 
 add_library(cyy_naive_lib_torch ${SOURCE})
 add_library(CyyNaiveLib::torch ALIAS cyy_naive_lib_torch)
-target_compile_definitions(cyy_naive_lib_torch HAS_CUDA=${HAS_CUDA})
+target_compile_definitions(cyy_naive_lib_torch PRIVATE HAS_CUDA=${HAS_CUDA})
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyAlgorithmLib)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::log)
-target_compile_definitions(cyy_naive_lib_torch PUBLIC _HAS_FEATURES_REMOVED_IN_CXX20=1)
+target_compile_definitions(cyy_naive_lib_torch
+                           PUBLIC _HAS_FEATURES_REMOVED_IN_CXX20=1)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::util)
 target_link_libraries(cyy_naive_lib_torch PRIVATE CyyNaiveLib::hardware)
 target_link_directories(cyy_naive_lib_torch PUBLIC ${pytorch_path}/lib)
