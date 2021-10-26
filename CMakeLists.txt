@@ -26,7 +26,6 @@ if(BUILD_VIDEO)
   set(BUILD_CV ON)
 endif()
 
-set(HAS_CUDA OFF)
 if(BUILD_TORCH)
   list(APPEND submodule_names torch)
 endif()

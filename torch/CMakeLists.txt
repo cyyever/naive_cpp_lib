@@ -17,10 +17,12 @@ endif()
 find_package(Torch REQUIRED)
 
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+set(HAS_CUDA OFF)
 if(TARGET torch_cuda)
   enable_language(CUDA)
   file(GLOB CUDA_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cu)
   list(APPEND SOURCE ${CUDA_SOURCE})
+  set(HAS_CUDA ON)
 endif()
 
 find_package(Boost REQUIRED)
