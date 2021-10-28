@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.19)
 
 project(CyyNaiveLib LANGUAGES CXX)
 
-set(submodule_names log util hardware)
+set(submodule_names log util)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  # list(APPEND submodule_names process task)
+  # list(APPEND submodule_names process task hardware)
 endif()
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_TORCH "Build torch module" OFF)
