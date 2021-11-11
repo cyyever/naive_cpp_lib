@@ -31,10 +31,10 @@ TEST_CASE("write_and_read") {
   auto [res, data] = ::cyy::naive_lib::io::read(pipefd[0], 1);
   CHECK(res);
   CHECK_EQ(data.size(), 1);
-  CHECK_EQ((char)(data[0]), 'a');
+  CHECK_EQ(static_cast<char>(data[0]), 'a');
 
   std::tie(res, data) = ::cyy::naive_lib::io::read(pipefd[0], 1);
   CHECK(res);
   CHECK_EQ(data.size(), 1);
-  CHECK_EQ((char)(data[0]), 'b');
+  CHECK_EQ(static_cast<char>(data[0]), 'b');
 }
