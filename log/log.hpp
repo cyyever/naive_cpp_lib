@@ -8,55 +8,11 @@
 #pragma once
 
 #include <filesystem>
+#include <source_location>
 #include <string>
 
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/spdlog.h>
-
-#if __has_include(<source_location>)
-#include <source_location>
-#endif
-#if defined(__cpp_lib_source_location) and __cpp_lib_source_location >= 201907L
-#include <source_location>
-#else
-// copy from <experimental/source_location> and modify some code to make clang
-// success.
-
-namespace std {
-  struct source_location {
-
-    // 14.1.2, source_location creation
-    static constexpr source_location current(
-#if defined(__clang__)
-        const char *__file = "unknown", int __line = 0
-#elif defined(__GNUC__) || defined(__GNUG__)
-        const char *__file = __builtin_FILE(), int __line = __builtin_LINE()
-#else
-        const char *__file = "unknown", int __line = 0
-#endif
-        ) noexcept {
-      source_location _loc;
-      _loc._M_file = __file;
-      _loc._M_line = static_cast<uint_least32_t>(__line);
-      return _loc;
-    }
-
-    constexpr source_location() noexcept {}
-
-    // 14.1.3, source_location field access
-    constexpr uint_least32_t line() const noexcept { return _M_line; }
-    constexpr const char *file_name() const noexcept { return _M_file; }
-
-  private:
-    const char *_M_file{"unknown"};
-    uint_least32_t _M_line{0};
-  }
-#ifdef __GNUG__
-  __attribute__((aligned(16)))
-#endif
-  ;
-} // namespace std
-#endif
 
 namespace cyy::naive_lib::log {
   struct initer {
