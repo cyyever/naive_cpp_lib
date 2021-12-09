@@ -48,14 +48,17 @@ namespace {
 
 namespace cyy::naive_lib::log {
 
-  initer::initer() {
-    // call this function on program starup to avoid race condition
-    spdlog::details::registry::instance();
-    auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
-    spdlog::set_default_logger(console_logger);
-    constexpr auto log_pattern = "%^[%Y-%m-%d %H:%M:%S.%f][thd %t][%l]%v%$";
-    spdlog::set_pattern(log_pattern);
-  }
+  struct initer {
+    initer() {
+      // call this function on program starup to avoid race condition
+      spdlog::details::registry::instance();
+      auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
+      spdlog::set_default_logger(console_logger);
+      constexpr auto log_pattern = "%^[%Y-%m-%d %H:%M:%S.%f][thd %t][%l]%v%$";
+      spdlog::set_pattern(log_pattern);
+    }
+  };
+  static initer __initer;
   void setup_file_logger(const std::filesystem::path &log_dir,
                          const std::string &name,
                          ::spdlog::level::level_enum level,

@@ -15,10 +15,6 @@
 #include <spdlog/spdlog.h>
 
 namespace cyy::naive_lib::log {
-  struct initer {
-    initer();
-  };
-  inline initer __initer;
 
   void set_level(spdlog::level::level_enum level);
 
