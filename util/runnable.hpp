@@ -11,10 +11,6 @@
 #include <functional>
 #include <mutex>
 #include <thread>
-#ifndef __cpp_lib_jthread
-#include "jthread.hpp"
-#include "stop_token.hpp"
-#endif
 
 namespace cyy::naive_lib {
   //! \brief runnable 封裝線程啓動和關閉的同步控制
