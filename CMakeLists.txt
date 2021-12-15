@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 
 project(CyyNaiveLib LANGUAGES CXX)
 
 set(submodule_names log util)
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  # list(APPEND submodule_names process task hardware)
-endif()
+# if(CMAKE_SYSTEM_NAME STREQUAL "Linux") list(APPEND submodule_names process
+# task hardware) endif()
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_CV "Build opencv module" OFF)
 option(BUILD_VIDEO "Build video modules" OFF)
@@ -30,8 +29,7 @@ if(BUILD_VIDEO)
   list(APPEND submodule_names video)
 endif()
 
-if(BUILD_VIDEO_PYTHON_BINDING
-   OR BUILD_CV_PYTHON_BINDING)
+if(BUILD_VIDEO_PYTHON_BINDING OR BUILD_CV_PYTHON_BINDING)
   list(APPEND submodule_names python_binding)
 endif()
 
