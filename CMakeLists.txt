@@ -43,6 +43,7 @@ set(submodule_libs)
 
 find_package(Boost)
 find_package(fmt)
+find_package(range-v3)
 foreach(submodule_name IN LISTS submodule_names)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${submodule_name})
   set(lib_name cyy_naive_lib_${submodule_name})
