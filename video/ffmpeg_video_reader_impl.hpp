@@ -442,7 +442,7 @@ namespace cyy::naive_lib::video {
       }
 
       std::shared_ptr<AVPacket> packet_ptr(
-          packet, [](auto pkg) { av_packet_free(&pkg); });
+          packet, [](AVPacket *pkg) { av_packet_free(&pkg); });
       auto res = get_packet(*packet);
       if (res <= 0) {
         return {res, nullptr};
@@ -484,7 +484,7 @@ namespace cyy::naive_lib::video {
       }
 
       std::shared_ptr<AVPacket> packet_ptr(
-          packet, [](auto pkg) { av_packet_free(&pkg); });
+          packet, [](AVPacket *pkg) { av_packet_free(&pkg); });
 
       while (true) {
         auto ret = avcodec_receive_frame(decode_ctx, avframe);
