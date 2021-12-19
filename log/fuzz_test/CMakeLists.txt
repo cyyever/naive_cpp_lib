@@ -1,7 +1,5 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/fuzzing.cmake)
-
 set(ENV{FUZZING_TIMEOUT} 10)
-set(ENV{MAX_FUZZING_TIME} 10)
+set(ENV{MAX_FUZZING_TIME} 5)
 file(GLOB fuzzing_sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 foreach(fuzzing_source IN LISTS fuzzing_sources)
