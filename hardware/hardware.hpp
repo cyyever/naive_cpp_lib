@@ -45,16 +45,7 @@ namespace cyy::naive_lib::hardware {
 
   //! \brief 给线程绑定cpu
   void alloc_cpu(std::thread &thd, size_t cpu_no);
-
-  //! \brief 根据ipv4获取mac地址
-  std::optional<std::string>
-  get_mac_address_by_ipv4(const std::string &ipv4_addr);
 #endif
 
-  //! \brief 获取所有mac地址
-  std::set<std::string> mac_address() noexcept(false);
-
-  //! \brief 获取所有ipv4地址
-  std::set<std::string> ipv4_address() noexcept(false);
 
 } // namespace cyy::naive_lib::hardware
