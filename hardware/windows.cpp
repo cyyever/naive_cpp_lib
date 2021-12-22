@@ -15,6 +15,7 @@
 #include <string>
 
 #pragma comment(lib, "IPHLPAPI.lib")
+#pragma comment(lib, "winsock2.lib")
 
 #include "hardware.hpp"
 #include "log/log.hpp"
