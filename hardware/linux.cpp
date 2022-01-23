@@ -43,9 +43,6 @@ namespace cyy::naive_lib::hardware {
     return static_cast<size_t>(physPages) * static_cast<size_t>(pageSize);
   }
 
-
-
-
 } // namespace cyy::naive_lib::hardware
 
 #endif

@@ -23,5 +23,7 @@ TEST_CASE("ffmpeg_writer") {
 
   cyy::naive_lib::video::ffmpeg_writer writer;
   REQUIRE(writer.open("a.flv", "flv", 320, 240));
-  CHECK(writer.write_frame(mat_opt.value().get_cv_mat()));
+  for (size_t i = 0; i < 250; i++) {
+    CHECK(writer.write_frame(mat_opt.value().get_cv_mat()));
+  }
 }

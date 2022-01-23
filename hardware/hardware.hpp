@@ -47,5 +47,4 @@ namespace cyy::naive_lib::hardware {
   void alloc_cpu(std::thread &thd, size_t cpu_no);
 #endif
 
-
 } // namespace cyy::naive_lib::hardware

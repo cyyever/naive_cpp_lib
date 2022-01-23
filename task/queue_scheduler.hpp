@@ -15,9 +15,10 @@
 #include <thread>
 #include <vector>
 
+#include <cyy/algorithm/thread_safe_container.hpp>
+
 #include "base_processor.hpp"
 #include "base_scheduler.hpp"
-#include <cyy/algorithm/thread_safe_container.hpp>
 
 namespace cyy::naive_lib::task {
 
@@ -100,7 +101,9 @@ namespace cyy::naive_lib::task {
     }
 
   private:
-    cyy::algorithm::thread_safe_linear_container<std::vector<std::shared_ptr<base_task>>> queue;
+    cyy::algorithm::thread_safe_linear_container<
+        std::vector<std::shared_ptr<base_task>>>
+        queue;
 
     processor_list_type processors;
     std::mutex processor_mutex;

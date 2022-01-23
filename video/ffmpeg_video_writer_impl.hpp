@@ -55,19 +55,18 @@ namespace cyy::naive_lib::video {
                   errno_to_str(ret));
         return false;
       }
-      output_ctx->oformat->video_codec = AV_CODEC_ID_H264;
-
-      auto codec = avcodec_find_encoder(output_ctx->oformat->video_codec);
-      if (!codec) {
-        LOG_ERROR("can't find encoder for url {}", url);
-        return false;
-      }
 
       output_stream = avformat_new_stream(output_ctx, nullptr);
       if (!output_stream) {
         LOG_ERROR("avformat_new_stream failed");
         return false;
       }
+      auto codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+      if (!codec) {
+        LOG_ERROR("can't find encoder for url {}", url);
+        return false;
+      }
+
       encode_ctx = avcodec_alloc_context3(codec);
       if (!encode_ctx) {
         LOG_ERROR("avcodec_alloc_context3 failed");

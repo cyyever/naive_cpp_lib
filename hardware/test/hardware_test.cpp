@@ -20,5 +20,4 @@ TEST_CASE("cpu_num") {
 #if defined(__linux__)
 TEST_CASE("memory_size") { CHECK(cyy::naive_lib::hardware::memory_size() > 0); }
 
-
 #endif

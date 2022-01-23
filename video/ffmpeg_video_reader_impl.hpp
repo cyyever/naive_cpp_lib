@@ -22,6 +22,7 @@ extern "C" {
 }
 
 #include <cyy/algorithm/thread_safe_container.hpp>
+
 #include "ffmpeg_base.hpp"
 #include "ffmpeg_video_reader.hpp"
 #include "log/log.hpp"
@@ -104,7 +105,7 @@ namespace cyy::naive_lib::video {
       stream_index = ret;
       auto video_stream = input_ctx->streams[ret];
 
-      AVCodec *codec = nullptr;
+      const AVCodec *codec = nullptr;
 
       /* //尝试用nvidia解码 */
       if (getenv("use_cuvid") != nullptr &&
@@ -350,15 +351,14 @@ namespace cyy::naive_lib::video {
     }
 
     void drop_non_key_frames() {
-      frame_filters.emplace("key_frame", [](uint64_t seq, auto const &frame) {
+      frame_filters.emplace("key_frame", [](uint64_t, auto const &frame) {
         return is_key_frame(frame);
       });
     }
     void add_named_filter(std::string name,
                           std::function<bool(uint64_t)> filter) {
-      frame_filters.emplace(name, [filter](uint64_t seq, auto const &frame) {
-        return filter(seq);
-      });
+      frame_filters.emplace(
+          name, [filter](uint64_t seq, auto const &) { return filter(seq); });
     }
     void remove_named_filter(std::string name) { frame_filters.erase(name); }
 
