@@ -11,6 +11,7 @@
 #include <cv/mat.hpp>
 #include <doctest/doctest.h>
 
+#include "../ffmpeg_video_reader.hpp"
 #include "../ffmpeg_video_writer.hpp"
 
 #define STR_H(x) #x
@@ -19,11 +20,20 @@
 TEST_CASE("ffmpeg_writer") {
 
   auto mat_opt = cyy::naive_lib::opencv::mat::load(STR_HELPER(IN_IMAGE));
-  CHECK(mat_opt);
+  REQUIRE(mat_opt);
 
   cyy::naive_lib::video::ffmpeg_writer writer;
-  REQUIRE(writer.open("a.flv", "flv", 320, 240));
+  REQUIRE(writer.open("a.h264", "h264", 320, 240));
   for (size_t i = 0; i < 250; i++) {
-    CHECK(writer.write_frame(mat_opt.value().get_cv_mat()));
+    REQUIRE(writer.write_frame(mat_opt.value().get_cv_mat()));
+  }
+  writer.close();
+  cyy::naive_lib::video::ffmpeg_reader reader;
+  REQUIRE(reader.open("a.h264"));
+  REQUIRE(reader.get_frame_rate());
+  for (size_t i = 0; i < 3; i++) {
+    auto [res, frame] = reader.next_frame();
+    REQUIRE(res > 0);
+    REQUIRE(frame.content.size()==mat_opt->get_cv_mat().size());
   }
 }
