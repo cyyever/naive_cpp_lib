@@ -34,6 +34,6 @@ TEST_CASE("ffmpeg_writer") {
   for (size_t i = 0; i < 3; i++) {
     auto [res, frame] = reader.next_frame();
     REQUIRE(res > 0);
-    REQUIRE(frame.content.size()==mat_opt->get_cv_mat().size());
+    REQUIRE(cyy::naive_lib::opencv::mat(frame.content).width() == 320);
   }
 }
