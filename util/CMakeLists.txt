@@ -6,7 +6,7 @@ find_package(Threads REQUIRED)
 find_package(Microsoft.GSL CONFIG REQUIRED)
 
 target_link_libraries(cyy_naive_lib_util PRIVATE CyyNaiveLib::log)
-target_link_libraries(cyy_naive_lib_util PUBLIC Threads::Threads)
+target_link_libraries(cyy_naive_lib_util PRIVATE Threads::Threads)
 target_link_libraries(cyy_naive_lib_util PRIVATE Microsoft.GSL::GSL)
 
 add_library(CyyNaiveLib::util ALIAS cyy_naive_lib_util)
