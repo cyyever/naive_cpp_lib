@@ -13,7 +13,7 @@
 #include <thread>
 
 namespace cyy::naive_lib {
-  //! \brief runnable 封裝線程啓動和關閉的同步控制
+  //! \brief runnable is a simple wrapper to std::jthread
   class runnable {
   public:
     runnable() = default;
@@ -30,14 +30,15 @@ namespace cyy::naive_lib {
 
     template <typename WakeUpType = std::function<void()>>
     void stop(WakeUpType wakeup = []() {}) {
-      std::unique_lock lock(sync_mutex);
-      if (!thd.joinable()) {
-        return;
+      {
+        std::lock_guard lock(sync_mutex);
+        if (!thd.joinable()) {
+          return;
+        }
+        std::stop_callback cb(thd.get_stop_token(), wakeup);
+        thd.request_stop();
+        thd.join();
       }
-      std::stop_callback cb(thd.get_stop_token(), wakeup);
-      thd.request_stop();
-      lock.unlock();
-      thd.join();
       stop_cv.notify_all();
     }
     template <typename Rep, typename Period>
@@ -58,10 +59,7 @@ namespace cyy::naive_lib {
     }
 
   protected:
-    bool needs_stop() {
-      std::unique_lock lock(sync_mutex);
-      return thd.get_stop_token().stop_requested();
-    }
+    bool needs_stop() { return thd.get_stop_token().stop_requested(); }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;
@@ -73,7 +71,7 @@ namespace cyy::naive_lib {
     std::jthread thd;
 
   protected:
-    std::recursive_mutex sync_mutex;
+    std::mutex sync_mutex;
     std::condition_variable_any stop_cv;
   };
 } // namespace cyy::naive_lib
