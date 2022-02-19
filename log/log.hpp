@@ -8,7 +8,9 @@
 #pragma once
 
 #include <filesystem>
+#ifdef __cpp_lib_source_location
 #include <source_location>
+#endif
 #include <string>
 
 #include <spdlog/fmt/fmt.h>
@@ -26,10 +28,16 @@ namespace cyy::naive_lib::log {
 
   template <typename... Args>
   void log_message(spdlog::level::level_enum level,
-                   const std::source_location &location, std::string fmt,
-                   Args &&...args) {
-    auto real_fmt = std::string("[") + location.file_name() + ":" +
-                    std::to_string(location.line()) + "] " + std::move(fmt);
+#ifdef __cpp_lib_source_location
+                   const std::source_location &location,
+#endif
+                   std::string fmt, Args &&...args) {
+    auto real_fmt = std::string("[")
+#ifdef __cpp_lib_source_location
+                    + location.file_name() + ":" +
+                    std::to_string(location.line()) + "] "
+#endif
+                    + std::move(fmt);
 
     spdlog::apply_all([&](auto const &logger) {
       logger->log(level, fmt::runtime(real_fmt), std::forward<Args>(args)...);
@@ -40,20 +48,28 @@ namespace cyy::naive_lib::log {
 
 #define LOG_DEBUG(...)                                                         \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::debug,           \
+#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
+#endif
                                    __VA_ARGS__)
 
 #define LOG_INFO(...)                                                          \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::info,            \
+#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
+#endif
                                    __VA_ARGS__)
 
 #define LOG_WARN(...)                                                          \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::warn,            \
+#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
+#endif
                                    __VA_ARGS__)
 
 #define LOG_ERROR(...)                                                         \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::err,             \
+#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
+#endif
                                    __VA_ARGS__)
