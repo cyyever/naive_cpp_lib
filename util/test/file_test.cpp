@@ -28,7 +28,9 @@ TEST_CASE("write_and_read") {
 
   CHECK_EQ(write_cnt_opt.value(), 2);
 
-  auto [res, data] = ::cyy::naive_lib::io::read(pipefd[0], 1);
+  auto tmp = ::cyy::naive_lib::io::read(pipefd[0], 1);
+  auto res = tmp.first;
+  auto data = tmp.second;
   CHECK(res);
   CHECK_EQ(data.size(), 1);
   CHECK_EQ(static_cast<char>(data[0]), 'a');

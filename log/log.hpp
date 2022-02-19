@@ -46,30 +46,37 @@ namespace cyy::naive_lib::log {
 
 } // namespace cyy::naive_lib::log
 
+#ifdef __cpp_lib_source_location
 #define LOG_DEBUG(...)                                                         \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::debug,           \
-#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
-#endif
                                    __VA_ARGS__)
 
 #define LOG_INFO(...)                                                          \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::info,            \
-#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
-#endif
                                    __VA_ARGS__)
 
 #define LOG_WARN(...)                                                          \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::warn,            \
-#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
-#endif
                                    __VA_ARGS__)
 
 #define LOG_ERROR(...)                                                         \
   cyy::naive_lib::log::log_message(spdlog::level::level_enum::err,             \
-#ifdef __cpp_lib_source_location
                                    std::source_location::current(),            \
-#endif
                                    __VA_ARGS__)
+#else
+#define LOG_DEBUG(...)                                                         \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::debug,           \
+                                   __VA_ARGS__)
+
+#define LOG_INFO(...)                                                          \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::info, __VA_ARGS__)
+
+#define LOG_WARN(...)                                                          \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::warn, __VA_ARGS__)
+
+#define LOG_ERROR(...)                                                         \
+  cyy::naive_lib::log::log_message(spdlog::level::level_enum::err, __VA_ARGS__)
+#endif
