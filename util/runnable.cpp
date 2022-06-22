@@ -17,7 +17,7 @@ namespace cyy::naive_lib {
     }
     try {
       thd = std::jthread(
-          [this]([[maybe_unused]] std::string name_) {
+          [this](std::stop_token st, [[maybe_unused]] std::string name_) {
             try {
 #if defined(__linux__)
               if (!name_.empty()) {
@@ -30,7 +30,6 @@ namespace cyy::naive_lib {
                 }
               }
 #endif
-              { std::lock_guard lock2(sync_mutex); }
               run();
             } catch (const std::exception &e) {
               if (exception_callback) {
@@ -41,7 +40,6 @@ namespace cyy::naive_lib {
             stop_cv.notify_all();
           },
           std::move(name));
-      st = thd.get_stop_token();
     } catch (const std::exception &e) {
       stop_cv.notify_all();
       if (exception_callback) {

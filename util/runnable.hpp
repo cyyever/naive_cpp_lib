@@ -38,9 +38,10 @@ namespace cyy::naive_lib {
         if (!thd.joinable()) {
           return;
         }
-        std::stop_callback cb(st, wakeup);
+        std::stop_callback cb(thd.get_stop_token(), wakeup);
         thd.request_stop();
         thd.join();
+        thd = std::jthread();
       }
       stop_cv.notify_all();
     }
@@ -62,7 +63,7 @@ namespace cyy::naive_lib {
     }
 
   protected:
-    bool needs_stop() { return st.stop_requested(); }
+    bool needs_stop() { return thd.get_stop_token().stop_requested(); }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;
@@ -74,7 +75,6 @@ namespace cyy::naive_lib {
     std::jthread thd;
 
   protected:
-    std::stop_token st;
     std::mutex sync_mutex;
     std::condition_variable_any stop_cv;
   };
