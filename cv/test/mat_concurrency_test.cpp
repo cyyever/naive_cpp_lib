@@ -28,7 +28,7 @@ TEST_CASE("mat") {
     CHECK_EQ(image_mat.channels(), 3);
 
     SUBCASE("resize") {
-      std::vector<std::thread> thds;
+      std::vector<std::jthread> thds;
 
       std::mutex mu;
       for (int i = 0; i < 8; i++) {
@@ -41,10 +41,6 @@ TEST_CASE("mat") {
             CHECK_EQ(image_mat2.height(), 20);
           }
         });
-      }
-
-      for (auto &thd : thds) {
-        thd.join();
       }
     }
   }
