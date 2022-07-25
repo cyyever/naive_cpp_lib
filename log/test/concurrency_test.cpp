@@ -7,6 +7,9 @@
  */
 
 #include <thread>
+#ifndef __cpp_lib_jthread
+#include "jthread.hpp"
+#endif
 
 #include <doctest/doctest.h>
 
