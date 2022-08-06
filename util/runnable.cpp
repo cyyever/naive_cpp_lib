@@ -17,8 +17,18 @@ namespace cyy::naive_lib {
     }
     try {
       thd = std::jthread(
-          [this](std::stop_token, [[maybe_unused]] std::string name_) {
+          [this](std::stop_token st, [[maybe_unused]] std::string name_) {
             try {
+              {
+                while (true) {
+                  if (this->sync_mutex.try_lock()) {
+                    this->stop_token_opt = st;
+                    this->sync_mutex.unlock();
+                    break;
+                  }
+                  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+              }
 #if defined(__linux__)
               if (!name_.empty()) {
                 // glibc 限制名字長度

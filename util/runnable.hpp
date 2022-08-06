@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <thread>
 #ifndef __cpp_lib_jthread
 #include "jthread.hpp"
@@ -38,10 +39,11 @@ namespace cyy::naive_lib {
         if (!thd.joinable()) {
           return;
         }
-        std::stop_callback cb(thd.get_stop_token(), wakeup);
+        std::stop_callback cb(*stop_token_opt, wakeup);
         thd.request_stop();
         thd.join();
         thd = std::jthread();
+        stop_token_opt.reset();
       }
       stop_cv.notify_all();
     }
@@ -63,7 +65,7 @@ namespace cyy::naive_lib {
     }
 
   protected:
-    bool needs_stop() { return thd.get_stop_token().stop_requested(); }
+    bool needs_stop() { return stop_token_opt->stop_requested(); }
 
   protected:
     std::function<void(const std::exception &e)> exception_callback;
@@ -73,6 +75,7 @@ namespace cyy::naive_lib {
 
   private:
     std::jthread thd;
+    std::optional<std::stop_token> stop_token_opt;
 
   protected:
     std::mutex sync_mutex;
