@@ -48,8 +48,8 @@ namespace cyy::naive_lib {
         std::stop_callback cb(*stop_token_opt, wakeup);
         thd.request_stop();
         thd.join();
-        thd = std::jthread();
         stop_token_opt.reset();
+        thd = std::jthread();
         break;
       }
       stop_cv.notify_all();
