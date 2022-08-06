@@ -29,14 +29,15 @@ public:
     stop();
   }
   void test_restart() {
-    for (size_t i = 0; i < 2; i++) {
+    for (size_t i = 0; i < 1; i++) {
       start();
       stop();
     }
   }
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
   void test_name() {
+    thread_name="test_thread";
     start(thread_name);
     stop();
     thread_name.clear();
@@ -61,7 +62,8 @@ public:
 
 private:
   void run() override {
-#if defined(__linux__)
+    LOG_ERROR("run thd");
+#if defined(__linux__) || defined(__FreeBSD__)
     if (!thread_name.empty()) {
       char buf[1024]{};
       auto err = pthread_getname_np(pthread_self(), buf, sizeof(buf));
@@ -90,7 +92,7 @@ TEST_CASE("runnable") {
     CHECK_THROWS(tester.start());
   }
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
   SUBCASE("name") { tester.test_name(); }
 #endif
 
