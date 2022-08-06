@@ -34,16 +34,23 @@ namespace cyy::naive_lib {
 
     template <typename WakeUpType = std::function<void()>>
     void stop(WakeUpType wakeup = []() {}) {
-      {
-        std::lock_guard lock(sync_mutex);
+      while (true) {
+        std::unique_lock lock(sync_mutex);
         if (!thd.joinable()) {
-          return;
+          break;
         }
+        if (!stop_token_opt.has_value()) {
+          lock.unlock();
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          continue;
+        }
+
         std::stop_callback cb(*stop_token_opt, wakeup);
         thd.request_stop();
         thd.join();
         thd = std::jthread();
         stop_token_opt.reset();
+        break;
       }
       stop_cv.notify_all();
     }
