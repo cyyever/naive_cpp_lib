@@ -50,8 +50,11 @@ namespace {
 
 namespace cyy::naive_lib::log {
 
-  std::string get_thread_name() {
-    std::string thd_name(32, {});
+  const std::string &get_thread_name() {
+    thread_local std::string thd_name(32, {});
+    if (thd_name[0] != '\0') {
+      return thd_name;
+    }
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_getname_np(pthread_self(), thd_name.data(), thd_name.size());
 #endif
