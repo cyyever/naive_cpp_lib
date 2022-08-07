@@ -50,8 +50,8 @@ namespace {
 
 namespace cyy::naive_lib::log {
 
-  const std::wstring &get_thread_name() {
-    thread_local std::wstring thd_name(32, {});
+  const std::string &get_thread_name() {
+    thread_local std::string thd_name(32, {});
     if (thd_name[0] != '\0') {
       return thd_name;
     }
@@ -65,10 +65,13 @@ namespace cyy::naive_lib::log {
     auto hr = GetThreadDescription(GetCurrentThread(), &data);
     if (SUCCEEDED(hr))
     {
-      thd_name=std::wstring(data);
+        std::wstring tmp(data);
       LocalFree(data);
+      thd_name=std::string(tmp.begin(),tmp.end());
+    } 
+    if (thd_name[0] == '\0') {
+      thd_name = fmt::format("{}", GetCurrentThreadId());
     }
-
 #endif
     return thd_name;
   }

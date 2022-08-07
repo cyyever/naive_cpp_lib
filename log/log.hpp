@@ -19,7 +19,7 @@
 
 namespace cyy::naive_lib::log {
 
-  const std::wstring &get_thread_name();
+  const std::string &get_thread_name();
   void set_thread_name(std::string_view name);
   void set_level(spdlog::level::level_enum level);
 
