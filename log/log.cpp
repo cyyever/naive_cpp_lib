@@ -55,7 +55,7 @@ namespace cyy::naive_lib::log {
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_getname_np(pthread_self(), thd_name.data(), thd_name.size());
 #endif
-    if (thd_name.empty()) {
+    if (thd_name[0] == '\0') {
       thd_name = fmt::format("{}", reinterpret_cast<size_t>(pthread_self()));
     }
     return thd_name;
