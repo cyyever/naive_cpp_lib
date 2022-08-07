@@ -30,15 +30,7 @@ namespace cyy::naive_lib {
                 }
               }
               if (!name_.empty()) {
-                // glibc 限制名字長度
-                name_.resize(15);
-#if defined(__linux__) || defined(__FreeBSD__)
-                auto err = pthread_setname_np(pthread_self(), name_.c_str());
-                if (err != 0) {
-                  LOG_ERROR("pthread_setname_np failed:{}",
-                            cyy::naive_lib::util::errno_to_str(err));
-                }
-#endif
+                cyy::naive_lib::log::set_thread_name(name_);
               }
               run();
             } catch (const std::exception &e) {

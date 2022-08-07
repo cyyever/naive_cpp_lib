@@ -12,6 +12,8 @@
 #include "log/log.hpp"
 
 TEST_CASE("default console logger") {
+  cyy::naive_lib::log::set_thread_name("test_thread");
+
   LOG_ERROR("hello world.....error");
   LOG_INFO("hello world.....info");
   LOG_DEBUG("hello world.....debug");

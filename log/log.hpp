@@ -12,12 +12,15 @@
 #include <source_location>
 #endif
 #include <string>
+#include <string_view>
 
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/spdlog.h>
 
 namespace cyy::naive_lib::log {
 
+  std::string get_thread_name();
+  void set_thread_name(std::string_view name);
   void set_level(spdlog::level::level_enum level);
 
   void setup_file_logger(const std::filesystem::path &log_dir,
@@ -38,7 +41,6 @@ namespace cyy::naive_lib::log {
                     std::to_string(location.line()) + "] "
 #endif
                     + std::move(fmt);
-
     spdlog::apply_all([&](auto const &logger) {
       logger->log(level, fmt::runtime(real_fmt), std::forward<Args>(args)...);
     });
