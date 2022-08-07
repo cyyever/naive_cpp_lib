@@ -50,25 +50,36 @@ namespace {
 
 namespace cyy::naive_lib::log {
 
-  const std::string &get_thread_name() {
-    thread_local std::string thd_name(32, {});
+  const std::wstring &get_thread_name() {
+    thread_local std::wstring thd_name(32, {});
     if (thd_name[0] != '\0') {
       return thd_name;
     }
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_getname_np(pthread_self(), thd_name.data(), thd_name.size());
-#endif
     if (thd_name[0] == '\0') {
       thd_name = fmt::format("{}", reinterpret_cast<size_t>(pthread_self()));
     }
+#elif defined(_WIN32)
+    PWSTR data;
+    auto hr = GetThreadDescription(GetCurrentThread(), &data);
+    if (SUCCEEDED(hr))
+    {
+      thd_name=std::wstring(data);
+      LocalFree(data);
+    }
+
+#endif
     return thd_name;
   }
   void set_thread_name(std::string_view name) {
-
     // glibc 限制名字長度
     name = name.substr(0, 15);
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_setname_np(pthread_self(), name.data());
+#elif defined(_WIN32)
+    std::wstring tmp_name(name.begin(),name.end());
+    SetThreadDescription(GetCurrentThread(),tmp_name.data());
 #endif
   }
 
