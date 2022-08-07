@@ -37,7 +37,7 @@ public:
 
 #if defined(__linux__) || defined(__FreeBSD__)
   void test_name() {
-    thread_name="test_thread";
+    thread_name = "test_thread";
     start(thread_name);
     stop();
     thread_name.clear();
