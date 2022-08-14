@@ -63,12 +63,11 @@ namespace cyy::naive_lib::log {
 #elif defined(_WIN32)
     PWSTR data;
     auto hr = GetThreadDescription(GetCurrentThread(), &data);
-    if (SUCCEEDED(hr))
-    {
-        std::wstring tmp(data);
+    if (SUCCEEDED(hr)) {
+      std::wstring tmp(data);
       LocalFree(data);
-      thd_name=std::string(tmp.begin(),tmp.end());
-    } 
+      thd_name = std::string(tmp.begin(), tmp.end());
+    }
     if (thd_name[0] == '\0') {
       thd_name = fmt::format("{}", GetCurrentThreadId());
     }
@@ -81,8 +80,8 @@ namespace cyy::naive_lib::log {
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_setname_np(pthread_self(), name.data());
 #elif defined(_WIN32)
-    std::wstring tmp_name(name.begin(),name.end());
-    SetThreadDescription(GetCurrentThread(),tmp_name.data());
+    std::wstring tmp_name(name.begin(), name.end());
+    SetThreadDescription(GetCurrentThread(), tmp_name.data());
 #endif
   }
 

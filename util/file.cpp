@@ -26,8 +26,6 @@
 #include <unistd.h>
 #endif
 
-#include <gsl/gsl>
-
 #include "file.hpp"
 #include "log/log.hpp"
 #include "util/error.hpp"
@@ -71,15 +69,17 @@ namespace cyy::naive_lib::io {
       return false;
     }
 #ifdef WIN32
-    auto cleanup = gsl::finally([fd]() { _close(fd); });
+    auto &cleanup = _close;
 #else
-    auto cleanup = gsl::finally([fd]() { close(fd); });
+    auto &cleanup = close;
 #endif
     if (!read(fd, content)) {
 
       LOG_ERROR("read file {} failed", file_path.string());
+      cleanup(fd);
       return false;
     }
+    cleanup(fd);
     return true;
   }
 
@@ -96,11 +96,13 @@ namespace cyy::naive_lib::io {
       return {};
     }
 #ifdef WIN32
-    auto cleanup = gsl::finally([fd]() { _close(fd); });
+    auto &cleanup = _close;
 #else
-    auto cleanup = gsl::finally([fd]() { close(fd); });
+    auto &cleanup = close;
 #endif
-    return write(fd, data, data_len);
+    auto res = write(fd, data, data_len);
+    cleanup(fd);
+    return res;
   }
 
   std::optional<size_t> write(int fd, const void *data, size_t data_len) {
