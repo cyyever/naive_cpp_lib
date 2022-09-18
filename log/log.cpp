@@ -90,7 +90,7 @@ namespace cyy::naive_lib::log {
     void format(const spdlog::details::log_msg &, const std::tm &,
                 spdlog::memory_buf_t &dest) override {
       auto thd_name = get_thread_name();
-      dest.append(thd_name.data(), thd_name.data() + thd_name.size());
+      dest.append(thd_name.data(), thd_name.data() + strlen(thd_name.data()));
     }
 
     std::unique_ptr<spdlog::custom_flag_formatter> clone() const override {
