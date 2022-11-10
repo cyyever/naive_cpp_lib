@@ -8,6 +8,7 @@
 #pragma once
 
 #include <filesystem>
+#include <version>
 #ifdef __cpp_lib_source_location
 #include <source_location>
 #endif
@@ -35,12 +36,13 @@ namespace cyy::naive_lib::log {
                    const std::source_location &location,
 #endif
                    std::string fmt, Args &&...args) {
-    auto real_fmt = std::string("[")
+    auto real_fmt =
 #ifdef __cpp_lib_source_location
-                    + location.file_name() + ":" +
-                    std::to_string(location.line()) + "] "
+        std::string("[") +
+        std::filesystem::path(location.file_name()).filename().string() + ":" +
+        std::to_string(location.line()) + "] " +
 #endif
-                    + std::move(fmt);
+        std::move(fmt);
     spdlog::apply_all([&](auto const &logger) {
       logger->log(level, fmt::runtime(real_fmt), std::forward<Args>(args)...);
     });
