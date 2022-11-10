@@ -61,7 +61,7 @@ public:
   }
 
 private:
-  void run() override {
+  void run(const std::stop_token &st) override {
     LOG_ERROR("run thd");
 #if defined(__linux__) || defined(__FreeBSD__)
     if (!thread_name.empty()) {

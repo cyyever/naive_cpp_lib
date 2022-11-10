@@ -78,7 +78,7 @@ namespace cyy::naive_lib {
     std::function<void(const std::exception &e)> exception_callback;
 
   private:
-    virtual void run() = 0;
+    virtual void run(const std::stop_token &st) = 0;
 
   private:
     std::jthread thd;

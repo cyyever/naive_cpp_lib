@@ -32,7 +32,7 @@ namespace cyy::naive_lib {
               if (!name_.empty()) {
                 cyy::naive_lib::log::set_thread_name(name_);
               }
-              run();
+              run(st);
             } catch (const std::exception &e) {
               if (exception_callback) {
                 exception_callback(e);
