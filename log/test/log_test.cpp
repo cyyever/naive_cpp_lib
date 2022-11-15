@@ -21,7 +21,7 @@ TEST_CASE("default console logger") {
 }
 
 TEST_CASE("set logger level") {
-  cyy::naive_lib::log::set_level(spdlog::level::err);
+  cyy::naive_lib::log::set_level(spdlog::level::level_enum::err);
   LOG_WARN("no warns");
   LOG_ERROR("an error");
 }
