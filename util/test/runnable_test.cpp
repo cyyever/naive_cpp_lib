@@ -29,7 +29,7 @@ public:
     stop();
   }
   void test_restart() {
-    for (size_t i = 0; i < 1; i++) {
+    for (size_t i = 0; i < 2; i++) {
       start();
       stop();
     }
