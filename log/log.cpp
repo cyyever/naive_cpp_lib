@@ -5,9 +5,6 @@
  * \date 2016-04-18
  */
 
-#ifdef _WIN32
-#define _CRT_SECURE_NO_WARNINGS
-#endif
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/rotating_file_sink.h>
