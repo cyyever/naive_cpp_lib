@@ -47,8 +47,13 @@ namespace {
 
 namespace cyy::naive_lib::log {
 
+#if defined(_WIN32)
+  const std::wstring &get_thread_name() {
+    thread_local std::wstring thd_name(32, {});
+#else
   const std::string &get_thread_name() {
     thread_local std::string thd_name(32, {});
+#endif
     if (thd_name[0] != '\0') {
       return thd_name;
     }
@@ -59,14 +64,16 @@ namespace cyy::naive_lib::log {
     }
 #elif defined(_WIN32)
     PWSTR data;
-    auto hr = GetThreadDescription(GetCurrentThread(), &data);
+    const auto hr = GetThreadDescription(GetCurrentThread(), &data);
     if (SUCCEEDED(hr)) {
-      std::wstring tmp(data);
+      thd_name=std::wstring(data);
       LocalFree(data);
-      thd_name = std::string(tmp.begin(), tmp.end());
+      /* thd_name = std::string(tmp.begin(), tmp.end()); */
     }
     if (thd_name[0] == '\0') {
-      thd_name = fmt::format("{}", GetCurrentThreadId());
+
+       auto tmp= fmt::format("{}", GetCurrentThreadId());
+      thd_name = std::wstring(tmp.begin(),tmp.end());
     }
 #endif
     return thd_name;

@@ -18,7 +18,11 @@
 
 namespace cyy::naive_lib::log {
 
+#if defined(_WIN32)
+  const std::wstring &get_thread_name();
+#else
   const std::string &get_thread_name();
+#endif
   void set_thread_name(std::string_view name);
   void set_level(spdlog::level::level_enum level);
 
