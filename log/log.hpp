@@ -27,16 +27,15 @@ namespace cyy::naive_lib::log {
                          ::spdlog::level::level_enum level,
                          size_t max_file_size = 512 * 1024 * 1024,
                          size_t max_file_num = 3);
-
   template <typename... Args>
   void log_message(spdlog::level::level_enum level,
                    const std::source_location &location, const char *fmt_string,
-                   Args &&...args) {
-    spdlog::apply_all([&](auto const &logger) {
+                   Args ...args) {
+    spdlog::apply_all([&]( std::shared_ptr<spdlog::logger> logger) {
       logger->log(
           level, fmt::runtime(fmt_string),
-          std::string(std::filesystem::path(location.file_name()).filename()),
-          location.line(), std::forward<Args>(args)...);
+            std::filesystem::path(location.file_name()).filename().string(),
+          location.line(), args...);
     });
   }
 

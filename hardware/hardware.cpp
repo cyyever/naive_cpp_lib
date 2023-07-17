@@ -6,10 +6,6 @@
  * \date 2016-09-13
  */
 
-#ifdef WIN32
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <cstdlib>
 #include <mutex>
 
