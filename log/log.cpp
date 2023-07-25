@@ -66,14 +66,14 @@ namespace cyy::naive_lib::log {
     PWSTR data;
     const auto hr = GetThreadDescription(GetCurrentThread(), &data);
     if (SUCCEEDED(hr)) {
-      thd_name=std::wstring(data);
+      thd_name = std::wstring(data);
       LocalFree(data);
       /* thd_name = std::string(tmp.begin(), tmp.end()); */
     }
     if (thd_name[0] == '\0') {
 
-       auto tmp= fmt::format("{}", GetCurrentThreadId());
-      thd_name = std::wstring(tmp.begin(),tmp.end());
+      auto tmp = fmt::format("{}", GetCurrentThreadId());
+      thd_name = std::wstring(tmp.begin(), tmp.end());
     }
 #endif
     return thd_name;
@@ -94,7 +94,7 @@ namespace cyy::naive_lib::log {
     void format(const spdlog::details::log_msg &, const std::tm &,
                 spdlog::memory_buf_t &dest) override {
       auto thd_name = get_thread_name();
-      dest.append(thd_name.data(), thd_name.data() +thd_name.size());
+      dest.append(thd_name);
     }
 
     std::unique_ptr<spdlog::custom_flag_formatter> clone() const override {
