@@ -11,6 +11,8 @@
 #include <functional>
 #include <mutex>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <thread>
 #ifndef __cpp_lib_jthread
 #include "jthread.hpp"
@@ -30,7 +32,7 @@ namespace cyy::naive_lib {
 
     //! \note 子類Destructor必須明確調用stop
     virtual ~runnable() = default;
-    void start(std::string name = "");
+    void start(std::string_view name = "");
 
     template <typename WakeUpType = std::function<void()>>
     void stop(WakeUpType wakeup = []() {}) {
@@ -73,14 +75,11 @@ namespace cyy::naive_lib {
 
   protected:
     bool needs_stop() { return stop_token_opt->stop_requested(); }
-
-  protected:
     std::function<void(const std::exception &e)> exception_callback;
 
   private:
     virtual void run(const std::stop_token &st) = 0;
 
-  private:
     std::jthread thd;
     std::optional<std::stop_token> stop_token_opt;
 

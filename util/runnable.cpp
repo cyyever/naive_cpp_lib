@@ -10,7 +10,7 @@
 #include "log/log.hpp"
 
 namespace cyy::naive_lib {
-  void runnable::start(std::string name) {
+  void runnable::start(std::string_view name) {
     std::lock_guard lock(sync_mutex);
     if (thd.joinable()) {
       throw std::runtime_error("thread is running");
@@ -41,7 +41,7 @@ namespace cyy::naive_lib {
             }
             stop_cv.notify_all();
           },
-          std::move(name));
+          std::string(name));
     } catch (const std::exception &e) {
       stop_cv.notify_all();
       if (exception_callback) {

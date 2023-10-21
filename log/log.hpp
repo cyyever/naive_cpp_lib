@@ -29,10 +29,10 @@ namespace cyy::naive_lib::log {
   void setup_file_logger(const std::filesystem::path &log_dir,
                          const std::string &name,
                          ::spdlog::level::level_enum level,
-                         size_t max_file_size = 512 * 1024 * 1024,
+                         size_t max_file_size = 512ull * 1024ull * 1024ull,
                          size_t max_file_num = 3);
 
-  inline constexpr std::string complete_fmt(std::string fmt_str) {
+  inline constexpr std::string complete_fmt(const std::string& fmt_str) {
     return std::string("[{}:{}] ") + fmt_str;
   }
 
@@ -40,7 +40,7 @@ namespace cyy::naive_lib::log {
   void log_message(spdlog::level::level_enum level,
                    const std::source_location &location, const T &fmt_string,
                    Args... args) {
-    spdlog::apply_all([&](std::shared_ptr<spdlog::logger> logger) {
+    spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& logger) {
       logger->log(
           level, fmt::runtime(fmt_string),
           std::filesystem::path(location.file_name()).filename().string(),
@@ -50,11 +50,11 @@ namespace cyy::naive_lib::log {
 
 } // namespace cyy::naive_lib::log
 
-#define __LOG_IMPL(log_level, fmt_str, ...)                                    \
+#define LOG_IMPL(log_level, fmt_str, ...)                                    \
   cyy::naive_lib::log::log_message(log_level, std::source_location::current(), \
                                    cyy::naive_lib::log::complete_fmt(fmt_str)  \
                                        __VA_OPT__(, ) __VA_ARGS__)
-#define LOG_DEBUG(...) __LOG_IMPL(spdlog::level::level_enum::debug, __VA_ARGS__)
-#define LOG_INFO(...) __LOG_IMPL(spdlog::level::level_enum::info, __VA_ARGS__)
-#define LOG_WARN(...) __LOG_IMPL(spdlog::level::level_enum::warn, __VA_ARGS__)
-#define LOG_ERROR(...) __LOG_IMPL(spdlog::level::level_enum::err, __VA_ARGS__)
+#define LOG_DEBUG(...) LOG_IMPL(spdlog::level::level_enum::debug, __VA_ARGS__)
+#define LOG_INFO(...) LOG_IMPL(spdlog::level::level_enum::info, __VA_ARGS__)
+#define LOG_WARN(...) LOG_IMPL(spdlog::level::level_enum::warn, __VA_ARGS__)
+#define LOG_ERROR(...) LOG_IMPL(spdlog::level::level_enum::err, __VA_ARGS__)
