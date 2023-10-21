@@ -16,7 +16,17 @@
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/spdlog.h>
 
+  template<std::size_t N>
+    struct Str {
+      char chars[N];
+    };
+  template<std::size_t N> Str(const char(&)[N]) -> Str<N>; // deduction guide
+  template<std::size_t M,std::size_t N>
+  constexpr std::string concat(Str<M> a,Str<N> b) {
+    return std::string(a.chars)+std::string(b.chars);
+  }
 namespace cyy::naive_lib::log {
+
 
 #if defined(_WIN32)
   const std::wstring &get_thread_name();
@@ -32,26 +42,22 @@ namespace cyy::naive_lib::log {
                          size_t max_file_size = 512ull * 1024ull * 1024ull,
                          size_t max_file_num = 3);
 
-  inline constexpr std::string complete_fmt(const std::string& fmt_str) {
-    return std::string("[{}:{}] ") + fmt_str;
-  }
+  template <auto fmt_string, typename... Args>
+  void log_message( const std::source_location &location, spdlog::level::level_enum level, Args... args) {
+    auto msg = fmt::format(
+    fmt::runtime(  concat(Str{"[{}:{}] "},fmt_string))
+        , std::filesystem::path(location.file_name()).filename().string(), location.line(), args...);
 
-  template <typename T, typename... Args>
-  void log_message( const std::source_location &location, spdlog::level::level_enum level, const T &fmt_string, Args... args) {
     spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& logger) {
       logger->log(
-          level, fmt::runtime(fmt_string),
-          std::filesystem::path(location.file_name()).filename().string(),
-          location.line(), args...);
+          level, "{}",msg);
     });
   }
 
 } // namespace cyy::naive_lib::log
 
 #define LOG_IMPL(log_level, fmt_str, ...)                                    \
-  cyy::naive_lib::log::log_message(std::source_location::current(),log_level, \
-                                   cyy::naive_lib::log::complete_fmt(fmt_str)  \
-                                       __VA_OPT__(, ) __VA_ARGS__)
+  cyy::naive_lib::log::log_message<Str{fmt_str}>(std::source_location::current(),log_level __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_DEBUG(...) LOG_IMPL(spdlog::level::level_enum::debug, __VA_ARGS__)
 #define LOG_INFO(...) LOG_IMPL(spdlog::level::level_enum::info, __VA_ARGS__)
 #define LOG_WARN(...) LOG_IMPL(spdlog::level::level_enum::warn, __VA_ARGS__)
