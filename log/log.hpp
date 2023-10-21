@@ -37,9 +37,7 @@ namespace cyy::naive_lib::log {
   }
 
   template <typename T, typename... Args>
-  void log_message(spdlog::level::level_enum level,
-                   const std::source_location &location, const T &fmt_string,
-                   Args... args) {
+  void log_message( const std::source_location &location, spdlog::level::level_enum level, const T &fmt_string, Args... args) {
     spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& logger) {
       logger->log(
           level, fmt::runtime(fmt_string),
@@ -51,7 +49,7 @@ namespace cyy::naive_lib::log {
 } // namespace cyy::naive_lib::log
 
 #define LOG_IMPL(log_level, fmt_str, ...)                                    \
-  cyy::naive_lib::log::log_message(log_level, std::source_location::current(), \
+  cyy::naive_lib::log::log_message(std::source_location::current(),log_level, \
                                    cyy::naive_lib::log::complete_fmt(fmt_str)  \
                                        __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_DEBUG(...) LOG_IMPL(spdlog::level::level_enum::debug, __VA_ARGS__)
