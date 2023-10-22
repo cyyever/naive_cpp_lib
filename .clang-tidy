@@ -1,5 +1,5 @@
 ---
 Checks: ' *, -altera*, -abseil*, -bugprone-easily-swappable-parameters, -bugprone-swapped-arguments,
-  -cppcoreguidelines-non-private-member-variables-in-classes, -llvmlibc*, -misc-non-private-member-variables-in-classes, -modernize-use-trailing-return-type, -*default-argument* '
+  -cppcoreguidelines-non-private-member-variables-in-classes,-readability-identifier-length, -llvmlibc*, -misc-non-private-member-variables-in-classes, -modernize-use-trailing-return-type, -*default-argument* '
 AnalyzeTemporaryDtors: false
 WarningsAsErrors: '*'
