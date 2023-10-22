@@ -5,6 +5,10 @@
  * \date 2016-04-18
  */
 
+#include "log.hpp"
+
+#include <ctime>
+
 #include <spdlog/fmt/chrono.h>
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/std.h>
@@ -12,35 +16,14 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-
-#if __has_include(<unistd.h>)
-#include <unistd.h>
-
-#include <sys/types.h>
-#endif
-#include <ctime>
-
-#include "log.hpp"
 namespace {
-
-  std::string now_str() {
-    time_t t;
-    time(&t);
-    return fmt::format("{:%Y-:%m-:%d-:%H-:%M-:%S}",fmt::localtime(t));
-  }
 
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
-    logger_name += "-";
-    logger_name += now_str();
-    logger_name += "--";
-#ifdef _WIN32
-    logger_name += std::to_string(_getpid());
-#else
-    logger_name += std::to_string(getpid());
-#endif
-    logger_name += ".log";
-    return log_dir / logger_name;
+    auto tp = time(nullptr);
+    return log_dir / fmt::format("{}-{:%Y-:%m-:%d-:%H-:%M-:%S}-{}.log",
+                                 logger_name, fmt::localtime(tp),
+                                 std::this_thread::get_id());
   }
 
 } // namespace
@@ -68,10 +51,8 @@ namespace cyy::naive_lib::log {
     if (SUCCEEDED(hr)) {
       thd_name = std::wstring(data);
       LocalFree(data);
-      /* thd_name = std::string(tmp.begin(), tmp.end()); */
     }
     if (thd_name[0] == '\0') {
-
       auto tmp = fmt::format("{}", GetCurrentThreadId());
       thd_name = std::wstring(tmp.begin(), tmp.end());
     }
@@ -79,9 +60,10 @@ namespace cyy::naive_lib::log {
     return thd_name;
   }
   void set_thread_name(std::string_view name) {
-    // glibc 限制名字長度
-    name = name.substr(0, 15);
 #if defined(__linux__) || defined(__FreeBSD__)
+    // glibc has a limit on name length
+    // NOLINTNEXTLINE(*magic*)
+    name = name.substr(0, 15);
     pthread_setname_np(pthread_self(), name.data());
 #elif defined(_WIN32)
     std::wstring tmp_name(name.begin(), name.end());
@@ -93,17 +75,17 @@ namespace cyy::naive_lib::log {
   public:
     void format(const spdlog::details::log_msg &, const std::tm &,
                 spdlog::memory_buf_t &dest) override {
-      auto thd_name = get_thread_name();
-      dest.append(thd_name);
+      dest.append(get_thread_name());
     }
 
-    std::unique_ptr<spdlog::custom_flag_formatter> clone() const override {
+    [[nodiscard]] std::unique_ptr<spdlog::custom_flag_formatter>
+    clone() const override {
       return spdlog::details::make_unique<thread_name_formatter>();
     }
   };
 
   struct initer {
-    initer() {
+    initer() noexcept {
       // call this function on program starup to avoid race condition
       spdlog::details::registry::instance();
       auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
@@ -114,13 +96,13 @@ namespace cyy::naive_lib::log {
       spdlog::set_formatter(std::move(formatter));
     }
   };
-  static initer __initer;
+  const static initer initer_object;
   void setup_file_logger(const std::filesystem::path &log_dir,
                          const std::string &name,
                          ::spdlog::level::level_enum min_level) {
     using ::spdlog::level::level_enum;
     // NOLINTNEXTLINE(*magic-number*)
-    size_t max_file_size = 512ull * 1024 * 1024 * 1024;
+    size_t max_file_size = 512ULL * 1024 * 1024 * 1024;
     size_t max_files = 3;
     for (int level = static_cast<int>(min_level);
          level <= static_cast<int>(level_enum::err); level++) {
