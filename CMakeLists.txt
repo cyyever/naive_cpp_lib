@@ -33,8 +33,6 @@ if(BUILD_VIDEO_PYTHON_BINDING OR BUILD_CV_PYTHON_BINDING)
   list(APPEND submodule_names python_binding)
 endif()
 
-option(WITH_ASAN "Build with address sanitizer" OFF)
-
 option(BUILD_FUZZING "Build fuzzing" OFF)
 
 include(cmake/all.cmake)
@@ -46,10 +44,6 @@ foreach(submodule_name IN LISTS submodule_names)
   set(lib_name cyy_naive_lib_${submodule_name})
   if(submodule_name STREQUAL "python_binding")
     set(lib_name cyy_naive_cpp_extension)
-  endif()
-  if(WITH_ASAN)
-    find_package(GoogleSanitizer REQUIRED)
-    target_link_libraries(${lib_name} INTERFACE GoogleSanitizer::address)
   endif()
   target_include_directories(
     ${lib_name} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
