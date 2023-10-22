@@ -1,0 +1,7 @@
+---
+Checks: ' *, -altera*, -abseil*, -bugprone-easily-swappable-parameters, -bugprone-swapped-arguments,
+  -cppcoreguidelines-non-private-member-variables-in-classes, -misc-non-private-member-variables-in-classes,
+  - '
+AnalyzeTemporaryDtors: false
+WarningsAsErrors: '*'
+FormatStyle: file

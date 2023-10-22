@@ -38,9 +38,7 @@ namespace cyy::naive_lib::log {
 
   void setup_file_logger(const std::filesystem::path &log_dir,
                          const std::string &name,
-                         ::spdlog::level::level_enum level,
-                         size_t max_file_size = 512ull * 1024ull * 1024ull,
-                         size_t max_file_num = 3);
+                         ::spdlog::level::level_enum min_level);
 
   template <auto fmt_string, typename... Args>
   void log_message( const std::source_location &location, spdlog::level::level_enum level, Args... args) {

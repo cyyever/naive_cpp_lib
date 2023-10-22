@@ -5,7 +5,9 @@
  * \date 2016-04-18
  */
 
+#include <spdlog/fmt/chrono.h>
 #include <spdlog/fmt/fmt.h>
+#include <spdlog/fmt/std.h>
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -24,9 +26,7 @@ namespace {
   std::string now_str() {
     time_t t;
     time(&t);
-    char buf[100]{};
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d-%H-%M-%S", std::localtime(&t));
-    return buf;
+    return fmt::format("{:%Y-:%m-:%d-:%H-:%M-:%S}",fmt::localtime(t));
   }
 
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
@@ -60,7 +60,7 @@ namespace cyy::naive_lib::log {
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_getname_np(pthread_self(), thd_name.data(), thd_name.size());
     if (thd_name[0] == '\0') {
-      thd_name = fmt::format("{}", reinterpret_cast<size_t>(pthread_self()));
+      thd_name = fmt::format("{}", std::this_thread::get_id());
     }
 #elif defined(_WIN32)
     PWSTR data;
@@ -117,19 +117,21 @@ namespace cyy::naive_lib::log {
   static initer __initer;
   void setup_file_logger(const std::filesystem::path &log_dir,
                          const std::string &name,
-                         ::spdlog::level::level_enum level,
-                         size_t max_file_size, size_t max_file_num) {
+                         ::spdlog::level::level_enum min_level) {
     using ::spdlog::level::level_enum;
-    for (int l = static_cast<int>(level);
-         l <= static_cast<int>(level_enum::err); l++) {
+    // NOLINTNEXTLINE(*magic-number*)
+    size_t max_file_size = 512ull * 1024 * 1024 * 1024;
+    size_t max_files = 3;
+    for (int level = static_cast<int>(min_level);
+         level <= static_cast<int>(level_enum::err); level++) {
       auto logger_name =
           name + "-" +
-          spdlog::level::to_short_c_str(static_cast<level_enum>(l));
+          spdlog::level::to_short_c_str(static_cast<level_enum>(level));
       auto file_logger = ::spdlog::rotating_logger_mt(
           logger_name, get_file_path(log_dir, logger_name).string(),
-          max_file_size, max_file_num);
-      file_logger->set_level(static_cast<level_enum>(l));
-      file_logger->flush_on(static_cast<level_enum>(l));
+          max_file_size, max_files);
+      file_logger->set_level(static_cast<level_enum>(level));
+      file_logger->flush_on(static_cast<level_enum>(level));
     }
   }
   void set_level(spdlog::level::level_enum level) { spdlog::set_level(level); }
