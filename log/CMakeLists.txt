@@ -9,7 +9,6 @@ endif()
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
 target_link_libraries(cyy_naive_lib_log PUBLIC spdlog::spdlog_header_only)
-target_set(cyy_naive_lib_log PUBLIC spdlog::spdlog_header_only)
 set_target_properties(cyy_naive_lib_log PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(CyyNaiveLib::log ALIAS cyy_naive_lib_log)
