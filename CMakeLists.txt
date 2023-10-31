@@ -57,23 +57,27 @@ foreach(submodule_name IN LISTS submodule_names)
   set_target_properties(${lib_name} PROPERTIES EXPORT_NAME ${submodule_name})
   list(APPEND submodule_libs ${lib_name})
 
-  install(
-    DIRECTORY ${submodule_name}/
-    DESTINATION include/cyy/naive_lib/${submodule_name}
-    FILES_MATCHING
-    PATTERN "*.hpp")
+  if(NOT BUILD_OBJECT_LIB)
+    install(
+      DIRECTORY ${submodule_name}/
+      DESTINATION include/cyy/naive_lib/${submodule_name}
+      FILES_MATCHING
+      PATTERN "*.hpp")
+  endif()
 endforeach()
 
-install(
-  TARGETS ${submodule_libs}
-  EXPORT CyyNaiveLibConfig
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib COMPONENT library
-  INCLUDES
-  DESTINATION include)
+if(NOT BUILD_OBJECT_LIB)
+  install(
+    TARGETS ${submodule_libs}
+    EXPORT CyyNaiveLibConfig
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib COMPONENT library
+    INCLUDES
+    DESTINATION include)
 
-install(
-  EXPORT CyyNaiveLibConfig
-  DESTINATION lib/cmake/${PROJECT_NAME}
-  NAMESPACE CyyNaiveLib::)
+  install(
+    EXPORT CyyNaiveLibConfig
+    DESTINATION lib/cmake/${PROJECT_NAME}
+    NAMESPACE CyyNaiveLib::)
+endif()
