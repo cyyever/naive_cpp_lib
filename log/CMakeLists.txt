@@ -1,6 +1,10 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_library(cyy_naive_lib_log ${SOURCE})
+if (BUILD_OBJECT_LIB)
+  add_library(cyy_naive_lib_log OBJECT ${SOURCE})
+else()
+  add_library(cyy_naive_lib_log ${SOURCE})
+endif()
 
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)

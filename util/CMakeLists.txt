@@ -1,6 +1,10 @@
 file(GLOB SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-add_library(cyy_naive_lib_util ${SOURCE})
+if (BUILD_OBJECT_LIB)
+  add_library(cyy_naive_lib_util OBJECT ${SOURCE})
+else()
+  add_library(cyy_naive_lib_util ${SOURCE})
+endif()
 
 find_package(Threads REQUIRED)
 

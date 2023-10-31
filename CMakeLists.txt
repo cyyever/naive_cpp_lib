@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 
 project(CyyNaiveLib LANGUAGES CXX)
 
-set(CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20)
 set(submodule_names log util)
 # if(CMAKE_SYSTEM_NAME STREQUAL "Linux") list(APPEND submodule_names process
 # task hardware) endif()
+option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_CV "Build opencv module" OFF)
 option(BUILD_VIDEO "Build video modules" OFF)
