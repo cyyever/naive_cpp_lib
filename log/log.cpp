@@ -21,7 +21,7 @@ namespace {
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
     auto tp = time(nullptr);
-    return log_dir / fmt::format("{}-{:%Y-:%m-:%d-:%H-:%M-:%S}-{}.log",
+    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log",
                                  logger_name, fmt::localtime(tp),
                                  std::this_thread::get_id());
   }
