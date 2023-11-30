@@ -4,10 +4,10 @@ if(BUILD_OBJECT_LIB)
   add_library(cyy_naive_lib_log OBJECT ${SOURCE})
 else()
   add_library(cyy_naive_lib_log ${SOURCE})
+  find_package(spdlog REQUIRED)
+  find_package(fmt REQUIRED)
 endif()
 
-find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED)
 target_link_libraries(cyy_naive_lib_log PUBLIC spdlog::spdlog_header_only)
 set_target_properties(cyy_naive_lib_log PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
