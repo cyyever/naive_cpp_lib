@@ -5,7 +5,6 @@ if(BUILD_OBJECT_LIB)
 else()
   add_library(cyy_naive_lib_log ${SOURCE})
   find_package(spdlog REQUIRED)
-  find_package(fmt REQUIRED)
 endif()
 
 target_link_libraries(cyy_naive_lib_log PUBLIC spdlog::spdlog_header_only)
