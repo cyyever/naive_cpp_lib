@@ -4,7 +4,7 @@
 #ifndef JTHREAD_HPP
 #define JTHREAD_HPP
 
-#include "stop_token.hpp"
+#include <stop_token>
 #include <thread>
 #include <future>
 #include <type_traits>
