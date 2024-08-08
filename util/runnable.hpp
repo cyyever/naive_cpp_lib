@@ -14,9 +14,6 @@
 #include <string>
 #include <string_view>
 #include <thread>
-#ifndef __cpp_lib_jthread
-#include "jthread.hpp"
-#endif
 
 namespace cyy::naive_lib {
   //! \brief runnable is a simple wrapper to std::jthread
