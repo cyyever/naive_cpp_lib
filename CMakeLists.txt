@@ -4,8 +4,6 @@ project(CyyNaiveLib LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(submodule_names log util)
-# if(CMAKE_SYSTEM_NAME STREQUAL "Linux") list(APPEND submodule_names process
-# task hardware) endif()
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_CV "Build opencv module" OFF)
@@ -46,12 +44,6 @@ foreach(submodule_name IN LISTS submodule_names)
   set(lib_name cyy_naive_lib_${submodule_name})
   if(submodule_name STREQUAL "python_binding")
     set(lib_name cyy_naive_cpp_extension)
-  endif()
-  target_include_directories(
-    ${lib_name} INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                          $<INSTALL_INTERFACE:include/cyy/naive_lib>)
-
-  if(submodule_name STREQUAL "python_binding")
     continue()
   endif()
   set_target_properties(${lib_name} PROPERTIES EXPORT_NAME ${submodule_name})
@@ -59,23 +51,13 @@ foreach(submodule_name IN LISTS submodule_names)
 
   if(NOT BUILD_OBJECT_LIB)
     install(
-      DIRECTORY ${submodule_name}/
-      DESTINATION include/cyy/naive_lib/${submodule_name}
-      FILES_MATCHING
-      PATTERN "*.hpp")
+      TARGETS ${lib_name}
+      EXPORT CyyNaiveLibConfig
+      FILE_SET public_headers DESTINATION include/cyy/naive_lib/${submodule_name})
   endif()
 endforeach()
 
 if(NOT BUILD_OBJECT_LIB)
-  install(
-    TARGETS ${submodule_libs}
-    EXPORT CyyNaiveLibConfig
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib COMPONENT library
-    INCLUDES
-    DESTINATION include)
-
   install(
     EXPORT CyyNaiveLibConfig
     DESTINATION lib/cmake/${PROJECT_NAME}
