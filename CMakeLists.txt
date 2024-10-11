@@ -53,7 +53,8 @@ foreach(submodule_name IN LISTS submodule_names)
     install(
       TARGETS ${lib_name}
       EXPORT CyyNaiveLibConfig
-      FILE_SET public_headers DESTINATION include/cyy/naive_lib/${submodule_name})
+      FILE_SET public_headers
+      DESTINATION include/cyy/naive_lib/${submodule_name})
   endif()
 endforeach()
 
