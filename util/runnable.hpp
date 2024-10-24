@@ -19,7 +19,7 @@ namespace cyy::naive_lib {
   //! \brief runnable is a simple wrapper to std::jthread
   class runnable {
   public:
-    runnable() = default;
+    runnable() noexcept = default;
 
     runnable(const runnable &) = delete;
     runnable &operator=(const runnable &) = delete;
@@ -71,7 +71,7 @@ namespace cyy::naive_lib {
     }
 
   protected:
-    bool needs_stop() { return stop_token_opt->stop_requested(); }
+    bool needs_stop() noexcept { return stop_token_opt->stop_requested(); }
     std::function<void(const std::exception &e)> exception_callback;
 
   private:

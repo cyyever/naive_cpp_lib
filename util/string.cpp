@@ -110,7 +110,7 @@ namespace cyy::naive_lib::strings {
 
     //先计算所需要的buffer大小
     auto cnt = WideCharToMultiByte(CP_ACP, 0,
-                                   reinterpret_cast<LPCWCH>(utf16_str.get()),
+                                     utf16_str.get(),
                                    wcnt, nullptr, 0, nullptr, nullptr);
 
     if (cnt == 0) {
