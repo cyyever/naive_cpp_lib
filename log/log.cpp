@@ -86,7 +86,7 @@ namespace cyy::naive_lib::log {
 
   struct initer {
     initer() noexcept {
-      // call this function on program starup to avoid race condition
+      // call this function on program startup to avoid race condition
       spdlog::details::registry::instance();
       auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
       spdlog::set_default_logger(console_logger);
