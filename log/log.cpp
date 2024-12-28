@@ -21,8 +21,8 @@ namespace {
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
     auto tp = time(nullptr);
-    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log",
-                                 logger_name, fmt::localtime(tp),
+    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
+                                 fmt::localtime(tp),
                                  std::this_thread::get_id());
   }
 
@@ -32,10 +32,10 @@ namespace cyy::naive_lib::log {
 
 #if defined(_WIN32)
   const std::wstring &get_thread_name() {
-    thread_local std::wstring thd_name(32, {});
+    static thread_local std::wstring thd_name(32, {});
 #else
   const std::string &get_thread_name() {
-    thread_local std::string thd_name(32, {});
+    static thread_local std::string thd_name(32, {});
 #endif
     if (thd_name[0] != '\0') {
       return thd_name;
@@ -64,10 +64,10 @@ namespace cyy::naive_lib::log {
     // glibc has a limit on name length
     // NOLINTNEXTLINE(*magic*)
     name = name.substr(0, 15);
-    pthread_setname_np(pthread_self(), name.data());
+    pthread_setname_np(pthread_self(), std::string(name).c_str());
 #elif defined(_WIN32)
     std::wstring tmp_name(name.begin(), name.end());
-    SetThreadDescription(GetCurrentThread(), tmp_name.data());
+    SetThreadDescription(GetCurrentThread(), tmp_name.c_str());
 #endif
   }
 
