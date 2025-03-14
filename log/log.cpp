@@ -73,7 +73,7 @@ namespace cyy::naive_lib::log {
 
   class thread_name_formatter : public spdlog::custom_flag_formatter {
   public:
-    void format(const spdlog::details::log_msg &, const std::tm &,
+    void format(const spdlog::details::log_msg & /*msg*/, const std::tm & /*tm_time*/,
                 spdlog::memory_buf_t &dest) override {
       dest.append(get_thread_name());
     }
@@ -102,8 +102,8 @@ namespace cyy::naive_lib::log {
                          ::spdlog::level::level_enum min_level) {
     using ::spdlog::level::level_enum;
     // NOLINTNEXTLINE(*magic-number*)
-    size_t max_file_size = 512ULL * 1024 * 1024 * 1024;
-    size_t max_files = 3;
+    size_t const max_file_size = 512ULL * 1024 * 1024 * 1024;
+    size_t const max_files = 3;
     for (int level = static_cast<int>(min_level);
          level <= static_cast<int>(level_enum::err); level++) {
       auto logger_name =

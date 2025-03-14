@@ -60,7 +60,7 @@ namespace cyy::naive_lib::io {
 #ifdef WIN32
     auto fd = _wopen(file_path.c_str(), O_RDONLY);
 #else
-    auto fd = open(file_path.c_str(), O_RDONLY);
+    auto fd = open(file_path.c_str(), O_RDONLY | O_CLOEXEC);
 #endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
@@ -87,7 +87,7 @@ namespace cyy::naive_lib::io {
 #ifdef WIN32
     auto fd = _wopen(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY);
 #else
-    auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY, S_IRWXU);
+    auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, S_IRWXU);
 #endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
@@ -106,7 +106,7 @@ namespace cyy::naive_lib::io {
 
   std::optional<size_t> write(int fd, const void *data, size_t data_len) {
     size_t write_cnt = 0;
-    auto tmp_data = static_cast<const std::byte *>(data);
+    const auto *tmp_data = static_cast<const std::byte *>(data);
     while (data_len != 0) {
 #ifdef WIN32
       auto cnt = ::_write(fd, tmp_data, data_len);
@@ -123,7 +123,7 @@ namespace cyy::naive_lib::io {
       auto saved_errno = errno;
       if (saved_errno == EAGAIN || saved_errno == EWOULDBLOCK) {
         return {write_cnt};
-      } else if (saved_errno == EINTR) {
+      } if (saved_errno == EINTR) {
         continue;
       } else {
         LOG_ERROR("write failed:{}",
@@ -140,7 +140,7 @@ namespace cyy::naive_lib::io {
     if (max_read_size_opt.has_value()) {
       max_read_size = max_read_size_opt.value();
     } else {
-      struct stat sb;
+      struct stat sb{};
       if (fstat(fd, &sb) != 0) {
         LOG_ERROR("fstat failed:{}", ::cyy::naive_lib::util::errno_to_str());
         return false;
@@ -159,7 +159,7 @@ namespace cyy::naive_lib::io {
       if (cnt == 0) { // EOF
         buf.resize(total_cnt);
         break;
-      } else if (cnt > 0) {
+      } if (cnt > 0) {
         total_cnt += cnt;
         if (static_cast<size_t>(cnt) < read_size) { //這意味着下次讀會阻塞
           break;
@@ -170,7 +170,7 @@ namespace cyy::naive_lib::io {
       auto saved_errno = errno;
       if (saved_errno == EAGAIN || saved_errno == EWOULDBLOCK) {
         break;
-      } else if (saved_errno == EINTR) {
+      } if (saved_errno == EINTR) {
         continue;
       } else {
         LOG_ERROR("read failed:{}",
@@ -191,14 +191,14 @@ namespace cyy::naive_lib::io {
 #ifndef WIN32
   read_only_mmaped_file::read_only_mmaped_file(
       const std::filesystem::path &file_path) {
-    auto fd = open(file_path.c_str(), O_RDONLY);
+    auto fd = open(file_path.c_str(), O_RDONLY | O_CLOEXEC);
     if (fd < 0) {
       throw std::runtime_error(std::string("open failed: ") +
                                ::cyy::naive_lib::util::errno_to_str(errno));
     }
     /* Obtain the size of the file and use it to specify the size of       the
      * mapping and the size of the buffer to be written */
-    struct stat sb;
+    struct stat sb{};
     if (fstat(fd, &sb) != 0) {
       close(fd);
       auto saved_errno = errno;

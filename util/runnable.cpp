@@ -11,13 +11,13 @@
 
 namespace cyy::naive_lib {
   void runnable::start(std::string_view name) {
-    std::lock_guard lock(sync_mutex);
+    std::lock_guard const lock(sync_mutex);
     if (thd.joinable()) {
       throw std::runtime_error("thread is running");
     }
     try {
       thd = std::jthread(
-          [this](std::stop_token st, [[maybe_unused]] std::string name_) {
+          [this](const std::stop_token& st, [[maybe_unused]] const std::string& name_) {
             try {
               {
                 while (true) {
