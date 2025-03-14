@@ -9,6 +9,7 @@
 
 #include <array>
 #include <filesystem>
+#include <format>
 #include <source_location>
 #include <string>
 #include <string_view>
@@ -47,8 +48,13 @@ namespace cyy::naive_lib::log {
                    spdlog::level::level_enum level, Args... args) {
     static_assert(concat(Str{"[{}:{}] "}, fmt_string).data());
     static constexpr auto fmt_str = concat(Str{"[{}:{}] "}, fmt_string);
+#if defined(__GNUC__)
+    auto msg = fmt::format(
+        fmt::runtime_format_string<char>(fmt_str.data()),
+#else
     auto msg = fmt::format(
         fmt_str.data(),
+#endif
         std::filesystem::path(location.file_name()).filename().string(),
         location.line(), args...);
 
