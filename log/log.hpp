@@ -9,13 +9,17 @@
 
 #include <array>
 #include <filesystem>
-#include <format>
 #include <source_location>
 #include <string>
 #include <string_view>
 #include <version>
 
+#if defined(__GNUC__)
 #include <spdlog/fmt/fmt.h>
+#else
+#include <format>
+#endif
+
 #include <spdlog/spdlog.h>
 
 template <std::size_t N> struct Str {
