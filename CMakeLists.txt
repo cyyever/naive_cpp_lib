@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 
 project(CyyNaiveLib LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(submodule_names log util)
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)

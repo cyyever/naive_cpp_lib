@@ -7,9 +7,6 @@
  */
 
 #include <thread>
-#ifndef __cpp_lib_jthread
-#include "jthread.hpp"
-#endif
 
 #include <doctest/doctest.h>
 
@@ -20,7 +17,8 @@ TEST_CASE("concurrency") {
                                          spdlog::level::level_enum::info);
   std::vector<std::jthread> thds;
 
-  for (int i = 0; i < 100; i++) {
+  const size_t thread_num = 100;
+  for (size_t i = 0; i < thread_num; i++) {
     thds.emplace_back([=]() {
       LOG_ERROR("{} {} {}", "hello", "world", i);
       LOG_WARN("{} {} {}", "hello", "world", i);

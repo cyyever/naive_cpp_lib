@@ -21,8 +21,8 @@ namespace {
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
     auto tp = time(nullptr);
-    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log",
-                                 logger_name, fmt::localtime(tp),
+    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
+                                 fmt::localtime(tp),
                                  std::this_thread::get_id());
   }
 
@@ -32,10 +32,10 @@ namespace cyy::naive_lib::log {
 
 #if defined(_WIN32)
   const std::wstring &get_thread_name() {
-    thread_local std::wstring thd_name(32, {});
+    static thread_local std::wstring thd_name(32, {});
 #else
   const std::string &get_thread_name() {
-    thread_local std::string thd_name(32, {});
+    static thread_local std::string thd_name(32, {});
 #endif
     if (thd_name[0] != '\0') {
       return thd_name;
@@ -64,16 +64,16 @@ namespace cyy::naive_lib::log {
     // glibc has a limit on name length
     // NOLINTNEXTLINE(*magic*)
     name = name.substr(0, 15);
-    pthread_setname_np(pthread_self(), name.data());
+    pthread_setname_np(pthread_self(), std::string(name).c_str());
 #elif defined(_WIN32)
     std::wstring tmp_name(name.begin(), name.end());
-    SetThreadDescription(GetCurrentThread(), tmp_name.data());
+    SetThreadDescription(GetCurrentThread(), tmp_name.c_str());
 #endif
   }
 
   class thread_name_formatter : public spdlog::custom_flag_formatter {
   public:
-    void format(const spdlog::details::log_msg &, const std::tm &,
+    void format(const spdlog::details::log_msg & /*msg*/, const std::tm & /*tm_time*/,
                 spdlog::memory_buf_t &dest) override {
       dest.append(get_thread_name());
     }
@@ -86,7 +86,7 @@ namespace cyy::naive_lib::log {
 
   struct initer {
     initer() noexcept {
-      // call this function on program starup to avoid race condition
+      // call this function on program startup to avoid race condition
       spdlog::details::registry::instance();
       auto console_logger = spdlog::stdout_color_mt("cyy_cxx");
       spdlog::set_default_logger(console_logger);
@@ -102,8 +102,8 @@ namespace cyy::naive_lib::log {
                          ::spdlog::level::level_enum min_level) {
     using ::spdlog::level::level_enum;
     // NOLINTNEXTLINE(*magic-number*)
-    size_t max_file_size = 512ULL * 1024 * 1024 * 1024;
-    size_t max_files = 3;
+    size_t const max_file_size = 512ULL * 1024 * 1024 * 1024;
+    size_t const max_files = 3;
     for (int level = static_cast<int>(min_level);
          level <= static_cast<int>(level_enum::err); level++) {
       auto logger_name =

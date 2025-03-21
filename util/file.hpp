@@ -57,8 +57,8 @@ namespace cyy::naive_lib::io {
     read_only_mmaped_file &
     operator=(read_only_mmaped_file &&) noexcept = delete;
 
-    const void *data() const { return addr; }
-    size_t size() const { return file_size; }
+    [[nodiscard]] const void *data() const { return addr; }
+    [[nodiscard]] size_t size() const { return file_size; }
 
   private:
     void *addr{nullptr};
