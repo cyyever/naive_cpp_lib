@@ -18,7 +18,7 @@ namespace {
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
     auto tp = std::chrono::zoned_time{std::chrono::current_zone(),
-                                      std::chrono::system_clock::now()}
+                                      std::chrono::steady_clock::now()}
                   .get_local_time();
     return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
                                  tp,
