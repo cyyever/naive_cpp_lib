@@ -9,10 +9,12 @@
 
 #include <array>
 #include <filesystem>
+#include <ranges>
 #include <source_location>
-#include <string_view>
 #include <string>
+#include <string_view>
 #include <version>
+
 #include <spdlog/spdlog.h>
 
 template <std::size_t N> struct Str {
@@ -22,8 +24,8 @@ template <std::size_t N> Str(const char (&)[N]) -> Str<N>; // deduction guide
 template <std::size_t M, std::size_t N>
 consteval std::array<char, M + N + 1> concat(Str<M> a, Str<N> b) {
   std::array<char, M + N + 1> result{};
-  auto it = std::copy(a.chars.begin(), a.chars.end(), result.begin());
-  std::copy(b.chars.begin(), b.chars.end(), it);
+  std::ranges::copy(a.chars, result.begin());
+  std::ranges::copy(b.chars, result.begin() + M);
   return result;
 }
 namespace cyy::naive_lib::log {
