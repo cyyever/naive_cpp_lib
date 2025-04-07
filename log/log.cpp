@@ -17,11 +17,12 @@ namespace {
 
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
-    auto tp = std::chrono::zoned_time{std::chrono::current_zone(),
-                                      std::chrono::steady_clock::now()}
-                  .get_local_time();
-    return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
-                                 tp,
+    // auto tp = std::chrono::zoned_time{std::chrono::current_zone(),
+    //                                   std::chrono::steady_clock::now()}
+    //               .get_local_time();
+    // return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
+                                 // tp,
+    return log_dir / std::format("{}-{}.log", logger_name,
                                  std::this_thread::get_id());
   }
 
