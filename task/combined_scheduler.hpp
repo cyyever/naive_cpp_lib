@@ -26,8 +26,8 @@ namespace cyy::naive_lib::task {
     explicit combined_scheduler(
         std::vector<std::shared_ptr<base_scheduler>> schedulers_,
         task_converter_type task_converter_)
-        : schedulers{std::move(schedulers_)}, task_converter{
-                                                  std::move(task_converter_)} {}
+        : schedulers{std::move(schedulers_)},
+          task_converter{std::move(task_converter_)} {}
     combined_scheduler(const combined_scheduler &) = delete;
     combined_scheduler &operator=(const combined_scheduler &) = delete;
     combined_scheduler(combined_scheduler &&) = default;

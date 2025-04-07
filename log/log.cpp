@@ -5,7 +5,6 @@
  * \date 2016-04-18
  */
 
-
 #include "log.hpp"
 
 #include <spdlog/pattern_formatter.h>
@@ -20,10 +19,10 @@ namespace {
     // auto tp = std::chrono::zoned_time{std::chrono::current_zone(),
     //                                   std::chrono::steady_clock::now()}
     //               .get_local_time();
-    // return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
-                                 // tp,
-    return log_dir / std::format("{}-{}.log", logger_name,
-                                 std::this_thread::get_id());
+    // return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log",
+    // logger_name, tp,
+    return log_dir /
+           std::format("{}-{}.log", logger_name, std::this_thread::get_id());
   }
 
 } // namespace

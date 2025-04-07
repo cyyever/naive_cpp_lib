@@ -475,8 +475,8 @@ namespace cyy::naive_lib::opencv {
       }
       auto &stream = get_stream();
 
-      //参考opencv-3.2.0/modules/core/src/cuda/gpu_mat.cu
-      // cv::cuda::GpuMat::copyTo
+      // 参考opencv-3.2.0/modules/core/src/cuda/gpu_mat.cu
+      //  cv::cuda::GpuMat::copyTo
       cudaSafeCall(cudaMemcpy2DAsync(
           buf, gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.data, gpu_mat.step,
           gpu_mat.cols * gpu_mat.elemSize(), gpu_mat.rows,
@@ -505,7 +505,7 @@ namespace cyy::naive_lib::opencv {
 
     mat_impl resize(int new_width, int new_height, int interpolation,
                     bool self_as_result = false) {
-      //由於gpu的resize實現和cpu的不一致,我們目前只使用cpu實現
+      // 由於gpu的resize實現和cpu的不一致,我們目前只使用cpu實現
       return cpu_unary_operation(
           [=, this](auto &result_cpu_mat) {
             cv::resize(cpu_mat, result_cpu_mat, cv::Size(new_width, new_height),
@@ -725,7 +725,7 @@ namespace cyy::naive_lib::opencv {
     mutable bool can_use_gpu{true};
 #ifdef HAVE_GPU_MAT
     mutable cv::cuda::GpuMat gpu_mat{};
-    //为了在不支持CUDA的机器上运行，我们必须延迟初始化stream，构造构造函数会抛出异常
+    // 为了在不支持CUDA的机器上运行，我们必须延迟初始化stream，构造构造函数会抛出异常
     static inline std::shared_ptr<cv::cuda::Stream> stream_ptr;
     static inline std::mutex stream_mutex;
 #endif
@@ -848,7 +848,7 @@ namespace cyy::naive_lib::opencv {
   }
 
   std::optional<mat> mat::load(const void *buf, size_t size) {
-    //先尝试用opencv读取
+    // 先尝试用opencv读取
     auto cv_mat = cv::imdecode(
         cv::_InputArray(static_cast<const unsigned char *>(buf), size),
         cv::IMREAD_ANYDEPTH | cv::IMREAD_COLOR);

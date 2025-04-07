@@ -447,7 +447,7 @@ namespace cyy::naive_lib::video {
         return {res, nullptr};
       }
 
-      //根據av_read_frame的註釋，爲了保證返回的packet在下次av_read_frame調用後不失效，我們做一些處理
+      // 根據av_read_frame的註釋，爲了保證返回的packet在下次av_read_frame調用後不失效，我們做一些處理
       if (packet->buf) {
         return {1, packet_ptr};
       }
@@ -468,7 +468,7 @@ namespace cyy::naive_lib::video {
     //	      first<0 失敗
     //	如果first<=0，返回空内容
     std::pair<int, frame> get_frame() {
-      //我们在循环中不断解码直到成功获取一帧或者失败
+      // 我们在循环中不断解码直到成功获取一帧或者失败
       const enum AVPixelFormat pix_fmt { AV_PIX_FMT_BGR24 };
 
       if (!has_open()) {

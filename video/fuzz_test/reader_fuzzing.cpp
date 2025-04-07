@@ -4,8 +4,9 @@
  * \brief 测试reader函数
  */
 
-#include "../ffmpeg_video_reader.hpp"
 #include <fstream>
+
+#include "../ffmpeg_video_reader.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
   if (Size == 0) {

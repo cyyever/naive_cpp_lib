@@ -77,7 +77,7 @@ namespace cyy::naive_lib::process {
       execvpe(config.binary_path.c_str(), argv.data(), envp.data());
       auto saved_errno = errno;
 
-      //通知父進程失敗了
+      // 通知父進程失敗了
       close(pipefd[0]);
       while (write(pipefd[1], "f", 1) < 0 && errno == EINTR) {
         continue;

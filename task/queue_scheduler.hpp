@@ -71,8 +71,8 @@ namespace cyy::naive_lib::task {
     }
 
     ~queue_scheduler() override {
-      //我们必须在这边明确地把processors清理掉，这样做是为了处理完任务队列内积压的任务，避免内存泄露
-      //在这边不能依赖processors的析构函数，因为这样的话queue和processors的析构函数的顺序依赖于成员声明的位置，很容易在重构时跪掉
+      // 我们必须在这边明确地把processors清理掉，这样做是为了处理完任务队列内积压的任务，避免内存泄露
+      // 在这边不能依赖processors的析构函数，因为这样的话queue和processors的析构函数的顺序依赖于成员声明的位置，很容易在重构时跪掉
       processors.clear();
     }
 
@@ -82,7 +82,7 @@ namespace cyy::naive_lib::task {
     processor_list_type
     make_processors(const std::vector<processor_factory> &makers) {
       processor_list_type new_processors;
-      //先构造新的processor
+      // 先构造新的processor
       for (auto maker : makers) {
         auto tmp = maker();
         tmp->set_get_task_func(

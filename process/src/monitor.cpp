@@ -32,9 +32,9 @@ namespace cyy::naive_lib::process::monitor {
           std::tuple<std::string, std::vector<std::string>,
                      std::vector<std::string>>;
       monitor_thread() {
-        struct sigaction sa {};
+        struct sigaction sa{};
 
-        //先獲取舊的信號處理
+        // 先獲取舊的信號處理
         if (sigaction(SIGCHLD, nullptr, &sa) != 0) {
           auto saved_errno = errno;
           LOG_ERROR("sigaction SIGCHLD failed:{}",
@@ -42,7 +42,7 @@ namespace cyy::naive_lib::process::monitor {
           throw std::runtime_error("sigaction SIGCHLD failed");
         }
 
-        //我們不能覆蓋信號處理函數，不安全
+        // 我們不能覆蓋信號處理函數，不安全
         if (sa.sa_handler != SIG_DFL) {
           throw std::runtime_error("signal hanlder for SIGCHLD has previously "
                                    "been set,we can't overwrite it");
@@ -197,13 +197,13 @@ namespace cyy::naive_lib::process::monitor {
               monitored_children.erase(it);
             }
             if (pid == -1) {
-              //繼續收割靈魂
+              // 繼續收割靈魂
               continue;
             }
             return;
           }
 
-          if (res_pid == 0) { //孩子還在
+          if (res_pid == 0) { // 孩子還在
             if (pid != -1) {
               std::lock_guard<std::mutex> lock(children_mutex);
               auto it = monitored_children.find(pid);
@@ -225,7 +225,7 @@ namespace cyy::naive_lib::process::monitor {
             auto it = monitored_children.find(pid);
             if (it != monitored_children.end()) {
               if (saved_errno == ECHILD) {
-                //孩子已經掛了
+                // 孩子已經掛了
                 deal_zombie(wstatus, it->second);
               } else {
                 LOG_ERROR("waitpid [{}] failed,ignore this child:{}", it->first,
@@ -248,7 +248,7 @@ namespace cyy::naive_lib::process::monitor {
             std::chrono::steady_clock::now());
       }
 
-      //查詢最近的要啓動的進程,獲取等待時間
+      // 查詢最近的要啓動的進程,獲取等待時間
       std::optional<std::chrono::milliseconds> get_wait_timeout() const {
         if (!retried_children.empty()) {
           auto now = steady_now();
@@ -303,7 +303,7 @@ namespace cyy::naive_lib::process::monitor {
 
               waitpid_wrapper(pid);
             }
-            //接下來处理任意子進程結束
+            // 接下來处理任意子進程結束
             waitpid_wrapper(-1);
           }
 
@@ -314,7 +314,7 @@ namespace cyy::naive_lib::process::monitor {
               break;
             }
 
-            //最近的要啓動的進程
+            // 最近的要啓動的進程
             auto it = retried_children.begin();
             auto setting = it->second;
             retried_children.erase(it);
@@ -359,7 +359,7 @@ namespace cyy::naive_lib::process::monitor {
           setting.result.channel_fd.reset();
         }
         if (WIFEXITED(wstatus)) {
-          //如果正常結束，我們不重啓
+          // 如果正常結束，我們不重啓
           if (WEXITSTATUS(wstatus) == EXIT_SUCCESS) {
             return;
           }
@@ -410,7 +410,7 @@ namespace cyy::naive_lib::process::monitor {
   } // namespace
 
   bool init() {
-    //我們需要在程序啓動時阻塞SIGCHLD,確保只有monitor_thread能調用到
+    // 我們需要在程序啓動時阻塞SIGCHLD,確保只有monitor_thread能調用到
     sigset_t set_only_chld{};
     sigemptyset(&set_only_chld);
     sigaddset(&set_only_chld, SIGCHLD);

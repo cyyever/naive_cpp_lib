@@ -44,7 +44,7 @@ TEST_CASE("monitor") {
     using namespace std::chrono_literals;
     auto child_id = test_start_process();
     CHECK(cyy::naive_lib::process::monitor::signal_monitored_process(child_id,
-                                                                   SIGKILL));
+                                                                     SIGKILL));
     std::this_thread::sleep_for(2s);
     CHECK(!cyy::naive_lib::process::monitor::monitored_process_exist(child_id));
   }
