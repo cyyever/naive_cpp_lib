@@ -8,8 +8,7 @@
 
 #include "error.hpp"
 
-#include <mutex>
-#include <system_error>
+import std;
 
 namespace cyy::naive_lib::util {
 

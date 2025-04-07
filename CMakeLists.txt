@@ -1,8 +1,20 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 4.0.0)
+
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "a9e1cf81-9932-4810-974b-6eccaf14e457")
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_MODULE_STD 1)
+if(MSVC)
+  set(CMAKE_CXX_STANDARD 23)
+else()
+  set(CMAKE_CXX_STANDARD 26)
+  set(CMAKE_CXX_COMPILER clang++)
+  set(CMAKE_C_COMPILER clang)
+  set(CMAKE_C_FLAGS -stdlib=libc)
+  set(CMAKE_CXX_FLAGS -stdlib=libc++)
+endif()
 
 project(CyyNaiveLib LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
 set(submodule_names log util)
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)

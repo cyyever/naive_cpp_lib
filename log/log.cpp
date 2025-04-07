@@ -5,24 +5,23 @@
  * \date 2016-04-18
  */
 
+
 #include "log.hpp"
 
-#include <ctime>
-
-#include <spdlog/fmt/chrono.h>
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/std.h>
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+import std;
 namespace {
 
   std::filesystem::path get_file_path(const std::filesystem::path &log_dir,
                                       std::string logger_name) {
-    auto tp = time(nullptr);
-    return log_dir / fmt::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
-                                 fmt::localtime(tp),
+    auto tp = std::chrono::zoned_time{std::chrono::current_zone(),
+                                      std::chrono::system_clock::now()}
+                  .get_local_time();
+    return log_dir / std::format("{}-{:%Y-%m-%d-%H-%M-%S}-{}.log", logger_name,
+                                 tp,
                                  std::this_thread::get_id());
   }
 
@@ -43,7 +42,7 @@ namespace cyy::naive_lib::log {
 #if defined(__linux__) || defined(__FreeBSD__)
     pthread_getname_np(pthread_self(), thd_name.data(), thd_name.size());
     if (thd_name[0] == '\0') {
-      thd_name = fmt::format("{}", std::this_thread::get_id());
+      thd_name = std::format("{}", std::this_thread::get_id());
     }
 #elif defined(_WIN32)
     PWSTR data;
@@ -53,7 +52,7 @@ namespace cyy::naive_lib::log {
       LocalFree(data);
     }
     if (thd_name[0] == '\0') {
-      auto tmp = fmt::format("{}", GetCurrentThreadId());
+      auto tmp = std::format("{}", GetCurrentThreadId());
       thd_name = std::wstring(tmp.begin(), tmp.end());
     }
 #endif
@@ -73,7 +72,8 @@ namespace cyy::naive_lib::log {
 
   class thread_name_formatter : public spdlog::custom_flag_formatter {
   public:
-    void format(const spdlog::details::log_msg & /*msg*/, const std::tm & /*tm_time*/,
+    void format(const spdlog::details::log_msg & /*msg*/,
+                const std::tm & /*tm_time*/,
                 spdlog::memory_buf_t &dest) override {
       dest.append(get_thread_name());
     }

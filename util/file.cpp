@@ -11,7 +11,6 @@
 
 #include <fcntl.h>
 #include <fstream>
-#include <stdexcept>
 
 #ifndef WIN32
 #include <sys/mman.h>
@@ -29,6 +28,7 @@
 #include "log/log.hpp"
 #include "util/error.hpp"
 
+import std;
 namespace cyy::naive_lib::io {
 
   std::optional<std::vector<std::byte>>
@@ -87,7 +87,8 @@ namespace cyy::naive_lib::io {
 #ifdef WIN32
     auto fd = _wopen(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY);
 #else
-    auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, S_IRWXU);
+    auto fd = open(file_path.c_str(), O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC,
+                   S_IRWXU);
 #endif
     if (fd < 0) {
       LOG_ERROR("open file {} failed:{}", file_path.string(),
@@ -114,16 +115,18 @@ namespace cyy::naive_lib::io {
       auto cnt = ::write(fd, tmp_data, data_len);
 #endif
       if (cnt >= 0) {
-        write_cnt += static_cast<size_t>(cnt);
-        tmp_data += cnt;
-        data_len -= static_cast<size_t>(cnt);
+        auto unsized_cnt = static_cast<size_t>(cnt);
+        write_cnt += unsized_cnt;
+        tmp_data += unsized_cnt;
+        data_len -= unsized_cnt;
         continue;
       }
 
       auto saved_errno = errno;
       if (saved_errno == EAGAIN || saved_errno == EWOULDBLOCK) {
         return {write_cnt};
-      } if (saved_errno == EINTR) {
+      }
+      if (saved_errno == EINTR) {
         continue;
       } else {
         LOG_ERROR("write failed:{}",
@@ -159,9 +162,10 @@ namespace cyy::naive_lib::io {
       if (cnt == 0) { // EOF
         buf.resize(total_cnt);
         break;
-      } if (cnt > 0) {
+      }
+      if (cnt > 0) {
         total_cnt += cnt;
-        if (static_cast<size_t>(cnt) < read_size) { //這意味着下次讀會阻塞
+        if (static_cast<size_t>(cnt) < read_size) { // 這意味着下次讀會阻塞
           break;
         }
         continue;
@@ -170,7 +174,8 @@ namespace cyy::naive_lib::io {
       auto saved_errno = errno;
       if (saved_errno == EAGAIN || saved_errno == EWOULDBLOCK) {
         break;
-      } if (saved_errno == EINTR) {
+      }
+      if (saved_errno == EINTR) {
         continue;
       } else {
         LOG_ERROR("read failed:{}",

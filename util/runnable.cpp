@@ -17,7 +17,8 @@ namespace cyy::naive_lib {
     }
     try {
       thd = std::jthread(
-          [this](const std::stop_token& st, [[maybe_unused]] const std::string& name_) {
+          [this](const std::stop_token &st,
+                 [[maybe_unused]] const std::string &name_) {
             try {
               {
                 while (true) {

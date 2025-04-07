@@ -12,17 +12,16 @@
 #include <Stringapiset.h>
 #endif
 
-#include <memory>
-
 #include "log/log.hpp"
 #include "string.hpp"
+import std;
 
 namespace cyy::naive_lib::strings {
 
 #ifdef _WIN32
   std::string GBK_to_UTF8(const std::string &str) {
 
-    //先转成 UTF-16
+    // 先转成 UTF-16
     auto wcnt = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
     if (wcnt == 0) {
       LOG_ERROR("MultiByteToWideChar failed");
@@ -40,7 +39,7 @@ namespace cyy::naive_lib::strings {
 
     utf16_str[wcnt] = '\0';
 
-    //先计算所需要的buffer大小
+    // 先计算所需要的buffer大小
     auto cnt = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS,
                                    reinterpret_cast<LPCWCH>(utf16_str.get()),
                                    wcnt, nullptr, 0, nullptr, nullptr);
@@ -65,7 +64,7 @@ namespace cyy::naive_lib::strings {
   }
 
   std::string UTF16_to_UTF8(const char *str, size_t len) {
-    //先计算所需要的buffer大小
+    // 先计算所需要的buffer大小
     auto cnt = WideCharToMultiByte(
         CP_UTF8, WC_ERR_INVALID_CHARS, reinterpret_cast<LPCWCH>(str),
         static_cast<int>(len / 2), nullptr, 0, nullptr, nullptr);
@@ -90,7 +89,7 @@ namespace cyy::naive_lib::strings {
   }
 
   std::string UTF8_to_GBK(const std::string &str) {
-    //先转成 UTF-16
+    // 先转成 UTF-16
     auto wcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
     if (wcnt == 0) {
       LOG_ERROR("MultiByteToWideChar failed");
@@ -108,10 +107,9 @@ namespace cyy::naive_lib::strings {
 
     utf16_str[wcnt] = '\0';
 
-    //先计算所需要的buffer大小
-    auto cnt = WideCharToMultiByte(CP_ACP, 0,
-                                     utf16_str.get(),
-                                   wcnt, nullptr, 0, nullptr, nullptr);
+    // 先计算所需要的buffer大小
+    auto cnt = WideCharToMultiByte(CP_ACP, 0, utf16_str.get(), wcnt, nullptr, 0,
+                                   nullptr, nullptr);
 
     if (cnt == 0) {
       LOG_ERROR("WideCharToMultiByte failed");
