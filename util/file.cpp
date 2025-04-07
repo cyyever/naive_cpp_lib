@@ -10,7 +10,6 @@
 #endif
 
 #include <fcntl.h>
-#include <fstream>
 
 #ifndef WIN32
 #include <sys/mman.h>

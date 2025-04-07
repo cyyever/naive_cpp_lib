@@ -4,13 +4,12 @@
  * \brief 测试runnable相关函数
  * \author cyy
  */
-#include <functional>
-#include <iostream>
 
 #include <doctest/doctest.h>
 
 #include "log/log.hpp"
 #include "util/runnable.hpp"
+import std;
 
 class test_class : public cyy::naive_lib::runnable {
 public:
