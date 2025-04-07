@@ -66,7 +66,7 @@ foreach(submodule_name IN LISTS submodule_names)
       TARGETS ${lib_name}
       EXPORT CyyNaiveLibConfig
       FILE_SET public_headers
-      DESTINATION include/cyy/naive_lib/${submodule_name})
+      DESTINATION include/cyy/naive_lib/)
   endif()
 endforeach()
 
