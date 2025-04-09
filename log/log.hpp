@@ -7,15 +7,8 @@
 
 #pragma once
 
-#include <array>
-#include <filesystem>
-#include <ranges>
-#include <source_location>
-#include <string>
-#include <string_view>
-#include <version>
-
 #include <spdlog/spdlog.h>
+import std;
 
 template <std::size_t N> struct Str {
   std::array<char, N> chars;

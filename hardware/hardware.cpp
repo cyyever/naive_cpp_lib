@@ -6,9 +6,6 @@
  * \date 2016-09-13
  */
 
-#include <cstdlib>
-#include <mutex>
-
 #ifdef HAVE_CUDA
 #include <cuda_runtime.h>
 #endif

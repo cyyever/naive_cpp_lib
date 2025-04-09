@@ -7,7 +7,6 @@
  */
 
 #include <doctest/doctest.h>
-#include <spdlog/common.h>
 
 #include "log/log.hpp"
 

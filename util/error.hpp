@@ -9,13 +9,13 @@
 #pragma once
 
 #include <cerrno>
-#include <string>
 
 #ifdef _WIN32
 #include <windows.h>
 
 #include <strsafe.h>
 #endif
+import std;
 
 namespace cyy::naive_lib::util {
 

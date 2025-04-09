@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <string>
+import std;
 
 namespace cyy::naive_lib::strings {
 

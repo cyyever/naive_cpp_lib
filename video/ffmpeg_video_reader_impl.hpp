@@ -6,10 +6,7 @@
  */
 
 #pragma once
-#include <iostream>
-#include <memory>
 #include <stdlib.h>
-#include <thread>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

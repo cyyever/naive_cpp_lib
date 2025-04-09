@@ -7,11 +7,8 @@
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
-#include <iostream>
-#include <map>
 #include <poll.h>
 #include <unistd.h>
-#include <vector>
 
 #include <sys/signalfd.h>
 #include <sys/wait.h>

@@ -8,8 +8,6 @@
 
 #include "base_processor.hpp"
 
-#include <chrono>
-
 #include "base_task.hpp"
 #include "hardware/hardware.hpp"
 #include "log/log.hpp"

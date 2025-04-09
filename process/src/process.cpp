@@ -9,7 +9,6 @@
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
-#include <set>
 #include <unistd.h>
 
 #include <sys/socket.h>

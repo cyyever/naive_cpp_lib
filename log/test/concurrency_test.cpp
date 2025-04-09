@@ -6,8 +6,6 @@
  * \date 2017-01-17
  */
 
-#include <thread>
-
 #include <doctest/doctest.h>
 
 #include "log/log.hpp"

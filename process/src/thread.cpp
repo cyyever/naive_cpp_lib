@@ -10,7 +10,6 @@
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
-#include <memory>
 #include <poll.h>
 #include <unistd.h>
 
