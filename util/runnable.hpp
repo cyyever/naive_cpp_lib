@@ -6,14 +6,7 @@
  */
 #pragma once
 
-#include <chrono>
-#include <condition_variable>
-#include <functional>
-#include <mutex>
-#include <optional>
-#include <stop_token>
-#include <string_view>
-#include <thread>
+import std;
 
 namespace cyy::naive_lib {
   //! \brief runnable is a simple wrapper to std::jthread
