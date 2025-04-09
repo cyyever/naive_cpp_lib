@@ -25,7 +25,7 @@ namespace cyy::naive_lib {
     void start(std::string_view name = "");
 
     template <typename WakeUpType = std::function<void()>>
-    void stop(WakeUpType wakeup = []() {}) {
+    void stop(const WakeUpType &wakeup = []() {}) {
       while (true) {
         std::unique_lock lock(sync_mutex);
         if (!thd.joinable()) {
@@ -37,7 +37,7 @@ namespace cyy::naive_lib {
           continue;
         }
 
-        std::stop_callback cb(*stop_token_opt, wakeup);
+        std::stop_callback const cb(*stop_token_opt, wakeup);
         thd.request_stop();
         thd.join();
         stop_token_opt.reset();
