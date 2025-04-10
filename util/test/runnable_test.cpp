@@ -46,7 +46,7 @@ public:
     throw_exception = true;
     bool const thrown = false;
     std::string const str_err;
-    exception_callback = [&thrown, &str_err](auto const &e) {
+    exception_callback = [&thrown, &str_err](const std::exception &e) {
       LOG_ERROR("exception callback:{}", e.what());
       str_err = e.what();
       thrown = true;
