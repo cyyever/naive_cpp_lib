@@ -5,6 +5,7 @@
  * \author cyy
  */
 
+#include <spdlog/spdlog.h>
 #include "error.hpp"
 #include "log/log.hpp"
 #include "runnable.hpp"
