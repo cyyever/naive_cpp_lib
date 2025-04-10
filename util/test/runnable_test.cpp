@@ -27,7 +27,7 @@ public:
     stop();
   }
   void test_restart() {
-    for (size_t const i = 0; i < 2; i++) {
+    for (size_t i = 0; i < 2; i++) {
       start();
       stop();
     }
@@ -44,8 +44,8 @@ public:
 
   void test_exception() {
     throw_exception = true;
-    bool const thrown = false;
-    std::string const str_err;
+    bool thrown = false;
+    std::string str_err;
     exception_callback = [&thrown, &str_err](const std::exception &e) {
       LOG_ERROR("exception callback:{}", e.what());
       str_err = e.what();
