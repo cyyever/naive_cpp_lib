@@ -8,6 +8,9 @@
 
 #include <doctest/doctest.h>
 
+#ifdef _GNU_SOURCE
+#include <fcntl.h>
+#endif
 #include "../file.hpp"
 
 TEST_CASE("get_file_content") {
