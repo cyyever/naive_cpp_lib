@@ -19,7 +19,11 @@ TEST_CASE("write_and_read") {
 #ifdef WIN32
   CHECK_EQ(_pipe(pipefd, 10, 0), 0);
 #else
+#ifdef _GNU_SOURCE
   CHECK_EQ(pipe2(pipefd, O_CLOEXEC), 0);
+#else
+  CHECK_EQ(pipe(pipefd), 0);
+#endif
 #endif
 
   auto write_cnt_opt = ::cyy::naive_lib::io::write(
