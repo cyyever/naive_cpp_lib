@@ -9,6 +9,7 @@
 #define NOMINMAX
 #endif
 
+#include <spdlog/spdlog.h>
 #include <fcntl.h>
 
 #ifndef WIN32
