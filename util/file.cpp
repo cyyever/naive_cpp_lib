@@ -9,6 +9,7 @@
 #define NOMINMAX
 #endif
 
+#include <spdlog/spdlog.h>
 #include <fcntl.h>
 
 #ifndef WIN32
@@ -127,11 +128,10 @@ namespace cyy::naive_lib::io {
       }
       if (saved_errno == EINTR) {
         continue;
-      } else {
-        LOG_ERROR("write failed:{}",
-                  ::cyy::naive_lib::util::errno_to_str(saved_errno));
-        return {};
       }
+      LOG_ERROR("write failed:{}",
+                ::cyy::naive_lib::util::errno_to_str(saved_errno));
+      return {};
     }
     return {write_cnt};
   }
@@ -176,12 +176,11 @@ namespace cyy::naive_lib::io {
       }
       if (saved_errno == EINTR) {
         continue;
-      } else {
-        LOG_ERROR("read failed:{}",
-                  ::cyy::naive_lib::util::errno_to_str(saved_errno));
-        buf.resize(total_cnt);
-        return false;
       }
+      LOG_ERROR("read failed:{}",
+                ::cyy::naive_lib::util::errno_to_str(saved_errno));
+      buf.resize(total_cnt);
+      return false;
     }
     return true;
   }

@@ -17,7 +17,7 @@ namespace cyy::naive_lib::util {
   std::string errno_to_str(int errno_) {
     static std::mutex err_mutex;
 
-    std::lock_guard lk(err_mutex);
+    std::lock_guard const lk(err_mutex);
 
     auto msg = std::system_category().default_error_condition(errno_).message();
     if (msg.empty()) {

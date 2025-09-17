@@ -46,7 +46,7 @@ public:
     throw_exception = true;
     bool thrown = false;
     std::string str_err;
-    exception_callback = [&thrown, &str_err](auto const &e) {
+    exception_callback = [&thrown, &str_err](const std::exception &e) {
       LOG_ERROR("exception callback:{}", e.what());
       str_err = e.what();
       thrown = true;
@@ -59,7 +59,7 @@ public:
   }
 
 private:
-  void run(const std::stop_token &) override {
+  void run(const std::stop_token & /*st*/) override {
     LOG_ERROR("run thd");
 #if defined(__linux__) || defined(__FreeBSD__)
     if (!thread_name.empty()) {

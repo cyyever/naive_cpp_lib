@@ -16,6 +16,7 @@ TEST_CASE("concurrency") {
   std::vector<std::jthread> thds;
 
   const size_t thread_num = 100;
+  thds.reserve(thread_num);
   for (size_t i = 0; i < thread_num; i++) {
     thds.emplace_back([=]() {
       LOG_ERROR("{} {} {}", "hello", "world", i);
