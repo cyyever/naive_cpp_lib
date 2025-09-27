@@ -4,11 +4,8 @@ set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_MODULE_STD 1)
 set(CMAKE_CXX_STANDARD 23)
-if(NOT WIN32)
-  set(CMAKE_CXX_COMPILER clang++)
-endif()
 
-project(CyyNaiveLib LANGUAGES CXX)
+project(CyyNaiveLib LANGUAGES CXX C)
 
 set(submodule_names log util)
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
