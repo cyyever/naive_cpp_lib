@@ -75,7 +75,11 @@ namespace cyy::naive_lib::log {
     void format(const spdlog::details::log_msg & /*msg*/,
                 const std::tm & /*tm_time*/,
                 spdlog::memory_buf_t &dest) override {
+#if defined(_WIN32)
+      dest.append(reinterpret_cast<const char *>(get_thread_name().c_str()));
+#else
       dest.append(get_thread_name());
+#endif
     }
 
     [[nodiscard]] std::unique_ptr<spdlog::custom_flag_formatter>
