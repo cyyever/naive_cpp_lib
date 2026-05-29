@@ -6,9 +6,10 @@
  * \date 2017-01-17
  */
 
-#include "error.hpp"
+#include <mutex>
+#include <system_error>
 
-import std;
+#include "error.hpp"
 
 namespace cyy::naive_lib::util {
 

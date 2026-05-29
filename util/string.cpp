@@ -12,9 +12,10 @@
 #include <Stringapiset.h>
 #endif
 
+#include <memory>
+
 #include "log/log.hpp"
 #include "string.hpp"
-import std;
 
 namespace cyy::naive_lib::strings {
 

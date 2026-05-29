@@ -28,7 +28,11 @@
 #include "log/log.hpp"
 #include "util/error.hpp"
 
-import std;
+#include <cstdint>
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
 namespace cyy::naive_lib::io {
 
   std::optional<std::vector<std::byte>>

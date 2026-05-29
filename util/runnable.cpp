@@ -10,7 +10,9 @@
 #include "log/log.hpp"
 #include "runnable.hpp"
 
-import std;
+#include <stdexcept>
+#include <string>
+
 namespace cyy::naive_lib {
   void runnable::start(std::string_view name) {
     std::lock_guard const lock(sync_mutex);
