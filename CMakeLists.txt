@@ -7,7 +7,11 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(CyyNaiveLib LANGUAGES CXX C)
 
-set(submodule_names log util)
+set(submodule_names log util hardware task)
+if(NOT WIN32)
+  # process is POSIX-only (fork/pipe2/signalfd); it does not build on Windows
+  list(APPEND submodule_names process)
+endif()
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_CV "Build opencv module" OFF)
@@ -54,11 +58,16 @@ foreach(submodule_name IN LISTS submodule_names)
   list(APPEND submodule_libs ${lib_name})
 
   if(NOT BUILD_OBJECT_LIB)
-    install(
-      TARGETS ${lib_name}
-      EXPORT CyyNaiveLibConfig
-      FILE_SET public_headers
-      DESTINATION include/cyy/naive_lib/)
+    get_target_property(header_sets ${lib_name} HEADER_SETS)
+    if("public_headers" IN_LIST header_sets)
+      install(
+        TARGETS ${lib_name}
+        EXPORT CyyNaiveLibConfig
+        FILE_SET public_headers
+        DESTINATION include/cyy/naive_lib/)
+    else()
+      install(TARGETS ${lib_name} EXPORT CyyNaiveLibConfig)
+    endif()
   endif()
 endforeach()
 
