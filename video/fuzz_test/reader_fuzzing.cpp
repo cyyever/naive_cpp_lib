@@ -16,9 +16,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     cyy::naive_lib::video::ffmpeg_reader reader;
     std::ofstream of("test.mp4", std::ios::binary | std::ios::trunc);
     of.write(reinterpret_cast<const char *>(Data), Size);
-    reader.open("test.mp4");
-    reader.get_frame_rate();
-    reader.next_frame();
+    // fuzzing only exercises the code paths; return values are intentionally
+    // ignored
+    static_cast<void>(reader.open("test.mp4"));
+    static_cast<void>(reader.get_frame_rate());
+    static_cast<void>(reader.next_frame());
   } catch (...) {
   }
   return 0; // Non-zero return values are reserved for future use.

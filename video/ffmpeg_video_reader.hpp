@@ -27,22 +27,23 @@ namespace cyy::naive_lib::video {
     //! \brief 打开视频
     //! \param url 视频地址，如果是本地文件，使用file://协议
     //! \note 先关闭之前打开的视频再打开此url对应的视频
-    bool open(const std::string &url) override;
+    [[nodiscard]] bool open(const std::string &url) override;
 
     //! \brief 关闭已经打开的视频，如果之前没调用过open，调用该函数无效果
     void close() noexcept override;
 
     //! \brief 获取視頻寬
-    std::optional<int> get_video_width() const;
+    [[nodiscard]] std::optional<int> get_video_width() const;
     //! \brief 获取視頻高
-    std::optional<int> get_video_height() const;
+    [[nodiscard]] std::optional<int> get_video_height() const;
 
     //! 設置播放的幀率，用於控制next_frame的速度
     void set_play_frame_rate(const std::array<size_t, 2> &frame_rate);
 
     //! \brief 获取视频帧率
     //! \note 如果无法获取视频帧率，則返回空
-    std::optional<std::array<size_t, 2>> get_frame_rate() override;
+    [[nodiscard]] std::optional<std::array<size_t, 2>>
+    get_frame_rate() override;
 
     void add_named_filter(std::string name, std::function<bool(size_t)> filter);
 
@@ -55,10 +56,10 @@ namespace cyy::naive_lib::video {
     //	      first=0 EOF
     //	      first<0 失敗
     //	如果first<=0，返回空内容
-    std::pair<int, frame> next_frame() override;
+    [[nodiscard]] std::pair<int, frame> next_frame() override;
 
     //! \brief jump to a frame
-    bool seek_frame(size_t frame_seq) override;
+    [[nodiscard]] bool seek_frame(size_t frame_seq) override;
 
   private:
     std::unique_ptr<ffmpeg_reader_impl<true>> pimpl;

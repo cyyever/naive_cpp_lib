@@ -31,15 +31,16 @@ namespace cyy::naive_lib::video {
     //! \param url 视频地址
     //! \note 如果是指定本地文件，则加上file://
     //! \note 先关闭之前打开的视频再打开此视频
-    virtual bool open(const std::string &url, const std::string &format_name,
-                      int video_width, int video_height,
-                      std::optional<std::pair<int, int>> frame_rate = {}) = 0;
+    [[nodiscard]] virtual bool
+    open(const std::string &url, const std::string &format_name,
+         int video_width, int video_height,
+         std::optional<std::pair<int, int>> frame_rate = {}) = 0;
 
     //! \brief 寫入一幀
-    virtual bool write_frame(const cv::Mat &mat) = 0;
+    [[nodiscard]] virtual bool write_frame(const cv::Mat &mat) = 0;
 
     //! \brief 關閉视频
     virtual void close() noexcept = 0;
-    virtual const std::string &get_url() const = 0;
+    [[nodiscard]] virtual const std::string &get_url() const = 0;
   };
 } // namespace cyy::naive_lib::video

@@ -10,6 +10,8 @@
 #include <cuda_runtime.h>
 #endif
 
+#include <format>
+
 #include "hardware.hpp"
 #include "log/log.hpp"
 
@@ -53,9 +55,9 @@ namespace cyy::naive_lib::hardware {
     int device = 0;
     auto error = cudaGetDevice(&device);
     if (error != cudaSuccess) {
-      throw std::runtime_error(std::string("cudaGetDevice failed: ") +
-                               std::to_string(error) + " " +
-                               cudaGetErrorString(error));
+      throw std::runtime_error(std::format("cudaGetDevice failed: {} {}",
+                                           static_cast<int>(error),
+                                           cudaGetErrorString(error)));
     }
     return device;
   }

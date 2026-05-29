@@ -16,9 +16,9 @@ namespace cyy::naive_lib::video {
     ffmpeg_base();
     virtual ~ffmpeg_base() { ffmpeg_base::close(); }
 
-    bool has_open() const { return opened; }
-    bool is_live_stream() const { return url_scheme == "rtsp"; }
-    const std::string &get_url() const { return url; }
+    [[nodiscard]] bool has_open() const { return opened; }
+    [[nodiscard]] bool is_live_stream() const { return url_scheme == "rtsp"; }
+    [[nodiscard]] const std::string &get_url() const { return url; }
 
   protected:
     //! \brief 打开视频

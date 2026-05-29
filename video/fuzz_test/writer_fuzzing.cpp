@@ -20,8 +20,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     cyy::naive_lib::video::ffmpeg_writer writer;
-    writer.open("test.flv", "flv", 320, 240);
-    writer.write_frame(mat_opt->get_cv_mat());
+    // fuzzing only exercises the code paths; return values are intentionally
+    // ignored
+    static_cast<void>(writer.open("test.flv", "flv", 320, 240));
+    static_cast<void>(writer.write_frame(mat_opt->get_cv_mat()));
   } catch (...) {
   }
   return 0; // Non-zero return values are reserved for future use.

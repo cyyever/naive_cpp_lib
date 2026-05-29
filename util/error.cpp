@@ -6,6 +6,7 @@
  * \date 2017-01-17
  */
 
+#include <format>
 #include <mutex>
 #include <system_error>
 
@@ -22,7 +23,7 @@ namespace cyy::naive_lib::util {
 
     auto msg = std::system_category().default_error_condition(errno_).message();
     if (msg.empty()) {
-      return std::string("Unknown error ") + std::to_string(errno_);
+      return std::format("Unknown error {}", errno_);
     }
     return msg;
   }
@@ -37,12 +38,12 @@ namespace cyy::naive_lib::util {
     if (!FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, winapi_errno, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-            (LPTSTR)&lpMsgBuf, 0, NULL)) {
+            nullptr, winapi_errno, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+            reinterpret_cast<LPTSTR>(&lpMsgBuf), 0, nullptr)) {
       return {};
     }
 
-    std::string msg((char *)lpMsgBuf);
+    std::string msg(static_cast<char *>(lpMsgBuf));
     LocalFree(lpMsgBuf);
     return msg;
   }
