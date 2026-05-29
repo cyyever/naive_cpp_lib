@@ -9,7 +9,10 @@
 #pragma once
 
 #include <cstddef>
-import std;
+#include <filesystem>
+#include <optional>
+#include <utility>
+#include <vector>
 
 namespace cyy::naive_lib::io {
 

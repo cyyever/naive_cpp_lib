@@ -7,8 +7,15 @@
 
 #pragma once
 
+#include <filesystem>
+#include <format>
+#include <memory>
+#include <source_location>
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include <spdlog/spdlog.h>
-import std;
 
 namespace cyy::naive_lib::log {
 
