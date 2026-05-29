@@ -19,25 +19,18 @@ namespace cyy::naive_lib {
     if (thd.joinable()) {
       throw std::runtime_error("thread is running");
     }
+    // Own the stop source so the worker never has to publish the jthread's
+    // stop_token back into this object across threads.
+    stop_source = std::stop_source();
     try {
       thd = std::jthread(
-          [this](const std::stop_token &st,
+          [this]([[maybe_unused]] const std::stop_token &st,
                  [[maybe_unused]] const std::string &name_) {
             try {
-              {
-                while (true) {
-                  if (this->sync_mutex.try_lock()) {
-                    this->stop_token_opt = st;
-                    this->sync_mutex.unlock();
-                    break;
-                  }
-                  std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                }
-              }
               if (!name_.empty()) {
                 cyy::naive_lib::log::set_thread_name(name_);
               }
-              run(st);
+              run(stop_source.get_token());
             } catch (const std::exception &e) {
               if (exception_callback) {
                 exception_callback(e);
