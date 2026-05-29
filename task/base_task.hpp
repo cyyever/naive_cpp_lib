@@ -8,8 +8,11 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <future>
+#include <mutex>
 #include <optional>
 
 namespace cyy::naive_lib::task {
@@ -24,23 +27,40 @@ namespace cyy::naive_lib::task {
     //! \brief 处理任务
     //! \param timeout 该线程等待超时时间
     bool wait_done(const std::chrono::milliseconds &timeout) {
+      // 快速路徑：已經結束的任务無需加鎖
+      if (auto s = status.load(std::memory_order_acquire);
+          s != task_status::unprocessed) {
+        return s == task_status::processed;
+      }
+      // std::future 不支持并发访问，用互斥量串行化等待者
       std::lock_guard lk(sync_mu);
-      if (status != task_status::unprocessed) {
-        return status == task_status::processed;
+      if (auto s = status.load(std::memory_order_relaxed);
+          s != task_status::unprocessed) {
+        return s == task_status::processed;
       }
-      auto res = _wait_done(timeout);
-      if (res) {
-        status = task_status::processed;
+      if (!_wait_done(timeout)) {
+        return false;
       }
-      return res;
+      // 只在仍未處理時轉為 processed，避免覆蓋并发的 mark_invalid
+      auto expected = task_status::unprocessed;
+      status.compare_exchange_strong(expected, task_status::processed,
+                                     std::memory_order_acq_rel);
+      return status.load(std::memory_order_relaxed) == task_status::processed;
     }
 
-    void mark_invalid() {
-      std::lock_guard lk(sync_mu);
-      status = task_status::invalid;
+    //! \brief 標記任务作廢，無鎖；已處理的任务不會被改寫
+    void mark_invalid() noexcept {
+      auto expected = task_status::unprocessed;
+      status.compare_exchange_strong(expected, task_status::invalid,
+                                     std::memory_order_acq_rel);
     }
-    bool is_invalid() const { return status == task_status::invalid; }
-    bool can_process() const { return status == task_status::unprocessed; }
+    [[nodiscard]] bool is_invalid() const noexcept {
+      return status.load(std::memory_order_acquire) == task_status::invalid;
+    }
+    [[nodiscard]] bool can_process() const noexcept {
+      return status.load(std::memory_order_acquire) ==
+             task_status::unprocessed;
+    }
 
   protected:
     virtual bool _wait_done(const std::chrono::milliseconds &timeout) = 0;
@@ -49,6 +69,7 @@ namespace cyy::naive_lib::task {
     //! \brief 任务状态
     enum class task_status : uint8_t { unprocessed, invalid, processed };
     std::atomic<task_status> status{task_status::unprocessed};
+    //! \brief 僅用於串行化 _wait_done 對 std::future 的訪問
     std::mutex sync_mu;
   };
 

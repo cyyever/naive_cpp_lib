@@ -10,17 +10,6 @@
 #include <spdlog/spdlog.h>
 import std;
 
-template <std::size_t N> struct Str {
-  std::array<char, N> chars;
-};
-template <std::size_t N> Str(const char (&)[N]) -> Str<N>; // deduction guide
-template <std::size_t M, std::size_t N>
-consteval std::array<char, M + N + 1> concat(Str<M> a, Str<N> b) {
-  std::array<char, M + N + 1> result{};
-  std::ranges::copy(a.chars, result.begin());
-  std::ranges::copy(b.chars, result.begin() + M);
-  return result;
-}
 namespace cyy::naive_lib::log {
 
 #if defined(_WIN32)
@@ -35,26 +24,26 @@ namespace cyy::naive_lib::log {
                          const std::string &name,
                          ::spdlog::level::level_enum min_level);
 
-  template <auto fmt_string, typename... Args>
+  template <typename... Args>
   void log_message(const std::source_location &location,
-                   spdlog::level::level_enum level, Args... args) {
-    static_assert(concat(Str{"[{}:{}] "}, fmt_string).data());
-    static constexpr auto fmt_str = concat(Str{"[{}:{}] "}, fmt_string);
-    auto msg = std::format(
-        fmt_str.data(),
+                   spdlog::level::level_enum level,
+                   std::format_string<Args...> fmt_string, Args &&...args) {
+    auto message = std::format(
+        "[{}:{}] {}",
         std::filesystem::path(location.file_name()).filename().string(),
-        location.line(), args...);
+        location.line(),
+        std::format(fmt_string, std::forward<Args>(args)...));
 
     spdlog::apply_all([&](const std::shared_ptr<spdlog::logger> &logger) {
-      logger->log(level, "{}", msg);
+      logger->log(level, "{}", message);
     });
   }
 
 } // namespace cyy::naive_lib::log
 
-#define LOG_IMPL(log_level, fmt_str, ...)                                      \
-  cyy::naive_lib::log::log_message<Str{fmt_str}>(                              \
-      std::source_location::current(), log_level __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_IMPL(log_level, ...)                                               \
+  cyy::naive_lib::log::log_message(std::source_location::current(),            \
+                                   log_level __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_DEBUG(...) LOG_IMPL(spdlog::level::level_enum::debug, __VA_ARGS__)
 #define LOG_INFO(...) LOG_IMPL(spdlog::level::level_enum::info, __VA_ARGS__)
 #define LOG_WARN(...) LOG_IMPL(spdlog::level::level_enum::warn, __VA_ARGS__)

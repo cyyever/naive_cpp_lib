@@ -1,6 +1,6 @@
 find_package(doctest REQUIRED)
 
-set(test_progs queue_scheduler_test)
+set(test_progs base_task_test queue_scheduler_test)
 
 foreach(test_prog ${test_progs})
   add_executable(${test_prog} ${CMAKE_CURRENT_LIST_DIR}/${test_prog}.cpp)
