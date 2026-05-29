@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 4.1.0)
 
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
+set(CMAKE_EXPERIMENTAL_EXPORT_PACKAGE_DEPENDENCIES
+    "1942b4fa-b2c5-4546-9385-83f254070067")
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_MODULE_STD 1)
 set(CMAKE_CXX_STANDARD 23)
@@ -74,5 +76,9 @@ if(NOT BUILD_OBJECT_LIB)
   install(
     EXPORT CyyNaiveLibConfig
     DESTINATION lib/cmake/${PROJECT_NAME}
-    NAMESPACE CyyNaiveLib::)
+    NAMESPACE CyyNaiveLib::
+    # Emit find_dependency(spdlog REQUIRED) into the generated config so every
+    # consumer of this package resolves spdlog (a PUBLIC dependency of the log
+    # module) via find_package.
+    EXPORT_PACKAGE_DEPENDENCIES)
 endif()
