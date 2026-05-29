@@ -25,7 +25,7 @@ TEST_CASE("set logger level") {
   LOG_ERROR("an error");
 }
 
-TEST_CASE("check format string") { LOG_ERROR("{} {}"); }
+TEST_CASE("check format string") { LOG_ERROR("{} {}", 1, 2); }
 
 TEST_CASE("file logger") {
   cyy::naive_lib::log::setup_file_logger(".", "file_logger",
