@@ -5,8 +5,8 @@ add_library(CyyNaiveLib::video ALIAS cyy_naive_lib_video)
 
 # dependency
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::log)
-target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::cv)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyNaiveLib::util)
+# cv is PUBLIC because cv::Mat appears in video's public headers
 find_package(CyyAlgorithmLib REQUIRED)
 target_link_libraries(cyy_naive_lib_video PRIVATE CyyAlgorithmLib)
 
@@ -21,7 +21,6 @@ target_link_libraries(
   PRIVATE PkgConfig::libavcodec PkgConfig::libavutil PkgConfig::libavformat
          PkgConfig::libswscale PkgConfig::libavdevice)
 
-find_package(OpenCV REQUIRED COMPONENTS core)
 target_link_libraries(cyy_naive_lib_video PUBLIC CyyNaiveLib::cv)
 
 add_subdirectory(test)
