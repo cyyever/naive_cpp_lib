@@ -8,6 +8,7 @@ foreach(test_prog audio_reader_test)
   target_compile_definitions(${test_prog}
                              PRIVATE IN_AUDIO=${TEST_AUDIO_DIR}/1.pcm_mulaw)
   target_compile_definitions(${test_prog}
-                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+                                     DOCTEST_CONFIG_USE_STD_HEADERS)
   add_test_with_runtime_analysis(TARGET ${test_prog})
 endforeach()

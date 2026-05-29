@@ -10,7 +10,8 @@ foreach(test_prog ${test_progs})
   target_link_libraries(${test_prog} PRIVATE CyyNaiveLib::cv)
   target_link_libraries(${test_prog} PRIVATE doctest::doctest)
   target_compile_definitions(${test_prog}
-                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+                                     DOCTEST_CONFIG_USE_STD_HEADERS)
   target_compile_definitions(${test_prog}
                              PRIVATE IN_IMAGE=${TEST_IMAGE_DIR}/1.jpg)
   target_compile_definitions(${test_prog}

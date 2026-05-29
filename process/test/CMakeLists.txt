@@ -8,6 +8,7 @@ foreach(test_prog ${test_progs})
   target_link_libraries(${test_prog} PRIVATE CyyNaiveLib::log)
   target_link_libraries(${test_prog} PRIVATE doctest::doctest)
   target_compile_definitions(${test_prog}
-                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+                                     DOCTEST_CONFIG_USE_STD_HEADERS)
   add_test_with_runtime_analysis(TARGET ${test_prog})
 endforeach()

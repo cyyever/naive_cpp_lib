@@ -15,7 +15,8 @@ foreach(test_source IN LISTS test_sources)
                              PRIVATE IN_IMAGE=${TEST_IMAGE_DIR}/1.jpg)
 
   target_compile_definitions(${test_prog}
-                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+                                     DOCTEST_CONFIG_USE_STD_HEADERS)
 
   if("HAVE_GPU_MAT" IN_LIST def_list)
     target_compile_definitions(${test_prog} PRIVATE USE_GPU)

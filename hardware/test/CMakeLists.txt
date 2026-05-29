@@ -7,7 +7,8 @@ foreach(test_source IN LISTS test_sources)
   target_link_libraries(${test_prog} PRIVATE CyyNaiveLib::hardware)
   target_link_libraries(${test_prog} PRIVATE doctest::doctest)
   target_compile_definitions(${test_prog}
-                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+                             PRIVATE DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+                                     DOCTEST_CONFIG_USE_STD_HEADERS)
 
   if(test_prog STREQUAL cuda_test)
     add_test_with_runtime_analysis(TARGET ${test_prog} ASAN FALSE)
