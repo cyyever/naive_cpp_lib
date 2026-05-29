@@ -7,11 +7,10 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(CyyNaiveLib LANGUAGES CXX C)
 
-set(submodule_names log util hardware task)
-if(NOT WIN32)
-  # process is POSIX-only (fork/pipe2/signalfd); it does not build on Windows
-  list(APPEND submodule_names process)
-endif()
+set(submodule_names log util hardware)
+# list(APPEND submodule_names task) if(NOT WIN32) # process is POSIX-only
+# (fork/pipe2/signalfd); it does not build on Windows list(APPEND
+# submodule_names process) endif()
 option(BUILD_OBJECT_LIB "Build CMake object libraries" OFF)
 option(BUILD_ALL "Build all modules" OFF)
 option(BUILD_CV "Build opencv module" OFF)
