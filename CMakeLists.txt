@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(CyyNaiveLib LANGUAGES CXX C)
 
-set(submodule_names log util hardware)
+set(submodule_names log util)
 # list(APPEND submodule_names task) if(NOT WIN32) # process is POSIX-only
 # (fork/pipe2/signalfd); it does not build on Windows list(APPEND
 # submodule_names process) endif()
