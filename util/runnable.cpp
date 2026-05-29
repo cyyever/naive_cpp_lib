@@ -5,7 +5,6 @@
  * \author cyy
  */
 
-#include <spdlog/spdlog.h>
 #include "error.hpp"
 #include "log/log.hpp"
 #include "runnable.hpp"
@@ -22,6 +21,7 @@ namespace cyy::naive_lib {
     // Own the stop source so the worker never has to publish the jthread's
     // stop_token back into this object across threads.
     stop_source = std::stop_source();
+    finished = false;
     try {
       thd = std::jthread(
           [this]([[maybe_unused]] const std::stop_token &st,
@@ -37,10 +37,17 @@ namespace cyy::naive_lib {
               }
               LOG_ERROR("catch thread exception:{}", e.what());
             }
+            // Publish completion under the lock so wait_stop() cannot miss it.
+            {
+              std::lock_guard const done_lock(sync_mutex);
+              finished = true;
+            }
             stop_cv.notify_all();
           },
           std::string(name));
     } catch (const std::exception &e) {
+      // The worker was never created, so mark completion here.
+      finished = true;
       stop_cv.notify_all();
       if (exception_callback) {
         exception_callback(e);
